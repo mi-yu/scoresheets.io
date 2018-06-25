@@ -38,7 +38,7 @@ jobs:
 
   deploy:
     docker:
-      - image: circle/python:2.7
+      - image: circleci/python:2.7
     working_directory: ~/repo
     steps:
       - run:
