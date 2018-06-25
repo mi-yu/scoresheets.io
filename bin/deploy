@@ -1,0 +1,17 @@
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [[ "$BRANCH" != "x" ]]; then
+    echo 'Current branch is not master';
+    exit 1;
+fi
+sudo apt-get update && sudo apt-get install -y python-dev
+sudo curl -O https://bootstrap.pypa.io/get-pip.py
+sudo python get-pip.py
+
+echo 'Installing AWS CLI...\n\n\n"
+
+sudo pip install awscli --upgrade
+aws --version
+aws s3 ls
+
+echo 'Deploying... \n\n\n"
+yarn run deploy
