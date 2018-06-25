@@ -4,7 +4,7 @@
 #
 version: 2
 jobs:
-  build:
+  test:
     docker:
       # specify the version you desire here
       - image: circleci/node:7.10
@@ -35,13 +35,28 @@ jobs:
         
       # run tests!
       # - run: yarn test
+
+  deploy:
+    docker:
+      - image: circle/python:2.7
+    working_directory: ~/repo
+    steps:
       - run:
           name: Install AWS CLI
           command: |
-            sudo apt-get update && sudo apt-get install -y python-dev
-            sudo curl -O https://bootstrap.pypa.io/get-pip.py
-            sudo python get-pip.py
-            sudo pip install awscli --upgrade
+            sudo pip install awscli
             aws --version
             aws s3 ls
             yarn run deploy 
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - test
+      - deploy:
+          requires:
+            - test
+          filters:
+            branches:
+              only: master
