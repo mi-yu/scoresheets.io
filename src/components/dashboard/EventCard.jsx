@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { Card, Label, Button, Grid } from 'semantic-ui-react'
 
 const EventCard = ({ _id, name, category, stateEvent, impound, division, setCurrentEvent }) => {
+	console.log(division)
 	let color = ''
 	switch (category) {
 		case 'bio':
@@ -34,7 +35,8 @@ const EventCard = ({ _id, name, category, stateEvent, impound, division, setCurr
 						<Label size="tiny" color={color}>
 							{category}
 						</Label>
-						{division.split('').map(div => <Label size="tiny">{div}</Label>)}
+						{division &&
+							division.split('').map(div => <Label size="tiny">{div}</Label>)}
 						{stateEvent && <Label size="tiny">trial</Label>}
 						{impound && <Label size="tiny">impound</Label>}
 					</Card.Description>

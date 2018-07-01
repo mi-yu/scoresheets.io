@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import createTheme from 'spectacle/lib/themes/default'
 import { Deck, Heading, Slide, Text, Appear } from 'spectacle'
 import Auth from '../modules/Auth'
+import { API_ROOT } from '../config'
 
 const theme = createTheme(
 	{
@@ -43,7 +44,7 @@ export default class Slideshow extends React.Component {
 		const { setMessage } = this.props
 		const token = Auth.getToken()
 
-		fetch(`/tournaments/${id}/slideshow`, {
+		fetch(`${API_ROOT}/tournaments/${id}/slideshow`, {
 			method: 'GET',
 			headers: new Headers({
 				Authorization: `Bearer ${token}`,

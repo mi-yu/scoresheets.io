@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { Icon, Table, Header } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import Auth from '../modules/Auth'
+import { API_ROOT } from '../config'
 
 export default class ResultsPage extends React.Component {
 	constructor(props) {
@@ -18,7 +19,7 @@ export default class ResultsPage extends React.Component {
 		const { tournament, division } = this.state
 		const token = Auth.getToken()
 
-		fetch(`/tournaments/${tournament._id}/${division}/results`, {
+		fetch(`${API_ROOT}/tournaments/${tournament._id}/${division}/results`, {
 			method: 'GET',
 			headers: new Headers({
 				Authorization: `Bearer ${token}`,

@@ -7,6 +7,7 @@ import EventCard from '../components/dashboard/EventCard'
 import TournamentCard from '../components/dashboard/TournamentCard'
 import EventsModal from '../components/events/EventsModal'
 import TournamentsModal from '../components/tournaments/TournamentsModal'
+import { API_ROOT } from '../config'
 
 export default class DashboardPage extends React.Component {
 	constructor(props) {
@@ -15,7 +16,6 @@ export default class DashboardPage extends React.Component {
 		this.state = {
 			tournaments: [],
 			events: [],
-			redirectToLogin: false,
 			eventsModalOpen: false,
 			tournamentsModalOpen: false,
 			editingEvent: false,
@@ -27,33 +27,21 @@ export default class DashboardPage extends React.Component {
 	}
 
 	componentDidMount() {
-		const { tournaments, events } = this.state
-
-		if (tournaments.length === 0 || events.length === 0) {
-			const token = Auth.getToken()
-			fetch('/admin/dashboard', {
-				method: 'GET',
-				headers: new Headers({
+		const token = Auth.getToken()
+		const requests = [`${API_ROOT}/tournaments`, `${API_ROOT}/events`].map(url =>
+			fetch(url, {
+				headers: {
 					Authorization: `Bearer ${token}`,
-				}),
+				},
+			}).then(res => res.json()),
+		)
+
+		Promise.all(requests).then(([tournaments, events]) => {
+			this.setState({
+				tournaments: tournaments,
+				events: events,
 			})
-				.then(data => {
-					if (data.ok) return data.json()
-					throw new Error()
-				})
-				.then(res => {
-					this.setState({
-						tournaments: res.tournaments,
-						events: res.events,
-					})
-				})
-				.catch(err => {
-					console.log(err)
-					this.setState({
-						redirectToLogin: true,
-					})
-				})
-		}
+		})
 	}
 
 	setCurrentEvent = (e, id) => {
@@ -123,7 +111,6 @@ export default class DashboardPage extends React.Component {
 		const {
 			tournaments,
 			events,
-			redirectToLogin,
 			currentEvent,
 			eventsModalOpen,
 			tournamentsModalOpen,
@@ -132,12 +119,15 @@ export default class DashboardPage extends React.Component {
 			currentTournament,
 			setMessage,
 		} = this.state
-
-		if (redirectToLogin) return <Redirect to="/users/login" />
-		else if (tournaments === null || events.length === 0) return null
+		console.log(events)
+		if (!tournaments || events.length === 0) {
+			console.log('no data')
+			return null
+		}
 
 		return (
 			<div>
+				<Header>{events[2].division}</Header>
 				<Header as="h1">Tournaments</Header>
 				<TournamentsModal
 					currentTournament={{ ...currentTournament }}

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { Header, Button, Table, Form, Icon } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import Auth from '../modules/Auth'
+import { API_ROOT } from '../config'
 
 const tierOptions = [...Array(5)].map((n, i) => ({ value: i + 1, text: String(i + 1) }))
 
@@ -19,7 +20,7 @@ export default class ScoreEntryPage extends React.Component {
 		const { tournamentId, eventId, division } = this.props.match.params
 		const token = Auth.getToken()
 
-		fetch(`/scoresheets/${tournamentId}/scores/${division}/${eventId}`, {
+		fetch(`${API_ROOT}/scoresheets/${tournamentId}/scores/${division}/${eventId}`, {
 			method: 'GET',
 			headers: new Headers({
 				Authorization: `Bearer ${token}`,
@@ -64,7 +65,7 @@ export default class ScoreEntryPage extends React.Component {
 
 	submitScores = () => {
 		const { scoresheetEntry, setMessage } = this.state
-		const url = `/scoresheets/${scoresheetEntry._id}/update`
+		const url = `${API_ROOT}/scoresheets/${scoresheetEntry._id}/update`
 		const eventName = scoresheetEntry.event.name
 		const token = Auth.getToken()
 		const payload = JSON.stringify({

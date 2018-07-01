@@ -6,6 +6,7 @@ import Auth from '../modules/Auth'
 import TournamentEventCard from '../components/tournaments/TournamentEventCard'
 import TeamCard from '../components/tournaments/TeamCard'
 import TeamsModal from '../components/tournaments/TeamsModal'
+import { API_ROOT } from '../config'
 
 const awardsOptions = [
 	{
@@ -44,7 +45,7 @@ export default class TournamentManagementPage extends React.Component {
 		const { id } = this.props.match.params
 		const token = Auth.getToken()
 
-		fetch(`/tournaments/${id}/allData`, {
+		fetch(`${API_ROOT}/tournaments/${id}/allData`, {
 			method: 'GET',
 			headers: new Headers({
 				Authorization: `Bearer ${token}`,
