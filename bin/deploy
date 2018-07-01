@@ -2,8 +2,8 @@
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 if [[ "$BRANCH" != "master" ]]; then
-    echo "Current branch is not master";
-    exit 1;
+    echo "Current branch is not master, did not deploy to S3";
+    exit 0;
 fi
 sudo apt-get update && sudo apt-get install -y python-dev
 sudo curl -O https://bootstrap.pypa.io/get-pip.py
