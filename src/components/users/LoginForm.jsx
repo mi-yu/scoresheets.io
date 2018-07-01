@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { Form, Message } from 'semantic-ui-react'
 import { Redirect } from 'react-router-dom'
 import Auth from '../../modules/Auth'
+import { API_ROOT } from '../../config'
 
 class LoginForm extends React.Component {
 	constructor(props) {
@@ -30,7 +31,7 @@ class LoginForm extends React.Component {
 			password,
 		}
 
-		fetch('/users/login', {
+		fetch(`${API_ROOT}/users/login`, {
 			method: 'POST',
 			headers: new Headers({
 				'Content-Type': 'application/json',

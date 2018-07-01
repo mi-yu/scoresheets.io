@@ -4,6 +4,7 @@ import { Button, Modal, Form, Dropdown, Icon } from 'semantic-ui-react'
 import OpenModalButton from '../modals/OpenModalButton'
 import Auth from '../../modules/Auth'
 import states from './StatesList'
+import { API_ROOT } from '../../config'
 
 class TournamentsModal extends React.Component {
 	constructor(props) {
@@ -57,8 +58,8 @@ class TournamentsModal extends React.Component {
 	handleSubmitEvent = () => {
 		const { editingTournament, currentTournament, updateTournament, setMessage } = this.state
 		const url = editingTournament
-			? `/tournaments/${currentTournament._id}/edit`
-			: '/tournaments/new'
+			? `${API_ROOT}/tournaments/${currentTournament._id}/edit`
+			: `${API_ROOT}/tournaments/new`
 		const token = Auth.getToken()
 
 		fetch(url, {

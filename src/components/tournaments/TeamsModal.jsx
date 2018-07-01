@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { Button, Modal, Form } from 'semantic-ui-react'
 import OpenModalButton from '../modals/OpenModalButton'
 import Auth from '../../modules/Auth'
+import { API_ROOT } from '../../config'
 
 export default class TeamsModal extends React.Component {
 	constructor(props) {
@@ -50,8 +51,8 @@ export default class TeamsModal extends React.Component {
 		const teamId = currentTeam._id
 		const teamDiv = currentTeam.division
 		const url = editingTeam
-			? `/tournaments/${tournamentId}/edit/${teamDiv}/${teamId}`
-			: `/tournaments/${tournamentId}/edit/addTeam`
+			? `${API_ROOT}/tournaments/${tournamentId}/edit/${teamDiv}/${teamId}`
+			: `${API_ROOT}/tournaments/${tournamentId}/edit/addTeam`
 		const token = Auth.getToken()
 
 		fetch(url, {

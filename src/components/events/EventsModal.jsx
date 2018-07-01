@@ -4,6 +4,7 @@ import { Button, Modal, Form, Dropdown } from 'semantic-ui-react'
 import OpenModalButton from '../modals/OpenModalButton'
 import options from './EventsOptions'
 import Auth from '../../modules/Auth'
+import { API_ROOT } from '../../config'
 
 class EventsModal extends React.Component {
 	constructor(props) {
@@ -57,7 +58,7 @@ class EventsModal extends React.Component {
 
 	handleSubmitEvent = () => {
 		const { editingEvent, currentEvent, updateEvent, setMessage } = this.state
-		const url = editingEvent ? `/events/${currentEvent._id}/edit` : '/events/new'
+		const url = editingEvent ? `${API_ROOT}/events/${currentEvent._id}/edit` : '/events/new'
 		const token = Auth.getToken()
 
 		fetch(url, {

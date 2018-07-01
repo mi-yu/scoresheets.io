@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { Form, Button, Icon, Table, Header } from 'semantic-ui-react'
 import { Redirect, Link } from 'react-router-dom'
 import Auth from '../modules/Auth'
+import { API_ROOT } from '../config'
 
 const divisionOptions = [
 	{
@@ -78,7 +79,7 @@ export default class BulkAddTeamsPage extends React.Component {
 
 	handleSubmit = () => {
 		const { tournament, setMessage, formData } = this.state
-		const url = `/tournaments/${tournament._id}/edit/bulkAddTeams`
+		const url = `${API_ROOT}/tournaments/${tournament._id}/edit/bulkAddTeams`
 		const token = Auth.getToken()
 
 		fetch(url, {

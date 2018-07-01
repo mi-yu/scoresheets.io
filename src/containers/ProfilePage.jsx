@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Redirect } from 'react-router-dom'
 import Auth from '../modules/Auth'
+import { API_ROOT } from '../config'
 
 class ProfilePage extends React.Component {
 	constructor(props) {
@@ -15,7 +16,7 @@ class ProfilePage extends React.Component {
 	componentDidMount() {
 		if (Object.keys(this.props.user).length === 0) {
 			const token = Auth.getToken()
-			fetch('/users/me', {
+			fetch(`${API_ROOT}/users/me`, {
 				method: 'GET',
 				headers: new Headers({
 					Authorization: `Bearer ${token}`,
