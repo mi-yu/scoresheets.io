@@ -119,7 +119,6 @@ export default class DashboardPage extends React.Component {
 			currentTournament,
 			setMessage,
 		} = this.state
-		console.log(events)
 		if (!tournaments || events.length === 0) {
 			console.log('no data')
 			return null
@@ -127,7 +126,6 @@ export default class DashboardPage extends React.Component {
 
 		return (
 			<div>
-				<Header>{events[2].division}</Header>
 				<Header as="h1">Tournaments</Header>
 				<TournamentsModal
 					currentTournament={{ ...currentTournament }}

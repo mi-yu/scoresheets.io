@@ -2,19 +2,20 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Menu, Item, Container } from 'semantic-ui-react'
 import { Link, Redirect } from 'react-router-dom'
+import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
+import { setUser } from '../actions/userActions'
 
 const activeStyle = {
 	borderBottom: '1px solid black',
 	color: 'black',
 }
 
-export default class Nav extends Component {
+class Nav extends Component {
 	constructor(props) {
 		super(props)
-		const url = window.location.pathname.split('/')
 		this.state = {
-			activeItem: url[url.length - 1],
+			activeItem: window.location.pathname,
 		}
 	}
 
@@ -44,7 +45,9 @@ export default class Nav extends Component {
 					<Item
 						name="Scribe"
 						onClick={this.handleClick}
-						style={activeItem === 'scribe' || activeItem === '' ? activeStyle : {}}
+						style={
+							activeItem.includes('scribe') || activeItem === '' ? activeStyle : {}
+						}
 					>
 						<Link to="/">Scribe</Link>
 					</Item>
@@ -53,21 +56,21 @@ export default class Nav extends Component {
 						<Menu.Menu borderless position="right" color="black">
 							<Item
 								name="Dashboard"
-								style={activeItem === 'dashboard' ? activeStyle : {}}
+								style={activeItem.includes('dashboard') ? activeStyle : {}}
 								onClick={this.handleClick}
 							>
 								<Link to="/admin/dashboard">Dashboard</Link>
 							</Item>
 							<Item
 								name="Profile"
-								style={activeItem === 'profile' ? activeStyle : {}}
+								style={activeItem.includes('profile') ? activeStyle : {}}
 								onClick={this.handleClick}
 							>
-								<Link to="/users/me">Profile</Link>
+								<Link to="/profile">Profile</Link>
 							</Item>
 							<Item
 								name="Logout"
-								style={activeItem === 'logout' ? activeStyle : {}}
+								style={activeItem.includes('logout') ? activeStyle : {}}
 								onClick={this.handleClick}
 							>
 								<Link to="/" onClick={this.handleLogout}>
@@ -79,14 +82,14 @@ export default class Nav extends Component {
 						<Menu.Menu borderless position="right" color="black">
 							<Item
 								name="Login"
-								style={activeItem === 'login' ? activeStyle : {}}
+								style={activeItem.includes('login') ? activeStyle : {}}
 								onClick={this.handleClick}
 							>
 								<Link to="/users/login">Login</Link>
 							</Item>
 							<Item
 								name="Register"
-								style={activeItem === 'register' ? activeStyle : {}}
+								style={activeItem.includes('register') ? activeStyle : {}}
 								onClick={this.handleClick}
 							>
 								<Link to="/users/register">Register</Link>
@@ -102,3 +105,16 @@ export default class Nav extends Component {
 Nav.propTypes = {
 	setUser: PropTypes.func.isRequired,
 }
+
+const mapStateToProps = state => ({
+	...state,
+})
+
+const mapDispatchToProps = dispatch => ({
+	setUser: user => dispatch(setUser(user)),
+})
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(Nav)

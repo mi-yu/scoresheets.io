@@ -2,8 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Form, Message } from 'semantic-ui-react'
 import { Redirect } from 'react-router-dom'
+import { connect } from 'react-redux'
 import Auth from '../../modules/Auth'
 import { API_ROOT } from '../../config'
+import { setUser } from '../../actions/userActions'
 
 class LoginForm extends React.Component {
 	constructor(props) {
@@ -15,8 +17,6 @@ class LoginForm extends React.Component {
 			loginSucess: false,
 			redirect: false,
 		}
-
-		this.setUser = props.setUser.bind(this)
 	}
 
 	handleChange = (e, { name, value }) => this.setState({ [name]: value })
@@ -44,7 +44,7 @@ class LoginForm extends React.Component {
 			})
 			.then(res => {
 				Auth.storeToken(res.token)
-				this.setUser(res.user)
+				this.props.setUser(res.user)
 				this.setState({
 					redirect: true,
 				})
@@ -79,7 +79,7 @@ class LoginForm extends React.Component {
 					<Form.Button content="Submit" color="blue" />
 				</Form>
 				{message && <Message error={!loginSucess} content={message} />}
-				{redirect && <Redirect to="/users/me" />}
+				{redirect && <Redirect to="/profile" />}
 			</div>
 		)
 	}
@@ -89,4 +89,11 @@ LoginForm.propTypes = {
 	setUser: PropTypes.func.isRequired,
 }
 
-export default LoginForm
+const mapDispatchToProps = dispatch => ({
+	setUser: user => dispatch(setUser(user)),
+})
+
+export default connect(
+	null,
+	mapDispatchToProps,
+)(LoginForm)

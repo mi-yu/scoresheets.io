@@ -1,28 +1,26 @@
 import React from 'react'
-import Nav from './Nav'
+import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Route, BrowserRouter as Router } from 'react-router-dom'
 import { Container, Message } from 'semantic-ui-react'
+import Nav from './Nav'
 
 import routes from '../routes'
 
 class Base extends React.Component {
-	state = {
-		user: {},
-		messageVisible: false,
-		message: '',
-		messageStatus: ''
-	}
-
-	setUser = newUser => {
-		this.setState({
-			user: newUser
-		})
+	constructor(props) {
+		super(props)
+		this.state = {
+			user: props.user || {},
+			messageVisible: false,
+			message: '',
+			messageStatus: '',
+		}
 	}
 
 	handleDismissMessage = () => {
 		this.setState({
-			messageVisible: false
+			messageVisible: false,
 		})
 	}
 
@@ -30,19 +28,19 @@ class Base extends React.Component {
 		this.setState({
 			message: msg,
 			messageStatus: status,
-			messageVisible: true
+			messageVisible: true,
 		})
 	}
 
 	render() {
-		const { user, message, messageStatus, messageVisible } = this.state
+		const { message, messageStatus, messageVisible } = this.state
 		const messageColor =
 			messageStatus === 'info' ? 'blue' : messageStatus === 'success' ? 'green' : 'red'
 		return (
 			<div>
 				<Router>
 					<div>
-						<Nav user={user} />
+						<Nav />
 						<Container>
 							{routes.map((route, i) => (
 								<Route
@@ -50,12 +48,7 @@ class Base extends React.Component {
 									key={i}
 									path={route.path}
 									render={props => (
-										<route.component
-											setUser={this.setUser}
-											setMessage={this.setMessage}
-											user={user}
-											{...props}
-										/>
+										<route.component setMessage={this.setMessage} {...props} />
 									)}
 								/>
 							))}
@@ -76,7 +69,14 @@ class Base extends React.Component {
 
 Base.propTypes = {
 	token: PropTypes.string,
-	user: PropTypes.object
+	user: PropTypes.object,
 }
 
-export default Base
+const mapStateToProps = state => ({
+	...state,
+})
+
+export default connect(
+	mapStateToProps,
+	null,
+)(Base)
