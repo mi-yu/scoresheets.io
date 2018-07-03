@@ -1,20 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Redirect } from 'react-router-dom'
+import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
 import { API_ROOT } from '../config'
+import { setUser } from '../actions/userActions'
 
 class ProfilePage extends React.Component {
-	constructor(props) {
-		super(props)
-		this.setUser = props.setUser.bind(this)
-		this.state = {
-			redirectToLogin: false,
-		}
-	}
-
 	componentDidMount() {
-		if (Object.keys(this.props.user).length === 0) {
+		if (!this.props.users.currentUser) {
 			const token = Auth.getToken()
 			fetch(`${API_ROOT}/users/me`, {
 				method: 'GET',
@@ -26,25 +20,25 @@ class ProfilePage extends React.Component {
 					if (data.ok) return data.json()
 					throw new Error()
 				})
-				.then(res => this.setUser(res.user))
+				.then(user => {
+					this.props.setUser(user)
+				})
 				.catch(err => {
 					console.log(err)
-					this.setState({
-						redirectToLogin: true,
-					})
 				})
 		}
 	}
 
 	render() {
-		const { user } = this.props
-
-		if (!user || this.state.redirectToLogin) return <Redirect to="/users/login" />
+		const { users, redirectToLogin } = this.props
+		const user = users.currentUser
+		if (!user) return null
+		if (redirectToLogin) return <Redirect to="/users/login" />
 
 		return (
 			<div>
 				<h1>id: {user._id}</h1>
-				<h1>Name: {user.name}</h1>
+				<h1>Name: {`${user.firstName} ${user.lastName}`}</h1>
 				<h1>Email: {user.email}</h1>
 			</div>
 		)
@@ -52,7 +46,6 @@ class ProfilePage extends React.Component {
 }
 
 ProfilePage.propTypes = {
-	setUser: PropTypes.func.isRequired,
 	user: PropTypes.shape({
 		_id: PropTypes.string.isRequired,
 		name: PropTypes.string.isRequired,
@@ -60,4 +53,15 @@ ProfilePage.propTypes = {
 	}).isRequired,
 }
 
-export default ProfilePage
+const mapStateToProps = state => ({
+	...state,
+})
+
+const mapDispatchToProps = dispatch => ({
+	setUser: user => dispatch(setUser(user)),
+})
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(ProfilePage)
