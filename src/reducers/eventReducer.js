@@ -1,15 +1,23 @@
-export default (state = {}, action) => {
+const defaultState = {
+	modalOpen: false,
+	editing: false,
+	currentEvent: {},
+}
+
+export default (state = defaultState, action) => {
 	switch (action.type) {
 		case 'SET_EVENTS':
 			return {
 				...state,
 				eventList: action.payload,
 			}
-		case 'SET_CURRENT_EVENT':
+		case 'SET_CURRENT_EVENT': {
 			return {
 				...state,
-				currentEvent: action.payload,
+				currentEvent: action.payload || {},
+				editing: action.payload,
 			}
+		}
 		case 'ADD_EVENT':
 			return {
 				...state,
@@ -36,6 +44,16 @@ export default (state = {}, action) => {
 				eventList: updatedList,
 			}
 		}
+		case 'OPEN_EVENTS_MODAL':
+			return {
+				...state,
+				modalOpen: true,
+			}
+		case 'CLOSE_EVENTS_MODAL':
+			return {
+				...state,
+				modalOpen: false,
+			}
 		default:
 			return state
 	}

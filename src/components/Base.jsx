@@ -4,38 +4,18 @@ import PropTypes from 'prop-types'
 import { Route, BrowserRouter as Router } from 'react-router-dom'
 import { Container, Message } from 'semantic-ui-react'
 import Nav from './Nav'
-
 import routes from '../routes'
+import { hideMessage } from '../actions/messageActions'
 
 class Base extends React.Component {
 	constructor(props) {
 		super(props)
-		this.state = {
-			user: props.user || {},
-			messageVisible: false,
-			message: '',
-			messageStatus: '',
-		}
-	}
-
-	handleDismissMessage = () => {
-		this.setState({
-			messageVisible: false,
-		})
-	}
-
-	setMessage = (msg, status) => {
-		this.setState({
-			message: msg,
-			messageStatus: status,
-			messageVisible: true,
-		})
 	}
 
 	render() {
-		const { message, messageStatus, messageVisible } = this.state
+		const { message, messageType, messageVisible, hideMessage } = this.props
 		const messageColor =
-			messageStatus === 'info' ? 'blue' : messageStatus === 'success' ? 'green' : 'red'
+			messageType === 'info' ? 'blue' : messageType === 'success' ? 'green' : 'red'
 		return (
 			<div>
 				<Router>
@@ -47,14 +27,12 @@ class Base extends React.Component {
 									exact
 									key={i}
 									path={route.path}
-									render={props => (
-										<route.component setMessage={this.setMessage} {...props} />
-									)}
+									render={props => <route.component {...props} />}
 								/>
 							))}
 							{messageVisible && (
 								<Message
-									onDismiss={this.handleDismissMessage}
+									onDismiss={hideMessage}
 									content={message}
 									color={messageColor}
 								/>
@@ -73,10 +51,16 @@ Base.propTypes = {
 }
 
 const mapStateToProps = state => ({
-	...state,
+	message: state.messages.message,
+	messageVisible: state.messages.messageVisible,
+	messageType: state.messages.type,
+})
+
+const mapDispatchToProps = dispatch => ({
+	hideMessage: () => dispatch(hideMessage()),
 })
 
 export default connect(
 	mapStateToProps,
-	null,
+	mapDispatchToProps,
 )(Base)

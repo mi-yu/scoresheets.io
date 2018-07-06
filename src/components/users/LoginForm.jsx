@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import Auth from '../../modules/Auth'
 import { API_ROOT } from '../../config'
 import { setUser } from '../../actions/userActions'
+import { setMessage } from '../../actions/messageActions'
 
 class LoginForm extends React.Component {
 	constructor(props) {
@@ -24,8 +25,8 @@ class LoginForm extends React.Component {
 	handleSubmit = e => {
 		e.preventDefault()
 
+		const { setUser, setMessage } = this.props
 		const { email, password } = this.state
-
 		const payload = {
 			email,
 			password,
@@ -44,12 +45,12 @@ class LoginForm extends React.Component {
 			})
 			.then(res => {
 				Auth.storeToken(res.token)
-				this.props.setUser(res.user)
+				setUser(res.user)
 				this.setState({
 					redirect: true,
 				})
 			})
-			.catch(err => new Error(err))
+			.catch(err => setMessage(err.message, 'error'))
 	}
 
 	render() {
@@ -91,6 +92,7 @@ LoginForm.propTypes = {
 
 const mapDispatchToProps = dispatch => ({
 	setUser: user => dispatch(setUser(user)),
+	setMessage: (message, type) => dispatch(setMessage(message, type)),
 })
 
 export default connect(

@@ -1,9 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Card, Label, Button, Grid } from 'semantic-ui-react'
+import { connect } from 'react-redux'
+import { setCurrentEvent, openEventsModal } from '../../actions/eventActions'
 
-const EventCard = ({ _id, name, category, stateEvent, impound, division, setCurrentEvent }) => {
-	console.log(division)
+const EventCard = ({ event, setCurrentEvent, openEventsModal }) => {
+	const { _id, name, category, stateEvent, impound, division } = event
 	let color = ''
 	switch (category) {
 		case 'bio':
@@ -42,7 +44,14 @@ const EventCard = ({ _id, name, category, stateEvent, impound, division, setCurr
 					</Card.Description>
 				</Card.Content>
 				<Card.Content>
-					<Button fluid color="blue" onClick={e => setCurrentEvent(e, _id)}>
+					<Button
+						fluid
+						color="blue"
+						onClick={() => {
+							setCurrentEvent(event)
+							openEventsModal()
+						}}
+					>
 						Edit
 					</Button>
 				</Card.Content>
@@ -61,4 +70,12 @@ EventCard.propTypes = {
 	setCurrentEvent: PropTypes.func.isRequired,
 }
 
-export default EventCard
+const mapDispatchToProps = dispatch => ({
+	setCurrentEvent: event => dispatch(setCurrentEvent(event)),
+	openEventsModal: () => dispatch(openEventsModal()),
+})
+
+export default connect(
+	null,
+	mapDispatchToProps,
+)(EventCard)

@@ -8,7 +8,7 @@ import { setUser } from '../actions/userActions'
 
 class ProfilePage extends React.Component {
 	componentDidMount() {
-		if (!this.props.users.currentUser) {
+		if (!this.props.user) {
 			const token = Auth.getToken()
 			fetch(`${API_ROOT}/users/me`, {
 				method: 'GET',
@@ -30,8 +30,7 @@ class ProfilePage extends React.Component {
 	}
 
 	render() {
-		const { users, redirectToLogin } = this.props
-		const user = users.currentUser
+		const { user, redirectToLogin } = this.props
 		if (!user) return null
 		if (redirectToLogin) return <Redirect to="/users/login" />
 
@@ -54,7 +53,7 @@ ProfilePage.propTypes = {
 }
 
 const mapStateToProps = state => ({
-	...state,
+	user: state.users.currentUser,
 })
 
 const mapDispatchToProps = dispatch => ({

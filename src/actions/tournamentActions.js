@@ -11,3 +11,22 @@ export const addTournament = tournament => dispatch => {
 		payload: tournament,
 	})
 }
+
+export const setCurrentTournament = tournament => dispatch => {
+	dispatch({
+		type: 'SET_CURRENT_TOURNAMENT',
+		payload: tournament,
+	})
+}
+
+export const openTournamentsModal = () => dispatch => {
+	dispatch({
+		type: 'OPEN_TOURNAMENTS_MODAL',
+	})
+}
+
+export const closeTournamentsModal = () => dispatch => {
+	dispatch({
+		type: 'CLOSE_TOURNAMENTS_MODAL',
+	})
+}
