@@ -9,116 +9,35 @@ import TournamentCard from '../components/dashboard/TournamentCard'
 import EventsModal from '../components/events/EventsModal'
 import TournamentsModal from '../components/tournaments/TournamentsModal'
 import { API_ROOT } from '../config'
-import { setTournaments, setCurrentTournament } from '../actions/tournamentActions'
-import { setEvents, setCurrentEvent } from '../actions/eventActions'
-
+import { setTournaments } from '../actions/tournamentActions'
+import { setEvents } from '../actions/eventActions'
+import { setMessage } from '../actions/messageActions'
 
 class DashboardPage extends React.Component {
 	constructor(props) {
 		super(props)
-
-		this.state = {
-			tournaments: [],
-			events: [],
-			eventsModalOpen: false,
-			tournamentsModalOpen: false,
-			editingEvent: false,
-			editingTournament: false,
-			currentEvent: {},
-			currentTournament: {},
-			setMessage: props.setMessage,
-		}
 	}
 
 	componentDidMount() {
-		const { setEvents, setTournaments } = this.props
+		const { setEvents, setTournaments, setMessage } = this.props
 		const token = Auth.getToken()
-		const requests = [`${API_ROOT}/tournaments`, `${API_ROOT}/events`].map(url => fetch(url, {
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		}).then(res => res.json()),
+		const requests = [`${API_ROOT}/tournaments`, `${API_ROOT}/events`].map(url =>
+			fetch(url, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}).then(res => res.json()),
 		)
 
-		Promise.all(requests).then(([tournaments, events]) => {
-			setTournaments(tournaments)
-			setEvents(events)
-		})
-	}
-
-	setCurrentEvent = (e, id) => {
-		const nextCurrentEvent = this.state.events.find(event => event._id === id)
-		this.setState({
-			currentEvent: nextCurrentEvent,
-			eventsModalOpen: true,
-			editingEvent: true,
-		})
-	}
-
-	setCurrentTournament = (e, id) => {
-		const tournament = this.state.tournaments.find(t => t._id === id)
-		this.setState({
-			currentTournament: tournament,
-			tournamentsModalOpen: true,
-			editingTournament: true,
-		})
-	}
-
-	clearCurrentEvent = () => {
-		this.setState({
-			currentEvent: {},
-			eventsModalOpen: true,
-			editingEvent: false,
-		})
-	}
-
-	clearCurrentTournament = () => {
-		this.setState({
-			currentTournament: {},
-			editingTournament: false,
-			tournamentsModalOpen: true,
-		})
-	}
-
-	updateEvent = updatedEvent => {
-		const { events } = this.state
-		const index = events.map(event => event._id).indexOf(updatedEvent._id)
-		if (index > -1) events[index] = updatedEvent
-		else events.push(updatedEvent)
-		this.setState({
-			events,
-		})
-	}
-
-	updateTournament = updated => {
-		const { tournaments } = this.state
-		const index = tournaments.map(t => t._id).indexOf(updated._id)
-		if (index > -1) tournaments[index] = updated
-		else tournaments.push(updated)
-		this.setState({
-			tournaments,
-		})
-	}
-
-	closeModalParent = () => {
-		this.setState({
-			eventsModalOpen: false,
-			tournamentsModalOpen: false,
-			editingEvent: false,
-			editingTournament: false,
-		})
+		Promise.all(requests)
+			.then(([tournaments, events]) => {
+				setTournaments(tournaments)
+				setEvents(events)
+			})
+			.catch(err => setMessage(err, 'error'))
 	}
 
 	render() {
-		const {
-			currentEvent,
-			eventsModalOpen,
-			tournamentsModalOpen,
-			editingEvent,
-			editingTournament,
-			currentTournament,
-			setMessage,
-		} = this.state
 		const { tournaments, events } = this.props
 		if (!tournaments || !events) {
 			console.log('no data')
@@ -127,50 +46,19 @@ class DashboardPage extends React.Component {
 
 		return (
 			<div>
-				<Header as="h1">
-					Tournaments
-				</Header>
-				<TournamentsModal
-					currentTournament={{ ...currentTournament }}
-					editingTournament={editingTournament}
-					modalOpen={tournamentsModalOpen}
-					clearCurrentTournament={this.clearCurrentTournament}
-					updateTournament={this.updateTournament}
-					setMessage={setMessage}
-					closeModalParent={this.closeModalParent}
-					events={events}
-				/>
+				<Header as="h1">Tournaments</Header>
+				<TournamentsModal />
 				<Grid>
 					{tournaments.map(tournament => (
-						<TournamentCard
-							key={tournament._id}
-							{...tournament}
-							setCurrentTournament={this.setCurrentTournament}
-						/>
+						<TournamentCard key={tournament._id} tournament={{ ...tournament }} />
 					))}
 				</Grid>
 				<Divider />
 
-				<Header as="h1">
-					2017-18 Season Events
-				</Header>
-				<EventsModal
-					currentEvent={{ ...currentEvent }}
-					editingEvent={editingEvent}
-					modalOpen={eventsModalOpen}
-					clearCurrentEvent={this.clearCurrentEvent}
-					updateEvent={this.updateEvent}
-					setMessage={setMessage}
-					closeModalParent={this.closeModalParent}
-				/>
+				<Header as="h1">2017-18 Season Events</Header>
+				<EventsModal />
 				<Grid>
-					{events.map(event => (
-						<EventCard
-							key={event._id}
-							{...event}
-							setCurrentEvent={this.setCurrentEvent}
-						/>
-					))}
+					{events.map(event => <EventCard key={event._id} event={{ ...event }} />)}
 				</Grid>
 			</div>
 		)
@@ -186,15 +74,17 @@ const mapStateToProps = state => ({
 	events: state.events.eventList,
 	currentTournament: state.tournaments.currentTournament,
 	currentEvent: state.events.currentEvent,
-	tournamentModalOpen: state.tournaments.modalOpen,
-	eventModalOpen: state.events.modalOpen,
+	tournamentsModalOpen: state.tournaments.modalOpen,
+	eventsModalOpen: state.events.modalOpen,
 })
 
 const mapDispatchToProps = dispatch => ({
 	setTournaments: tournaments => dispatch(setTournaments(tournaments)),
-	setCurrentTournament: tournament => dispatch(setCurrentTournament(tournament)),
 	setEvents: events => dispatch(setEvents(events)),
-	setCurrentEvent: event => dispatch(setCurrentEvent(event)),
+	setMessage: (message, type) => dispatch(setMessage(message, type)),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(DashboardPage)
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(DashboardPage)

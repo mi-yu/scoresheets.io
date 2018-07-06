@@ -1,6 +1,7 @@
 const defaultState = {
 	modalOpen: false,
 	editing: false,
+	currentTournament: {},
 }
 
 export default (state = defaultState, action) => {
@@ -10,20 +11,13 @@ export default (state = defaultState, action) => {
 				...state,
 				tournamentList: action.payload,
 			}
-		case 'SET_CURRENT_TOURNAMENT':
-			{
-				const {
-					tournamentList
-				} = state
-				const nextCurrentTournament =
-					tournamentList &&
-					tournamentList.filter(tournament => tournament._id === action.payload)
-				return {
-					...state,
-					currentTournament: nextCurrentTournament || {},
-					editing: state.tournamentList && state.tournamentList.includes(action.payload),
-				}
+		case 'SET_CURRENT_TOURNAMENT': {
+			return {
+				...state,
+				currentTournament: action.payload || {},
+				editing: action.payload,
 			}
+		}
 		case 'ADD_TOURNAMENT':
 			return {
 				...state,

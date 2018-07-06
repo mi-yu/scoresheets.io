@@ -1,65 +1,43 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Button, Modal, Form, Dropdown, Icon } from 'semantic-ui-react'
+import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import OpenModalButton from '../modals/OpenModalButton'
 import Auth from '../../modules/Auth'
 import states from './StatesList'
 import { API_ROOT } from '../../config'
-import { closeTournamentsModal, openTournamentsModal, setCurrentTournament } from '../../actions/tournamentActions'
+import {
+	closeTournamentsModal,
+	openTournamentsModal,
+	setCurrentTournament,
+} from '../../actions/tournamentActions'
+import { setMessage } from '../../actions/messageActions'
 
 class TournamentsModal extends React.Component {
 	constructor(props) {
 		super(props)
-		this.state = {
-			...props,
-		}
-	}
-
-	componentWillReceiveProps(nextProps) {
-		if (this.state.modalOpen !== nextProps.modalOpen) {
-			this.setState({
-				...nextProps,
-				currentTournament: nextProps.currentTournament || {},
-			})
-		}
-	}
-	openModal = () => {
-		this.setState({
-			modalOpen: true,
-		})
-	}
-
-	closeModal = () => {
-		this.state.closeModalParent()
-		this.setState({
-			modalOpen: false,
-		})
 	}
 
 	handleChange = (e, { name, value }) => {
-		this.setState({
-			...this.state,
-			currentTournament: {
-				...this.state.currentTournament,
-				[name]: value,
-			},
+		const { currentTournament, setCurrentTournament } = this.props
+		setCurrentTournament({
+			...currentTournament,
+			[name]: value,
 		})
 	}
 
 	handleCheck = (e, { name, checked }) => {
-		this.setState({
-			...this.state,
-			currentTournament: {
-				...this.state.currentTournament,
-				[name]: checked,
-			},
+		const { currentTournament, setCurrentTournament } = this.props
+		setCurrentTournament({
+			...currentTournament,
+			[name]: checked,
 		})
 	}
 
 	handleSubmitEvent = () => {
-		const { editingTournament, currentTournament, updateTournament, setMessage } = this.state
-		const url = editingTournament
+		const { editing, currentTournament, setMessage, closeTournamentsModal } = this.props
+		const url = editing
 			? `${API_ROOT}/tournaments/${currentTournament._id}/edit`
 			: `${API_ROOT}/tournaments/new`
 		const token = Auth.getToken()
@@ -74,24 +52,21 @@ class TournamentsModal extends React.Component {
 		})
 			.then(data => {
 				if (data.ok) return data.json()
-				this.closeModal()
+				closeTournamentsModal()
 			})
 			.then(res => {
 				if (res.message.success) {
 					setMessage(res.message.success, 'success')
-					updateTournament(res.newTournament)
 				} else setMessage(res.message.error, 'error')
-				this.closeModal()
+				closeTournamentsModal()
 			})
 			.catch(err => {
-				this.setState({
-					redirectToLogin: true,
-				})
+				setMessage(err.message, 'error')
 			})
 	}
 
 	handleQuickAddEvent = key => {
-		const { events } = this.state
+		const { events, currentTournament, setCurrentTournament } = this.props
 		let newEvents = events
 		switch (key) {
 			case 0: // only B events
@@ -120,19 +95,28 @@ class TournamentsModal extends React.Component {
 
 		newEvents = newEvents.map(event => event._id)
 
-		this.setState({
-			currentTournament: {
-				...this.state.currentTournament,
-				events: newEvents,
-			},
+		setCurrentTournament({
+			...currentTournament,
+			events: newEvents,
 		})
 	}
 
 	render() {
 		let eventsOptions = []
 
-		if (this.state.events) {
-			eventsOptions = this.state.events.map(event => ({ text: event.name, value: event._id }))
+		const {
+			events,
+			modalOpen,
+			openTournamentsModal,
+			setCurrentTournament,
+			closeTournamentsModal,
+			currentTournament,
+		} = this.props
+
+		if (events) {
+			eventsOptions = events.map(event => ({ text: event.name, value: event._id }))
+		} else {
+			return <Redirect to="/admin/dashboard" />
 		}
 
 		return (
@@ -149,7 +133,7 @@ class TournamentsModal extends React.Component {
 				}
 				closeIcon
 				open={modalOpen}
-				onClose={this.closeModal}
+				onClose={closeTournamentsModal}
 			>
 				<Modal.Header>
 					{currentTournament.name
@@ -289,12 +273,18 @@ TournamentsModal.propTypes = {
 const mapStateToProps = state => ({
 	modalOpen: state.tournaments.modalOpen,
 	editing: state.tournaments.editing,
+	currentTournament: state.tournaments.currentTournament,
+	events: state.events.eventList,
 })
 
 const mapDispatchToProps = dispatch => ({
 	openTournamentsModal: () => dispatch(openTournamentsModal()),
 	closeTournamentsModal: () => dispatch(closeTournamentsModal()),
 	setCurrentTournament: tournamentId => dispatch(setCurrentTournament(tournamentId)),
+	setMessage: (message, type) => dispatch(setMessage(message, type)),
 })
 
-export default TournamentsModal
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(TournamentsModal)

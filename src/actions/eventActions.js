@@ -5,10 +5,11 @@ export const setEvents = events => dispatch => {
 	})
 }
 
-export const setCurrentEvent = eventId => dispatch => {
+export const setCurrentEvent = event => dispatch => {
+	console.log(event)
 	dispatch({
 		type: 'SET_CURRENT_EVENT',
-		payload: eventId,
+		payload: event,
 	})
 }
 

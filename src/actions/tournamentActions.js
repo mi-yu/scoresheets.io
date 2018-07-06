@@ -12,10 +12,10 @@ export const addTournament = tournament => dispatch => {
 	})
 }
 
-export const setCurrentTournament = tournamentId => dispatch => {
+export const setCurrentTournament = tournament => dispatch => {
 	dispatch({
 		type: 'SET_CURRENT_TOURNAMENT',
-		payload: tournamentId,
+		payload: tournament,
 	})
 }
 

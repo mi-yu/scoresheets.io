@@ -2,10 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Card, Button, Grid } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
 
 import { setCurrentTournament, openTournamentsModal } from '../../actions/tournamentActions'
 
-const TournamentCard = (tournament) => {
+const TournamentCard = ({ tournament, setCurrentTournament, openTournamentsModal }) => {
 	const { _id, name, city, state, date } = tournament
 	return (
 		<Grid.Column width={4}>
@@ -35,13 +36,16 @@ const TournamentCard = (tournament) => {
 							}}
 						>
 							Manage
-					</Button>
-						<Button color="grey" onClick={() => {
-							setCurrentTournament(_id)
-							openTournamentsModal()
-						}}>
+						</Button>
+						<Button
+							color="grey"
+							onClick={() => {
+								setCurrentTournament(tournament)
+								openTournamentsModal()
+							}}
+						>
 							Edit Details
-					</Button>
+						</Button>
 					</div>
 				</Card.Content>
 			</Card>
@@ -58,4 +62,12 @@ TournamentCard.propTypes = {
 	setCurrentTournament: PropTypes.func.isRequired,
 }
 
-export default TournamentCard
+const mapDispatchToProps = dispatch => ({
+	setCurrentTournament: tournament => dispatch(setCurrentTournament(tournament)),
+	openTournamentsModal: () => dispatch(openTournamentsModal()),
+})
+
+export default connect(
+	null,
+	mapDispatchToProps,
+)(TournamentCard)

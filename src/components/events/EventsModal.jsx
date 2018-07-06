@@ -1,64 +1,38 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Button, Modal, Form, Dropdown } from 'semantic-ui-react'
+import { connect } from 'react-redux'
 import OpenModalButton from '../modals/OpenModalButton'
 import options from './EventsOptions'
 import Auth from '../../modules/Auth'
 import { API_ROOT } from '../../config'
+import { closeEventsModal, openEventsModal, setCurrentEvent } from '../../actions/eventActions'
+import { setMessage } from '../../actions/messageActions'
 
 class EventsModal extends React.Component {
 	constructor(props) {
 		super(props)
-		this.state = {
-			...props,
-		}
-	}
-
-	componentWillReceiveProps(nextProps) {
-		if (this.state.modalOpen !== nextProps.modalOpen) {
-			this.setState({
-				...nextProps,
-				currentEvent: nextProps.currentEvent || {},
-			})
-		}
-	}
-
-	openModal = () => {
-		this.setState({
-			modalOpen: true,
-		})
-	}
-
-	closeModal = () => {
-		this.state.closeModalParent()
-		this.setState({
-			modalOpen: false,
-		})
 	}
 
 	handleChange = (e, { name, value }) => {
-		this.setState({
-			...this.state,
-			currentEvent: {
-				...this.state.currentEvent,
-				[name]: value,
-			},
+		const { currentEvent, setCurrentEvent } = this.props
+		setCurrentEvent({
+			...currentEvent,
+			[name]: value,
 		})
 	}
 
 	handleCheck = (e, { name, checked }) => {
-		this.setState({
-			...this.state,
-			currentEvent: {
-				...this.state.currentEvent,
-				[name]: checked,
-			},
+		const { currentEvent, setCurrentEvent } = this.props
+		setCurrentEvent({
+			...currentEvent,
+			[name]: checked,
 		})
 	}
 
 	handleSubmitEvent = () => {
-		const { editingEvent, currentEvent, updateEvent, setMessage } = this.state
-		const url = editingEvent ? `${API_ROOT}/events/${currentEvent._id}/edit` : '/events/new'
+		const { editing, currentEvent, closeEventsModal, setCurrentEvent, setMessage } = this.props
+		const url = editing ? `${API_ROOT}/events/${currentEvent._id}/edit` : '/events/new'
 		const token = Auth.getToken()
 
 		fetch(url, {
@@ -76,30 +50,37 @@ class EventsModal extends React.Component {
 			.then(res => {
 				if (res.message.success) {
 					setMessage(res.message.success, 'success')
-					updateEvent(res.updatedEvent)
+					setCurrentEvent(res.updatedEvent)
 				} else setMessage(res.message.error, 'error')
-				this.closeModal()
+				closeEventsModal()
 			})
 			.catch(err => {
-				this.setState({
-					redirectToLogin: true,
-				})
+				setMessage(err.message, 'error')
 			})
 	}
 	render() {
-		const { modalOpen, currentEvent, clearCurrentEvent } = this.state
+		const {
+			modalOpen,
+			currentEvent,
+			setCurrentEvent,
+			openEventsModal,
+			closeEventsModal,
+		} = this.props
 		return (
 			<Modal
 				trigger={
 					<OpenModalButton
-						onClick={() => clearCurrentEvent()}
+						onClick={() => {
+							openEventsModal()
+							setCurrentEvent()
+						}}
 						text="New Event"
 						icon="plus"
 					/>
 				}
 				closeIcon
 				open={modalOpen}
-				onClose={this.closeModal}
+				onClose={closeEventsModal}
 			>
 				<Modal.Header>
 					{currentEvent.name ? `Edit Event: ${currentEvent.name}` : 'New Event'}
@@ -179,7 +160,7 @@ class EventsModal extends React.Component {
 					</Form>
 				</Modal.Content>
 				<Modal.Actions>
-					<Button onClick={this.closeModal}>Cancel</Button>
+					<Button onClick={closeEventsModal}>Cancel</Button>
 					<Button color="green" onClick={this.handleSubmitEvent}>
 						Submit
 					</Button>
@@ -202,4 +183,20 @@ EventsModal.propTypes = {
 	}).isRequired,
 }
 
-export default EventsModal
+const mapStateToProps = state => ({
+	modalOpen: state.events.modalOpen,
+	editing: state.events.editing,
+	currentEvent: state.events.currentEvent,
+})
+
+const mapDispatchToProps = dispatch => ({
+	setCurrentEvent: event => dispatch(setCurrentEvent(event)),
+	openEventsModal: () => dispatch(openEventsModal()),
+	closeEventsModal: () => dispatch(closeEventsModal()),
+	setMessage: (message, type) => dispatch(setMessage(message, type)),
+})
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(EventsModal)
