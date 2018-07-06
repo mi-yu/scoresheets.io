@@ -5,10 +5,10 @@ export const setEvents = events => dispatch => {
 	})
 }
 
-export const setCurrentEvent = event => dispatch => {
+export const setCurrentEvent = eventId => dispatch => {
 	dispatch({
 		type: 'SET_CURRENT_EVENT',
-		payload: event,
+		payload: eventId,
 	})
 }
 
@@ -30,5 +30,17 @@ export const removeEvent = event => dispatch => {
 	dispatch({
 		type: 'REMOVE_EVENT',
 		payload: event,
+	})
+}
+
+export const openEventsModal = () => dispatch => {
+	dispatch({
+		type: 'OPEN_EVENTS_MODAL',
+	})
+}
+
+export const closeEventsModal = () => dispatch => {
+	dispatch({
+		type: 'CLOSE_EVENTS_MODAL',
 	})
 }

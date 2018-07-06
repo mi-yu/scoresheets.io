@@ -2,14 +2,18 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Grid, Header, Divider } from 'semantic-ui-react'
 import { Redirect } from 'react-router-dom'
+import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
 import EventCard from '../components/dashboard/EventCard'
 import TournamentCard from '../components/dashboard/TournamentCard'
 import EventsModal from '../components/events/EventsModal'
 import TournamentsModal from '../components/tournaments/TournamentsModal'
 import { API_ROOT } from '../config'
+import { setTournaments, setCurrentTournament } from '../actions/tournamentActions'
+import { setEvents, setCurrentEvent } from '../actions/eventActions'
 
-export default class DashboardPage extends React.Component {
+
+class DashboardPage extends React.Component {
 	constructor(props) {
 		super(props)
 
@@ -27,20 +31,18 @@ export default class DashboardPage extends React.Component {
 	}
 
 	componentDidMount() {
+		const { setEvents, setTournaments } = this.props
 		const token = Auth.getToken()
-		const requests = [`${API_ROOT}/tournaments`, `${API_ROOT}/events`].map(url =>
-			fetch(url, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			}).then(res => res.json()),
+		const requests = [`${API_ROOT}/tournaments`, `${API_ROOT}/events`].map(url => fetch(url, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		}).then(res => res.json()),
 		)
 
 		Promise.all(requests).then(([tournaments, events]) => {
-			this.setState({
-				tournaments: tournaments,
-				events: events,
-			})
+			setTournaments(tournaments)
+			setEvents(events)
 		})
 	}
 
@@ -109,8 +111,6 @@ export default class DashboardPage extends React.Component {
 
 	render() {
 		const {
-			tournaments,
-			events,
 			currentEvent,
 			eventsModalOpen,
 			tournamentsModalOpen,
@@ -119,14 +119,17 @@ export default class DashboardPage extends React.Component {
 			currentTournament,
 			setMessage,
 		} = this.state
-		if (!tournaments || events.length === 0) {
+		const { tournaments, events } = this.props
+		if (!tournaments || !events) {
 			console.log('no data')
 			return null
 		}
 
 		return (
 			<div>
-				<Header as="h1">Tournaments</Header>
+				<Header as="h1">
+					Tournaments
+				</Header>
 				<TournamentsModal
 					currentTournament={{ ...currentTournament }}
 					editingTournament={editingTournament}
@@ -148,7 +151,9 @@ export default class DashboardPage extends React.Component {
 				</Grid>
 				<Divider />
 
-				<Header as="h1">2017-18 Season Events</Header>
+				<Header as="h1">
+					2017-18 Season Events
+				</Header>
 				<EventsModal
 					currentEvent={{ ...currentEvent }}
 					editingEvent={editingEvent}
@@ -175,3 +180,21 @@ export default class DashboardPage extends React.Component {
 DashboardPage.propTypes = {
 	setMessage: PropTypes.func.isRequired,
 }
+
+const mapStateToProps = state => ({
+	tournaments: state.tournaments.tournamentList,
+	events: state.events.eventList,
+	currentTournament: state.tournaments.currentTournament,
+	currentEvent: state.events.currentEvent,
+	tournamentModalOpen: state.tournaments.modalOpen,
+	eventModalOpen: state.events.modalOpen,
+})
+
+const mapDispatchToProps = dispatch => ({
+	setTournaments: tournaments => dispatch(setTournaments(tournaments)),
+	setCurrentTournament: tournament => dispatch(setCurrentTournament(tournament)),
+	setEvents: events => dispatch(setEvents(events)),
+	setCurrentEvent: event => dispatch(setCurrentEvent(event)),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(DashboardPage)

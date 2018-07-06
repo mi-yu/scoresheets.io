@@ -1,10 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Button, Modal, Form, Dropdown, Icon } from 'semantic-ui-react'
+import { connect } from 'react-redux'
 import OpenModalButton from '../modals/OpenModalButton'
 import Auth from '../../modules/Auth'
 import states from './StatesList'
 import { API_ROOT } from '../../config'
+import { closeTournamentsModal, openTournamentsModal, setCurrentTournament } from '../../actions/tournamentActions'
 
 class TournamentsModal extends React.Component {
 	constructor(props) {
@@ -127,7 +129,6 @@ class TournamentsModal extends React.Component {
 	}
 
 	render() {
-		const { modalOpen, currentTournament, clearCurrentTournament } = this.state
 		let eventsOptions = []
 
 		if (this.state.events) {
@@ -138,7 +139,10 @@ class TournamentsModal extends React.Component {
 			<Modal
 				trigger={
 					<OpenModalButton
-						onClick={() => clearCurrentTournament()}
+						onClick={() => {
+							openTournamentsModal()
+							setCurrentTournament()
+						}}
 						text="New Tournament"
 						icon="plus"
 					/>
@@ -260,7 +264,7 @@ class TournamentsModal extends React.Component {
 					</Form>
 				</Modal.Content>
 				<Modal.Actions>
-					<Button onClick={this.closeModal}>Cancel</Button>
+					<Button onClick={closeTournamentsModal}>Cancel</Button>
 					<Button color="green" onClick={this.handleSubmitEvent}>
 						Submit
 					</Button>
@@ -281,5 +285,16 @@ TournamentsModal.propTypes = {
 		events: PropTypes.arrayOf(PropTypes.string).isRequired,
 	}).isRequired,
 }
+
+const mapStateToProps = state => ({
+	modalOpen: state.tournaments.modalOpen,
+	editing: state.tournaments.editing,
+})
+
+const mapDispatchToProps = dispatch => ({
+	openTournamentsModal: () => dispatch(openTournamentsModal()),
+	closeTournamentsModal: () => dispatch(closeTournamentsModal()),
+	setCurrentTournament: tournamentId => dispatch(setCurrentTournament(tournamentId)),
+})
 
 export default TournamentsModal

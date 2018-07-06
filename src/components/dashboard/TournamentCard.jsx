@@ -3,43 +3,51 @@ import PropTypes from 'prop-types'
 import { Card, Button, Grid } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 
-const TournamentCard = ({ _id, name, city, state, date, setCurrentTournament }) => (
-	<Grid.Column width={4}>
-		<Card>
-			<Card.Content>
-				<Card.Header>{name}</Card.Header>
-				<Card.Meta>
-					{city}, {state} on {new Date(date).toLocaleDateString()}
-				</Card.Meta>
-			</Card.Content>
-			<Card.Content extra>
-				<div className="ui two buttons">
-					<Button
-						as={Link}
-						color="blue"
-						to={{
-							pathname: `/tournaments/${_id}/manage`,
-							state: {
-								tournament: {
-									_id,
-									name,
-									city,
-									state,
-									date,
+import { setCurrentTournament, openTournamentsModal } from '../../actions/tournamentActions'
+
+const TournamentCard = (tournament) => {
+	const { _id, name, city, state, date } = tournament
+	return (
+		<Grid.Column width={4}>
+			<Card>
+				<Card.Content>
+					<Card.Header>{name}</Card.Header>
+					<Card.Meta>
+						{city}, {state} on {new Date(date).toLocaleDateString()}
+					</Card.Meta>
+				</Card.Content>
+				<Card.Content extra>
+					<div className="ui two buttons">
+						<Button
+							as={Link}
+							color="blue"
+							to={{
+								pathname: `/tournaments/${_id}/manage`,
+								state: {
+									tournament: {
+										_id,
+										name,
+										city,
+										state,
+										date,
+									},
 								},
-							},
-						}}
-					>
-						Manage
+							}}
+						>
+							Manage
 					</Button>
-					<Button color="grey" onClick={e => setCurrentTournament(e, _id)}>
-						Edit Details
+						<Button color="grey" onClick={() => {
+							setCurrentTournament(_id)
+							openTournamentsModal()
+						}}>
+							Edit Details
 					</Button>
-				</div>
-			</Card.Content>
-		</Card>
-	</Grid.Column>
-)
+					</div>
+				</Card.Content>
+			</Card>
+		</Grid.Column>
+	)
+}
 
 TournamentCard.propTypes = {
 	_id: PropTypes.string.isRequired,
