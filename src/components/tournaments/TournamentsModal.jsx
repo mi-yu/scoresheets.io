@@ -15,10 +15,6 @@ import {
 import { setMessage } from '../../actions/messageActions'
 
 class TournamentsModal extends React.Component {
-	constructor(props) {
-		super(props)
-	}
-
 	handleChange = (e, { name, value }) => {
 		const { currentTournament, setCurrentTournament } = this.props
 		setCurrentTournament({
