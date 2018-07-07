@@ -8,10 +8,6 @@ import routes from '../routes'
 import { hideMessage } from '../actions/messageActions'
 
 class Base extends React.Component {
-	constructor(props) {
-		super(props)
-	}
-
 	render() {
 		const { message, messageType, messageVisible, hideMessage } = this.props
 		const messageColor =

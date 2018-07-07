@@ -6,14 +6,15 @@ import OpenModalButton from '../modals/OpenModalButton'
 import options from './EventsOptions'
 import Auth from '../../modules/Auth'
 import { API_ROOT } from '../../config'
-import { closeEventsModal, openEventsModal, setCurrentEvent } from '../../actions/eventActions'
+import {
+	closeEventsModal,
+	openEventsModal,
+	setCurrentEvent,
+	updateEvent,
+} from '../../actions/eventActions'
 import { setMessage } from '../../actions/messageActions'
 
 class EventsModal extends React.Component {
-	constructor(props) {
-		super(props)
-	}
-
 	handleChange = (e, { name, value }) => {
 		const { currentEvent, setCurrentEvent } = this.props
 		setCurrentEvent({
@@ -31,12 +32,20 @@ class EventsModal extends React.Component {
 	}
 
 	handleSubmitEvent = () => {
-		const { editing, currentEvent, closeEventsModal, setCurrentEvent, setMessage } = this.props
-		const url = editing ? `${API_ROOT}/events/${currentEvent._id}/edit` : '/events/new'
+		const {
+			editing,
+			currentEvent,
+			closeEventsModal,
+			updateEvent,
+			setCurrentEvent,
+			setMessage,
+		} = this.props
+		const url = editing ? `${API_ROOT}/events/${currentEvent._id}` : '/events'
+		const method = editing ? 'PATCH' : 'POST'
 		const token = Auth.getToken()
 
 		fetch(url, {
-			method: 'POST',
+			method,
 			headers: new Headers({
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${token}`,
@@ -48,16 +57,15 @@ class EventsModal extends React.Component {
 				throw new Error()
 			})
 			.then(res => {
-				if (res.message.success) {
-					setMessage(res.message.success, 'success')
-					setCurrentEvent(res.updatedEvent)
-				} else setMessage(res.message.error, 'error')
+				updateEvent(res)
+				setCurrentEvent({})
 				closeEventsModal()
 			})
 			.catch(err => {
 				setMessage(err.message, 'error')
 			})
 	}
+
 	render() {
 		const {
 			modalOpen,
@@ -66,6 +74,7 @@ class EventsModal extends React.Component {
 			openEventsModal,
 			closeEventsModal,
 		} = this.props
+
 		return (
 			<Modal
 				trigger={
@@ -191,6 +200,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
 	setCurrentEvent: event => dispatch(setCurrentEvent(event)),
+	updateEvent: event => dispatch(updateEvent(event)),
 	openEventsModal: () => dispatch(openEventsModal()),
 	closeEventsModal: () => dispatch(closeEventsModal()),
 	setMessage: (message, type) => dispatch(setMessage(message, type)),

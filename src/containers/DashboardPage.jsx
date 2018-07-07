@@ -14,11 +14,8 @@ import { setEvents } from '../actions/eventActions'
 import { setMessage } from '../actions/messageActions'
 
 class DashboardPage extends React.Component {
-	constructor(props) {
-		super(props)
-	}
-
 	componentDidMount() {
+		// eslint-disable-next-line
 		const { setEvents, setTournaments, setMessage } = this.props
 		const token = Auth.getToken()
 		const requests = [`${API_ROOT}/tournaments`, `${API_ROOT}/events`].map(url =>
@@ -26,7 +23,10 @@ class DashboardPage extends React.Component {
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
-			}).then(res => res.json()),
+			}).then(res => {
+				if (res.ok) return res.json()
+				throw res
+			}),
 		)
 
 		Promise.all(requests)
@@ -34,15 +34,13 @@ class DashboardPage extends React.Component {
 				setTournaments(tournaments)
 				setEvents(events)
 			})
-			.catch(err => setMessage(err, 'error'))
+			.catch(err => err.json())
+			.then(err => setMessage(err, 'error'))
 	}
 
 	render() {
 		const { tournaments, events } = this.props
-		if (!tournaments || !events) {
-			console.log('no data')
-			return null
-		}
+		if (!tournaments || !events) return null
 
 		return (
 			<div>
