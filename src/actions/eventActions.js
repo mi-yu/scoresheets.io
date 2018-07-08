@@ -6,10 +6,22 @@ export const setEvents = events => dispatch => {
 }
 
 export const setCurrentEvent = event => dispatch => {
-	console.log(event)
 	dispatch({
 		type: 'SET_CURRENT_EVENT',
 		payload: event,
+	})
+}
+
+export const clearCurrentEvent = () => dispatch => {
+	dispatch({
+		type: 'CLEAR_CURRENT_EVENT',
+	})
+}
+
+export const setEditing = editing => dispatch => {
+	dispatch({
+		type: 'SET_EVENT_EDITING',
+		payload: editing,
 	})
 }
 

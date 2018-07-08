@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Grid, Header, Divider } from 'semantic-ui-react'
-import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
 import EventCard from '../components/dashboard/EventCard'
@@ -65,6 +64,8 @@ class DashboardPage extends React.Component {
 
 DashboardPage.propTypes = {
 	setMessage: PropTypes.func.isRequired,
+	tournaments: PropTypes.arrayOf(PropTypes.object).isRequired,
+	events: PropTypes.arrayOf(PropTypes.object).isRequired,
 }
 
 const mapStateToProps = state => ({
