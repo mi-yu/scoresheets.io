@@ -2,6 +2,7 @@ const defaultState = {
 	modalOpen: false,
 	editing: false,
 	currentEvent: {},
+	eventList: [],
 }
 
 export default (state = defaultState, action) => {
@@ -15,13 +16,22 @@ export default (state = defaultState, action) => {
 			return {
 				...state,
 				currentEvent: action.payload || {},
-				editing: action.payload,
 			}
 		}
+		case 'CLEAR_CURRENT_EVENT':
+			return {
+				...state,
+				currentEvent: {},
+			}
+		case 'SET_EVENT_EDITING':
+			return {
+				...state,
+				editing: action.payload,
+			}
 		case 'ADD_EVENT':
 			return {
 				...state,
-				eventList: [...state.eventList, action.payload],
+				eventList: [action.payload, ...state.eventList],
 			}
 		case 'UPDATE_EVENT': {
 			const { eventList } = state

@@ -22,8 +22,9 @@ class Nav extends Component {
 	handleClick = e => this.setState({ activeItem: e.target.innerHTML.toLowerCase() })
 
 	handleLogout = () => {
+		const { setUser } = this.props
 		Auth.removeToken()
-		this.props.setUser({})
+		setUser({})
 		return <Redirect to="/" />
 	}
 
@@ -107,7 +108,7 @@ Nav.propTypes = {
 }
 
 const mapStateToProps = state => ({
-	...state,
+	user: state.users.currentUser,
 })
 
 const mapDispatchToProps = dispatch => ({

@@ -11,6 +11,10 @@ import {
 	closeTournamentsModal,
 	openTournamentsModal,
 	setCurrentTournament,
+	clearCurrentTournament,
+	updateTournament,
+	setEditing,
+	addTournament,
 } from '../../actions/tournamentActions'
 import { setMessage } from '../../actions/messageActions'
 
@@ -32,14 +36,24 @@ class TournamentsModal extends React.Component {
 	}
 
 	handleSubmitEvent = () => {
-		const { editing, currentTournament, setMessage, closeTournamentsModal } = this.props
+		const {
+			editing,
+			currentTournament,
+			setMessage,
+			closeTournamentsModal,
+			updateTournament,
+			clearCurrentTournament,
+			setEditing,
+			addTournament,
+		} = this.props
 		const url = editing
-			? `${API_ROOT}/tournaments/${currentTournament._id}/edit`
-			: `${API_ROOT}/tournaments/new`
+			? `${API_ROOT}/tournaments/${currentTournament._id}`
+			: `${API_ROOT}/tournaments`
+		const method = editing ? 'PATCH' : 'POST'
 		const token = Auth.getToken()
 
 		fetch(url, {
-			method: 'POST',
+			method,
 			headers: new Headers({
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${token}`,
@@ -51,9 +65,10 @@ class TournamentsModal extends React.Component {
 				closeTournamentsModal()
 			})
 			.then(res => {
-				if (res.message.success) {
-					setMessage(res.message.success, 'success')
-				} else setMessage(res.message.error, 'error')
+				if (editing) updateTournament(res)
+				else addTournament(res)
+				clearCurrentTournament()
+				setEditing(false)
 				closeTournamentsModal()
 			})
 			.catch(err => {
@@ -104,9 +119,10 @@ class TournamentsModal extends React.Component {
 			events,
 			modalOpen,
 			openTournamentsModal,
-			setCurrentTournament,
+			clearCurrentTournament,
 			closeTournamentsModal,
 			currentTournament,
+			setEditing,
 		} = this.props
 
 		if (events) {
@@ -121,7 +137,8 @@ class TournamentsModal extends React.Component {
 					<OpenModalButton
 						onClick={() => {
 							openTournamentsModal()
-							setCurrentTournament()
+							clearCurrentTournament()
+							setEditing(false)
 						}}
 						text="New Tournament"
 						icon="plus"
@@ -257,13 +274,23 @@ class TournamentsModal extends React.Component {
 TournamentsModal.propTypes = {
 	modalOpen: PropTypes.bool.isRequired,
 	currentTournament: PropTypes.shape({
-		_id: PropTypes.string.isRequired,
-		name: PropTypes.string.isRequired,
-		city: PropTypes.string.isRequired,
-		state: PropTypes.string.isRequired,
-		date: PropTypes.string.isRequired,
-		events: PropTypes.arrayOf(PropTypes.string).isRequired,
+		_id: PropTypes.string,
+		name: PropTypes.string,
+		city: PropTypes.string,
+		state: PropTypes.string,
+		date: PropTypes.string,
+		events: PropTypes.arrayOf(PropTypes.string),
 	}).isRequired,
+	setCurrentTournament: PropTypes.func.isRequired,
+	openTournamentsModal: PropTypes.func.isRequired,
+	closeTournamentsModal: PropTypes.func.isRequired,
+	updateTournament: PropTypes.func.isRequired,
+	addTournament: PropTypes.func.isRequired,
+	setEditing: PropTypes.func.isRequired,
+	clearCurrentTournament: PropTypes.func.isRequired,
+	setMessage: PropTypes.func.isRequired,
+	events: PropTypes.arrayOf(PropTypes.object).isRequired,
+	editing: PropTypes.bool.isRequired,
 }
 
 const mapStateToProps = state => ({
@@ -276,8 +303,12 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
 	openTournamentsModal: () => dispatch(openTournamentsModal()),
 	closeTournamentsModal: () => dispatch(closeTournamentsModal()),
-	setCurrentTournament: tournamentId => dispatch(setCurrentTournament(tournamentId)),
+	setCurrentTournament: tournament => dispatch(setCurrentTournament(tournament)),
+	clearCurrentTournament: () => dispatch(clearCurrentTournament()),
+	addTournament: tournament => dispatch(addTournament(tournament)),
+	updateTournament: tournament => dispatch(updateTournament(tournament)),
 	setMessage: (message, type) => dispatch(setMessage(message, type)),
+	setEditing: editing => dispatch(setEditing(editing)),
 })
 
 export default connect(

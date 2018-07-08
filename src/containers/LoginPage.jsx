@@ -6,12 +6,8 @@ import LoginForm from '../components/users/LoginForm'
 const LoginPage = ({ setUser }) => (
 	<div>
 		<Header as="h1"> Login </Header>
-		<LoginForm setUser={setUser} />
+		<LoginForm />
 	</div>
 )
-
-LoginPage.propTypes = {
-	setUser: PropTypes.func.isRequired,
-}
 
 export default LoginPage

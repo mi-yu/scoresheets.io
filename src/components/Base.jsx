@@ -42,13 +42,15 @@ class Base extends React.Component {
 }
 
 Base.propTypes = {
-	token: PropTypes.string,
-	user: PropTypes.object,
+	message: PropTypes.string.isRequired,
+	messageType: PropTypes.string.isRequired,
+	messageVisible: PropTypes.bool.isRequired,
+	hideMessage: PropTypes.func.isRequired,
 }
 
 const mapStateToProps = state => ({
 	message: state.messages.message,
-	messageVisible: state.messages.messageVisible,
+	messageVisible: state.messages.visible,
 	messageType: state.messages.type,
 })
 

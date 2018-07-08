@@ -12,10 +12,30 @@ export const addTournament = tournament => dispatch => {
 	})
 }
 
+export const updateTournament = tournament => dispatch => {
+	dispatch({
+		type: 'UPDATE_TOURNAMENT',
+		payload: tournament,
+	})
+}
+
 export const setCurrentTournament = tournament => dispatch => {
 	dispatch({
 		type: 'SET_CURRENT_TOURNAMENT',
 		payload: tournament,
+	})
+}
+
+export const setEditing = editing => dispatch => {
+	dispatch({
+		type: 'SET_TOURNAMENT_EDITING',
+		payload: editing,
+	})
+}
+
+export const clearCurrentTournament = () => dispatch => {
+	dispatch({
+		type: 'CLEAR_CURRENT_TOURNAMENT',
 	})
 }
 

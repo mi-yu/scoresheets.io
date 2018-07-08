@@ -8,7 +8,8 @@ import { setUser } from '../actions/userActions'
 
 class ProfilePage extends React.Component {
 	componentDidMount() {
-		if (!this.props.user) {
+		const { user, setUser } = this.props
+		if (!Object.keys(user).length) {
 			const token = Auth.getToken()
 			fetch(`${API_ROOT}/users/me`, {
 				method: 'GET',
@@ -20,8 +21,8 @@ class ProfilePage extends React.Component {
 					if (data.ok) return data.json()
 					throw new Error()
 				})
-				.then(user => {
-					this.props.setUser(user)
+				.then(res => {
+					setUser(res)
 				})
 				.catch(err => {
 					console.log(err)
@@ -46,9 +47,9 @@ class ProfilePage extends React.Component {
 
 ProfilePage.propTypes = {
 	user: PropTypes.shape({
-		_id: PropTypes.string.isRequired,
-		name: PropTypes.string.isRequired,
-		email: PropTypes.string.isRequired,
+		_id: PropTypes.string,
+		name: PropTypes.string,
+		email: PropTypes.string,
 	}).isRequired,
 }
 

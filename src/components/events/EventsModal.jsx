@@ -10,7 +10,10 @@ import {
 	closeEventsModal,
 	openEventsModal,
 	setCurrentEvent,
+	clearCurrentEvent,
 	updateEvent,
+	addEvent,
+	setEditing,
 } from '../../actions/eventActions'
 import { setMessage } from '../../actions/messageActions'
 
@@ -37,8 +40,10 @@ class EventsModal extends React.Component {
 			currentEvent,
 			closeEventsModal,
 			updateEvent,
-			setCurrentEvent,
+			clearCurrentEvent,
 			setMessage,
+			setEditing,
+			addEvent,
 		} = this.props
 		const url = editing ? `${API_ROOT}/events/${currentEvent._id}` : '/events'
 		const method = editing ? 'PATCH' : 'POST'
@@ -57,8 +62,10 @@ class EventsModal extends React.Component {
 				throw new Error()
 			})
 			.then(res => {
-				updateEvent(res)
-				setCurrentEvent({})
+				if (editing) updateEvent(res)
+				else addEvent(res)
+				clearCurrentEvent()
+				setEditing(false)
 				closeEventsModal()
 			})
 			.catch(err => {
@@ -70,7 +77,7 @@ class EventsModal extends React.Component {
 		const {
 			modalOpen,
 			currentEvent,
-			setCurrentEvent,
+			clearCurrentEvent,
 			openEventsModal,
 			closeEventsModal,
 		} = this.props
@@ -81,7 +88,8 @@ class EventsModal extends React.Component {
 					<OpenModalButton
 						onClick={() => {
 							openEventsModal()
-							setCurrentEvent()
+							clearCurrentEvent()
+							setEditing(false)
 						}}
 						text="New Event"
 						icon="plus"
@@ -182,14 +190,20 @@ class EventsModal extends React.Component {
 EventsModal.propTypes = {
 	modalOpen: PropTypes.bool.isRequired,
 	currentEvent: PropTypes.shape({
-		_id: PropTypes.string.isRequired,
-		name: PropTypes.string.isRequired,
-		category: PropTypes.oneOf(['bio', 'earth', 'inquiry', 'phys/chem', 'building']).isRequired,
-		stateEvent: PropTypes.bool.isRequired,
-		impound: PropTypes.bool.isRequired,
-		division: PropTypes.oneOf(['B', 'C', 'BC']).isRequired,
-		setCurrentEvent: PropTypes.func.isRequired,
+		_id: PropTypes.string,
+		name: PropTypes.string,
+		category: PropTypes.oneOf(['bio', 'earth', 'inquiry', 'phys/chem', 'building']),
+		stateEvent: PropTypes.bool,
+		impound: PropTypes.bool,
+		division: PropTypes.oneOf(['B', 'C', 'BC']),
+		setCurrentEvent: PropTypes.func,
 	}).isRequired,
+	clearCurrentEvent: PropTypes.func.isRequired,
+	setMessage: PropTypes.func.isRequired,
+	openEventsModal: PropTypes.func.isRequired,
+	closeEventsModal: PropTypes.func.isRequired,
+	setEditing: PropTypes.func.isRequired,
+	addEvent: PropTypes.func.isRequired,
 }
 
 const mapStateToProps = state => ({
@@ -200,10 +214,13 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
 	setCurrentEvent: event => dispatch(setCurrentEvent(event)),
+	clearCurrentEvent: () => dispatch(clearCurrentEvent()),
 	updateEvent: event => dispatch(updateEvent(event)),
+	addEvent: event => dispatch(addEvent(event)),
 	openEventsModal: () => dispatch(openEventsModal()),
 	closeEventsModal: () => dispatch(closeEventsModal()),
 	setMessage: (message, type) => dispatch(setMessage(message, type)),
+	setEditing: editing => dispatch(setEditing(editing)),
 })
 
 export default connect(
