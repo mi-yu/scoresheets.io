@@ -1,5 +1,5 @@
 const defaultState = {
-	message: null,
+	message: '',
 	type: 'info',
 	visible: false,
 }

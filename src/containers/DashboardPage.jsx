@@ -15,26 +15,28 @@ import { setMessage } from '../actions/messageActions'
 class DashboardPage extends React.Component {
 	componentDidMount() {
 		// eslint-disable-next-line
-		const { setEvents, setTournaments, setMessage } = this.props
-		const token = Auth.getToken()
-		const requests = [`${API_ROOT}/tournaments`, `${API_ROOT}/events`].map(url =>
-			fetch(url, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			}).then(res => {
-				if (res.ok) return res.json()
-				throw res
-			}),
-		)
+		const { setEvents, setTournaments, setMessage, tournaments, events } = this.props
+		if (!tournaments.length || !events.length) {
+			const token = Auth.getToken()
+			const requests = [`${API_ROOT}/tournaments`, `${API_ROOT}/events`].map(url =>
+				fetch(url, {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}).then(res => {
+					if (res.ok) return res.json()
+					throw res
+				}),
+			)
 
-		Promise.all(requests)
-			.then(([tournaments, events]) => {
-				setTournaments(tournaments)
-				setEvents(events)
-			})
-			.catch(err => err.json())
-			.then(err => setMessage(err, 'error'))
+			Promise.all(requests)
+				.then(([tournaments, events]) => {
+					setTournaments(tournaments)
+					setEvents(events)
+				})
+				.catch(err => err.json())
+				.then(err => setMessage(err, 'error'))
+		}
 	}
 
 	render() {

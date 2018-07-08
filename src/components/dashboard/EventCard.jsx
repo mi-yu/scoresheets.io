@@ -38,7 +38,11 @@ const EventCard = ({ event, setCurrentEvent, openEventsModal, setEditing }) => {
 							{category}
 						</Label>
 						{division &&
-							division.split('').map(div => <Label size="tiny">{div}</Label>)}
+							division.split('').map(div => (
+								<Label key={div} size="tiny">
+									{div}
+								</Label>
+							))}
 						{stateEvent && <Label size="tiny">trial</Label>}
 						{impound && <Label size="tiny">impound</Label>}
 					</Card.Description>

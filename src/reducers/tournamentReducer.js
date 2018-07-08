@@ -4,6 +4,7 @@ const defaultState = {
 	currentTournament: {
 		events: [],
 	},
+	tournamentList: [],
 }
 
 export default (state = defaultState, action) => {

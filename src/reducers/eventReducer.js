@@ -2,6 +2,7 @@ const defaultState = {
 	modalOpen: false,
 	editing: false,
 	currentEvent: {},
+	eventList: [],
 }
 
 export default (state = defaultState, action) => {

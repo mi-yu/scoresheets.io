@@ -274,12 +274,12 @@ class TournamentsModal extends React.Component {
 TournamentsModal.propTypes = {
 	modalOpen: PropTypes.bool.isRequired,
 	currentTournament: PropTypes.shape({
-		_id: PropTypes.string.isRequired,
-		name: PropTypes.string.isRequired,
-		city: PropTypes.string.isRequired,
-		state: PropTypes.string.isRequired,
-		date: PropTypes.string.isRequired,
-		events: PropTypes.arrayOf(PropTypes.string).isRequired,
+		_id: PropTypes.string,
+		name: PropTypes.string,
+		city: PropTypes.string,
+		state: PropTypes.string,
+		date: PropTypes.string,
+		events: PropTypes.arrayOf(PropTypes.string),
 	}).isRequired,
 	setCurrentTournament: PropTypes.func.isRequired,
 	openTournamentsModal: PropTypes.func.isRequired,

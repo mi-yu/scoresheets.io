@@ -50,7 +50,7 @@ Base.propTypes = {
 
 const mapStateToProps = state => ({
 	message: state.messages.message,
-	messageVisible: state.messages.messageVisible,
+	messageVisible: state.messages.visible,
 	messageType: state.messages.type,
 })
 
