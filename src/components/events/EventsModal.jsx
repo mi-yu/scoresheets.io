@@ -16,6 +16,7 @@ import {
 	setEditing,
 } from '../../actions/eventActions'
 import { setMessage } from '../../actions/messageActions'
+import request from '../../modules/request'
 
 class EventsModal extends React.Component {
 	handleChange = (e, { name, value }) => {
@@ -49,7 +50,7 @@ class EventsModal extends React.Component {
 		const method = editing ? 'PATCH' : 'POST'
 		const token = Auth.getToken()
 
-		fetch(url, {
+		request(url, {
 			method,
 			headers: new Headers({
 				'Content-Type': 'application/json',
@@ -57,10 +58,6 @@ class EventsModal extends React.Component {
 			}),
 			body: JSON.stringify(currentEvent),
 		})
-			.then(data => {
-				if (data.ok) return data.json()
-				throw new Error()
-			})
 			.then(res => {
 				if (editing) updateEvent(res)
 				else addEvent(res)

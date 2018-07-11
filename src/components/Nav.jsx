@@ -30,6 +30,9 @@ class Nav extends Component {
 
 	render() {
 		const { activeItem } = this.state
+		const { user } = this.props
+
+		const loggedIn = Auth.isAuthenticated() && Object.keys(user).length !== 0
 
 		return (
 			<Container style={{ paddingTop: '0' }}>
@@ -53,7 +56,7 @@ class Nav extends Component {
 						<Link to="/">Scribe</Link>
 					</Item>
 
-					{Auth.isAuthenticated() ? (
+					{loggedIn ? (
 						<Menu.Menu borderless position="right" color="black">
 							<Item
 								name="Dashboard"

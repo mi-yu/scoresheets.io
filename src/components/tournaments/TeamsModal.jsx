@@ -4,6 +4,7 @@ import { Button, Modal, Form } from 'semantic-ui-react'
 import OpenModalButton from '../modals/OpenModalButton'
 import Auth from '../../modules/Auth'
 import { API_ROOT } from '../../config'
+import request from '../../modules/request'
 
 export default class TeamsModal extends React.Component {
 	constructor(props) {
@@ -55,7 +56,7 @@ export default class TeamsModal extends React.Component {
 			: `${API_ROOT}/tournaments/${tournamentId}/edit/addTeam`
 		const token = Auth.getToken()
 
-		fetch(url, {
+		request(url, {
 			method: 'POST',
 			headers: new Headers({
 				'Content-Type': 'application/json',
@@ -63,10 +64,6 @@ export default class TeamsModal extends React.Component {
 			}),
 			body: JSON.stringify(currentTeam),
 		})
-			.then(data => {
-				if (data.ok) return data.json()
-				this.closeModal()
-			})
 			.then(res => {
 				if (res.message.success) {
 					setMessage(res.message.success, 'success')
@@ -75,6 +72,7 @@ export default class TeamsModal extends React.Component {
 				this.closeModal()
 			})
 			.catch(err => {
+				this.closeModal()
 				setMessage(err, 'error')
 			})
 	}

@@ -2,7 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Redirect, Link } from 'react-router-dom'
 import { Grid, Header, Divider, Button, Icon, Dropdown, Input } from 'semantic-ui-react'
+import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
+import request from '../modules/request'
 import TournamentEventCard from '../components/tournaments/TournamentEventCard'
 import TeamCard from '../components/tournaments/TeamCard'
 import TeamsModal from '../components/tournaments/TeamsModal'
@@ -42,19 +44,16 @@ export default class TournamentManagementPage extends React.Component {
 	}
 
 	componentDidMount() {
+		// eslint-disable-next-line
 		const { id } = this.props.match.params
 		const token = Auth.getToken()
 
-		fetch(`${API_ROOT}/tournaments/${id}/allData`, {
+		const requests = request(`${API_ROOT}/tournaments/${id}/allData`, {
 			method: 'GET',
 			headers: new Headers({
 				Authorization: `Bearer ${token}`,
 			}),
 		})
-			.then(data => {
-				if (data.ok) return data.json()
-				throw new Error()
-			})
 			.then(res => {
 				this.setState({
 					tournament: res.tournament,
