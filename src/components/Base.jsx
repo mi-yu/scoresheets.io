@@ -5,40 +5,51 @@ import { Route, BrowserRouter as Router } from 'react-router-dom'
 import { Container, Message } from 'semantic-ui-react'
 import Nav from './Nav'
 import routes from '../routes'
-import { hideMessage } from '../actions/messageActions'
+import { setMessage, hideMessage } from '../actions/messageActions'
 
-class Base extends React.Component {
-	render() {
-		const { message, messageType, messageVisible, hideMessage } = this.props
-		const messageColor =
-			messageType === 'info' ? 'blue' : messageType === 'success' ? 'green' : 'red'
-		return (
-			<div>
-				<Router>
-					<div>
-						<Nav />
-						<Container>
-							{routes.map((route, i) => (
-								<Route
-									exact
-									key={i}
-									path={route.path}
-									render={props => <route.component {...props} />}
-								/>
-							))}
-							{messageVisible && (
-								<Message
-									onDismiss={hideMessage}
-									content={message}
-									color={messageColor}
-								/>
-							)}
-						</Container>
-					</div>
-				</Router>
-			</div>
-		)
+const translateMessageType = type => {
+	switch (type) {
+		case 'info':
+			return 'blue'
+		case 'success':
+			return 'green'
+		default:
+			return 'red'
 	}
+}
+
+const Base = ({ message, messageType, messageVisible, hideMessage, setMessage }) => {
+	const messageColor = translateMessageType(messageType)
+	return (
+		<div>
+			<Router>
+				<div>
+					<Nav />
+					<Container>
+						{routes.map(route => (
+							<Route
+								exact
+								path={route.path}
+								render={props => (
+									<route.component
+										{...props}
+										setMessage={setMessage}
+									/>
+								)}
+							/>
+						))}
+						{messageVisible && (
+							<Message
+								onDismiss={hideMessage}
+								content={message}
+								color={messageColor}
+							/>
+						)}
+					</Container>
+				</div>
+			</Router>
+		</div>
+	)
 }
 
 Base.propTypes = {
@@ -56,6 +67,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
 	hideMessage: () => dispatch(hideMessage()),
+	setMessage: (message, type) => dispatch(setMessage(message, type)),
 })
 
 export default connect(

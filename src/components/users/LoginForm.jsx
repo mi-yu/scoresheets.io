@@ -4,9 +4,10 @@ import { Form, Message } from 'semantic-ui-react'
 import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import Auth from '../../modules/Auth'
+import request from '../../modules/request'
 import { API_ROOT } from '../../config'
 import { setUser } from '../../actions/userActions'
-import { setMessage } from '../../actions/messageActions'
+import { setMessage, showMessage } from '../../actions/messageActions'
 
 class LoginForm extends React.Component {
 	constructor(props) {
@@ -14,8 +15,6 @@ class LoginForm extends React.Component {
 		this.state = {
 			email: '',
 			password: '',
-			message: '',
-			loginSucess: false,
 			redirect: false,
 		}
 	}
@@ -25,36 +24,36 @@ class LoginForm extends React.Component {
 	handleSubmit = e => {
 		e.preventDefault()
 
-		const { setUser, setMessage } = this.props
+		const { setUser, setMessage, showMessage } = this.props
 		const { email, password } = this.state
 		const payload = {
 			email,
 			password,
 		}
 
-		fetch(`${API_ROOT}/users/login`, {
+		request(`${API_ROOT}/users/login`, {
 			method: 'POST',
 			headers: new Headers({
 				'Content-Type': 'application/json',
 			}),
 			body: JSON.stringify(payload),
 		})
-			.then(data => {
-				if (data.ok) return data.json()
-				throw new Error()
-			})
-			.then(res => {
-				Auth.storeToken(res.token)
-				setUser(res.user)
+			.then(response => {
+				Auth.storeToken(response.token)
+				setUser(response.user)
 				this.setState({
 					redirect: true,
 				})
 			})
-			.catch(err => setMessage(err.message, 'error'))
+			.catch(err => {
+				console.log(err.message)
+				setMessage(err.message, 'error')
+				showMessage()
+			})
 	}
 
 	render() {
-		const { password, email, redirect, message, loginSucess } = this.state
+		const { password, email, redirect } = this.state
 
 		return (
 			<div>
@@ -79,7 +78,6 @@ class LoginForm extends React.Component {
 					</Form.Field>
 					<Form.Button content="Submit" color="blue" />
 				</Form>
-				{message && <Message error={!loginSucess} content={message} />}
 				{redirect && <Redirect to="/profile" />}
 			</div>
 		)
@@ -93,6 +91,7 @@ LoginForm.propTypes = {
 const mapDispatchToProps = dispatch => ({
 	setUser: user => dispatch(setUser(user)),
 	setMessage: (message, type) => dispatch(setMessage(message, type)),
+	showMessage: () => dispatch(showMessage()),
 })
 
 export default connect(

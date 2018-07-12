@@ -5,35 +5,47 @@ import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
 import { API_ROOT } from '../config'
 import { setUser } from '../actions/userActions'
+import { setMessage, showMessage } from '../actions/messageActions'
+import request from '../modules/request'
 
 class ProfilePage extends React.Component {
+	constructor(props) {
+		super(props)
+		this.state = {
+			redirectToLogin: false,
+		}
+	}
+
 	componentDidMount() {
-		const { user, setUser } = this.props
+		const { user, setUser, setMessage, showMessage } = this.props
 		if (!Object.keys(user).length) {
 			const token = Auth.getToken()
-			fetch(`${API_ROOT}/users/me`, {
+			request(`${API_ROOT}/users/me`, {
 				method: 'GET',
 				headers: new Headers({
 					Authorization: `Bearer ${token}`,
 				}),
 			})
-				.then(data => {
-					if (data.ok) return data.json()
-					throw new Error()
-				})
 				.then(res => {
 					setUser(res)
 				})
-				.catch(err => {
-					console.log(err)
+				.catch(errResponse => {
+					errResponse.json().then(err => {
+						setMessage(err.message, 'error')
+						showMessage()
+						this.setState({
+							redirectToLogin: true,
+						})
+					})
 				})
 		}
 	}
 
 	render() {
-		const { user, redirectToLogin } = this.props
-		if (!user) return null
+		const { user } = this.props
+		const { redirectToLogin } = this.state
 		if (redirectToLogin) return <Redirect to="/users/login" />
+		if (!Object.keys(user).length) return null
 
 		return (
 			<div>
@@ -59,6 +71,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
 	setUser: user => dispatch(setUser(user)),
+	setMessage: (message, type) => dispatch(setMessage(message, type)),
+	showMessage: () => dispatch(showMessage()),
 })
 
 export default connect(

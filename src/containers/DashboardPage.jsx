@@ -11,6 +11,7 @@ import { API_ROOT } from '../config'
 import { setTournaments } from '../actions/tournamentActions'
 import { setEvents } from '../actions/eventActions'
 import { setMessage } from '../actions/messageActions'
+import request from '../modules/request'
 
 class DashboardPage extends React.Component {
 	componentDidMount() {
@@ -19,23 +20,19 @@ class DashboardPage extends React.Component {
 		if (!tournaments.length || !events.length) {
 			const token = Auth.getToken()
 			const requests = [`${API_ROOT}/tournaments`, `${API_ROOT}/events`].map(url =>
-				fetch(url, {
+				request(url, {
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},
-				}).then(res => {
-					if (res.ok) return res.json()
-					throw res
 				}),
 			)
 
 			Promise.all(requests)
-				.then(([tournaments, events]) => {
-					setTournaments(tournaments)
-					setEvents(events)
+				.then(([tournamentList, eventList]) => {
+					setTournaments(tournamentList)
+					setEvents(eventList)
 				})
-				.catch(err => err.json())
-				.then(err => setMessage(err, 'error'))
+				.catch(err => setMessage(err, 'error'))
 		}
 	}
 
@@ -45,7 +42,9 @@ class DashboardPage extends React.Component {
 
 		return (
 			<div>
-				<Header as="h1">Tournaments</Header>
+				<Header as="h1">
+					{'Tournaments'}
+				</Header>
 				<TournamentsModal />
 				<Grid>
 					{tournaments.map(tournament => (
@@ -54,7 +53,9 @@ class DashboardPage extends React.Component {
 				</Grid>
 				<Divider />
 
-				<Header as="h1">2017-18 Season Events</Header>
+				<Header as="h1">
+					{'2017-18 Season Events'}
+				</Header>
 				<EventsModal />
 				<Grid>
 					{events.map(event => <EventCard key={event._id} event={{ ...event }} />)}

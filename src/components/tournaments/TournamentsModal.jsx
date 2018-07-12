@@ -17,6 +17,7 @@ import {
 	addTournament,
 } from '../../actions/tournamentActions'
 import { setMessage } from '../../actions/messageActions'
+import request from '../../modules/request'
 
 class TournamentsModal extends React.Component {
 	handleChange = (e, { name, value }) => {
@@ -52,7 +53,7 @@ class TournamentsModal extends React.Component {
 		const method = editing ? 'PATCH' : 'POST'
 		const token = Auth.getToken()
 
-		fetch(url, {
+		request(url, {
 			method,
 			headers: new Headers({
 				'Content-Type': 'application/json',
@@ -60,10 +61,6 @@ class TournamentsModal extends React.Component {
 			}),
 			body: JSON.stringify(currentTournament),
 		})
-			.then(data => {
-				if (data.ok) return data.json()
-				closeTournamentsModal()
-			})
 			.then(res => {
 				if (editing) updateTournament(res)
 				else addTournament(res)
@@ -72,6 +69,7 @@ class TournamentsModal extends React.Component {
 				closeTournamentsModal()
 			})
 			.catch(err => {
+				closeTournamentsModal()
 				setMessage(err.message, 'error')
 			})
 	}
