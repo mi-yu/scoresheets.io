@@ -9,6 +9,7 @@ import TournamentEventCard from '../components/tournaments/TournamentEventCard'
 import TeamCard from '../components/tournaments/TeamCard'
 import TeamsModal from '../components/tournaments/TeamsModal'
 import { API_ROOT } from '../config'
+import { setCurrentTournament } from '../actions/tournamentActions'
 
 const awardsOptions = [
 	{
@@ -29,43 +30,42 @@ const awardsOptions = [
 	},
 ]
 
-export default class TournamentManagementPage extends React.Component {
+class TournamentManagementPage extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			redirectToLogin: false,
-			numAwards: 0,
-			editingTeam: false,
-			currentTeam: {},
-			setMessage: props.setMessage,
 			eventsFilter: '',
 			teamsFilter: '',
+			teams: [],
 		}
 	}
 
 	componentDidMount() {
 		// eslint-disable-next-line
 		const { id } = this.props.match.params
+		const { tournament, setCurrentTournament, setMessage } = this.props
 		const token = Auth.getToken()
 
-		const requests = request(`${API_ROOT}/tournaments/${id}/allData`, {
-			method: 'GET',
-			headers: new Headers({
-				Authorization: `Bearer ${token}`,
-			}),
-		})
-			.then(res => {
-				this.setState({
-					tournament: res.tournament,
-					events: res.events,
-					teams: res.teams,
-					schools: res.schools,
+		if (!tournament.events.length) {
+			const requests = [`${API_ROOT}/tournaments/${id}`, `${API_ROOT}/tournaments/${id}/teams`].map(url =>
+				request(url, {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}),
+			)
+
+			Promise.all(requests)
+				.then(([returnedTournament, teams]) => {
+					setCurrentTournament({
+						...returnedTournament,
+						teams,
+					})
 				})
-			})
-			.catch(err => {
-				console.log(err)
-				this.setState({ redirectToLogin: true })
-			})
+				.catch(err => {
+					setMessage(err.message, 'error')
+				})
+		}
 	}
 
 	setCurrentTeam = (e, id) => {
@@ -100,10 +100,9 @@ export default class TournamentManagementPage extends React.Component {
 		this.setState({ editingTeam: false, teamModalOpen: false })
 	}
 
-	handleChange = (e, { name, value }) =>
-		this.setState({
-			[name]: value,
-		})
+	handleChange = (e, { name, value }) => this.setState({
+		[name]: value,
+	})
 
 	handleFilter = (e, { name, value }) => {
 		this.setState({ [name]: value.toLowerCase() })
@@ -112,40 +111,38 @@ export default class TournamentManagementPage extends React.Component {
 	matchesTeamsFilter = team => {
 		const { teamsFilter } = this.state
 		return (
-			teamsFilter === '' ||
-			team.school.toLowerCase().includes(teamsFilter) ||
-			(team.division.toLowerCase() + team.teamNumber).includes(teamsFilter)
+			teamsFilter === ''
+			|| team.school.toLowerCase().includes(teamsFilter)
+			|| (team.division.toLowerCase() + team.teamNumber).includes(teamsFilter)
 		)
 	}
 
 	matchesEventsFilter = event => {
 		const { eventsFilter } = this.state
 		return (
-			event.name.toLowerCase().includes(eventsFilter) ||
-			event.category.toLowerCase().includes(eventsFilter)
+			event.name.toLowerCase().includes(eventsFilter)
+			|| event.category.toLowerCase().includes(eventsFilter)
 		)
 	}
 
 	render() {
-		const {
-			tournament,
-			teams,
-			schools,
-			redirectToLogin,
-			numAwards,
-			teamModalOpen,
-			editingTeam,
-			currentTeam,
-		} = this.state
+		const { tournament } = this.props
+		const { redirectToLogin, numAwards } = this.state
+		const { teams } = tournament
+
 		if (redirectToLogin) return <Redirect to="/users/login" />
-		else if (!tournament) return null
+		if (!tournament.events.length || !teams) return null
+
 		return (
 			<div>
-				<Header as="h1"> {tournament.name} </Header>
-				<p> {new Date(tournament.date).toLocaleDateString()} </p>
+				<Header as="h1">
+					{tournament.name}
+				</Header>
 				<p>
-					{' '}
-					{tournament.city}, {tournament.state}{' '}
+					{new Date(tournament.date).toLocaleDateString()}
+				</p>
+				<p>
+					{`${tournament.city}, ${tournament.state}`}
 				</p>
 				<Button
 					primary
@@ -156,7 +153,7 @@ export default class TournamentManagementPage extends React.Component {
 					}}
 				>
 					<Icon name="trophy" />
-					B Results
+					{'B Results'}
 				</Button>
 				<Button
 					primary
@@ -167,7 +164,7 @@ export default class TournamentManagementPage extends React.Component {
 					}}
 				>
 					<Icon name="trophy" />
-					C Results
+					{'C Results'}
 				</Button>
 				<Button.Group>
 					<Dropdown
@@ -185,16 +182,19 @@ export default class TournamentManagementPage extends React.Component {
 						as={Link}
 						to={{
 							pathname: `/tournaments/${tournament._id}/slideshow`,
-							state: { numAwards, tournament },
+							state: { tournament },
 						}}
 					>
-						Start Awards Presentation <Icon name="right arrow" />
+						{'Start Awards Presentation'}
+						<Icon name="right arrow" />
 					</Button>
 				</Button.Group>
 				<Divider />
 				<Grid>
 					<Grid.Column floated="left" width={4}>
-						<Header as="h2">Teams</Header>
+						<Header as="h2">
+							{'Teams'}
+						</Header>
 					</Grid.Column>
 					<Grid.Column floated="right" width={4} textAlign="right">
 						<Input
@@ -205,7 +205,7 @@ export default class TournamentManagementPage extends React.Component {
 						/>
 					</Grid.Column>
 				</Grid>
-				<TeamsModal
+				{/* <TeamsModal
 					currentTeam={currentTeam}
 					tournament={tournament}
 					schools={schools}
@@ -215,23 +215,24 @@ export default class TournamentManagementPage extends React.Component {
 					updateTeam={this.updateTeam}
 					clearCurrentTeam={this.clearCurrentTeam}
 					setMessage={this.state.setMessage}
-				/>
+				/> */}
 				<Button
 					as={Link}
 					to={{
 						pathname: `/tournaments/${tournament._id}/edit/bulkAddTeams`,
-						state: { tournament: { ...tournament }, schools },
+						state: { tournament: { ...tournament } },
 					}}
 					color="green"
 				>
 					<Icon name="plus" />
 					<Icon name="zip" />
-					Bulk Add Teams
+					{'Bulk Add Teams'}
 				</Button>
-
 				{teams.length > 0 && (
 					<div>
-						<Header as="h3">B Teams</Header>
+						<Header as="h3">
+							{'B Teams'}
+						</Header>
 						<Grid>
 							{teams.map(team => {
 								if (team.division === 'B' && this.matchesTeamsFilter(team)) {
@@ -240,7 +241,9 @@ export default class TournamentManagementPage extends React.Component {
 								return null
 							})}
 						</Grid>
-						<Header as="h3">C Teams</Header>
+						<Header as="h3">
+							{'C Teams'}
+						</Header>
 						<Grid>
 							{teams.map(team => {
 								if (team.division === 'C' && this.matchesTeamsFilter(team)) {
@@ -254,7 +257,9 @@ export default class TournamentManagementPage extends React.Component {
 				<Divider />
 				<Grid>
 					<Grid.Column floated="left" width={4}>
-						<Header as="h2">Events</Header>
+						<Header as="h2">
+							{'Events'}
+						</Header>
 					</Grid.Column>
 					<Grid.Column floated="right" width={4} textAlign="right">
 						<Input
@@ -289,8 +294,29 @@ TournamentManagementPage.propTypes = {
 		params: PropTypes.object.isRequired,
 	}),
 	setMessage: PropTypes.func.isRequired,
+	setCurrentTournament: PropTypes.func.isRequired,
+	tournament: PropTypes.shape({
+		_id: PropTypes.string.isRequired,
+		name: PropTypes.string.isRequired,
+		city: PropTypes.string.isRequired,
+		state: PropTypes.string.isRequired,
+		date: PropTypes.string.isRequired,
+	}).isRequired,
 }
 
 TournamentManagementPage.defaultProps = {
 	match: undefined,
 }
+
+const mapStateToProps = state => ({
+	tournament: state.tournaments.currentTournament,
+})
+
+const mapDispatchToProps = dispatch => ({
+	setCurrentTournament: tournament => dispatch(setCurrentTournament(tournament)),
+})
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(TournamentManagementPage)

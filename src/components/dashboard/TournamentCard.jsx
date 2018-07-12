@@ -16,9 +16,11 @@ const TournamentCard = ({ tournament, setCurrentTournament, openTournamentsModal
 		<Grid.Column width={4}>
 			<Card>
 				<Card.Content>
-					<Card.Header>{name}</Card.Header>
+					<Card.Header>
+						{name}
+					</Card.Header>
 					<Card.Meta>
-						{city}, {state} on {new Date(date).toLocaleDateString()}
+						{`${city}, ${state} on ${new Date(date).toLocaleDateString()}`}
 					</Card.Meta>
 				</Card.Content>
 				<Card.Content extra>
@@ -28,18 +30,9 @@ const TournamentCard = ({ tournament, setCurrentTournament, openTournamentsModal
 							color="blue"
 							to={{
 								pathname: `/tournaments/${_id}/manage`,
-								state: {
-									tournament: {
-										_id,
-										name,
-										city,
-										state,
-										date,
-									},
-								},
 							}}
 						>
-							Manage
+							{'Manage'}
 						</Button>
 						<Button
 							color="grey"
@@ -49,7 +42,7 @@ const TournamentCard = ({ tournament, setCurrentTournament, openTournamentsModal
 								openTournamentsModal()
 							}}
 						>
-							Edit Details
+							{'Edit Details'}
 						</Button>
 					</div>
 				</Card.Content>

@@ -32,8 +32,7 @@ class DashboardPage extends React.Component {
 					setTournaments(tournamentList)
 					setEvents(eventList)
 				})
-				.catch(err => err.json())
-				.then(err => setMessage(err, 'error'))
+				.catch(err => setMessage(err, 'error'))
 		}
 	}
 
@@ -43,7 +42,9 @@ class DashboardPage extends React.Component {
 
 		return (
 			<div>
-				<Header as="h1">Tournaments</Header>
+				<Header as="h1">
+					{'Tournaments'}
+				</Header>
 				<TournamentsModal />
 				<Grid>
 					{tournaments.map(tournament => (
@@ -52,7 +53,9 @@ class DashboardPage extends React.Component {
 				</Grid>
 				<Divider />
 
-				<Header as="h1">2017-18 Season Events</Header>
+				<Header as="h1">
+					{'2017-18 Season Events'}
+				</Header>
 				<EventsModal />
 				<Grid>
 					{events.map(event => <EventCard key={event._id} event={{ ...event }} />)}

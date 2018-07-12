@@ -32,7 +32,7 @@ class Nav extends Component {
 		const { activeItem } = this.state
 		const { user } = this.props
 
-		const loggedIn = Auth.isAuthenticated() && Object.keys(user).length !== 0
+		const loggedIn = Auth.isAuthenticated()
 
 		return (
 			<Container style={{ paddingTop: '0' }}>
