@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Grid, Header, Divider } from 'semantic-ui-react'
 import { connect } from 'react-redux'
+import { Redirect } from 'react-router-dom'
 import Auth from '../modules/Auth'
 import EventCard from '../components/dashboard/EventCard'
 import TournamentCard from '../components/dashboard/TournamentCard'
@@ -10,13 +11,17 @@ import TournamentsModal from '../components/tournaments/TournamentsModal'
 import { API_ROOT } from '../config'
 import { setTournaments } from '../actions/tournamentActions'
 import { setEvents } from '../actions/eventActions'
-import { setMessage } from '../actions/messageActions'
+import { setMessage, showMessage } from '../actions/messageActions'
 import request from '../modules/request'
 
 class DashboardPage extends React.Component {
+	state = {
+		redirectToLogin: false,
+	}
+
 	componentDidMount() {
 		// eslint-disable-next-line
-		const { setEvents, setTournaments, setMessage, tournaments, events } = this.props
+		const { setEvents, setTournaments, setMessage, showMessage, tournaments, events } = this.props
 		if (!tournaments.length || !events.length) {
 			const token = Auth.getToken()
 			const requests = [`${API_ROOT}/tournaments`, `${API_ROOT}/events`].map(url =>
@@ -32,13 +37,21 @@ class DashboardPage extends React.Component {
 					setTournaments(tournamentList)
 					setEvents(eventList)
 				})
-				.catch(err => setMessage(err, 'error'))
+				.catch(err => {
+					setMessage(err.message, 'error')
+					showMessage()
+					this.setState({
+						redirectToLogin: true,
+					})
+				})
 		}
 	}
 
 	render() {
 		const { tournaments, events } = this.props
+		const { redirectToLogin } = this.state
 		if (!tournaments || !events) return null
+		if (redirectToLogin) return <Redirect to="/users/login" />
 
 		return (
 			<div>
@@ -84,6 +97,7 @@ const mapDispatchToProps = dispatch => ({
 	setTournaments: tournaments => dispatch(setTournaments(tournaments)),
 	setEvents: events => dispatch(setEvents(events)),
 	setMessage: (message, type) => dispatch(setMessage(message, type)),
+	showMessage: () => dispatch(showMessage()),
 })
 
 export default connect(
