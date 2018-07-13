@@ -10,6 +10,9 @@ import TeamCard from '../components/tournaments/TeamCard'
 import TeamsModal from '../components/tournaments/TeamsModal'
 import { API_ROOT } from '../config'
 import { setCurrentTournament } from '../actions/tournamentActions'
+import { setEvents } from '../actions/eventActions'
+import arrayToObject from '../modules/arrayToObject'
+import { setMessage, showMessage } from '../actions/messageActions'
 
 const awardsOptions = [
 	{
@@ -43,27 +46,36 @@ class TournamentManagementPage extends React.Component {
 	componentDidMount() {
 		// eslint-disable-next-line
 		const { id } = this.props.match.params
-		const { tournament, setCurrentTournament, setMessage } = this.props
+		const { tournament, setCurrentTournament, setMessage, events, setEvents } = this.props
+		console.log('events before fetches', events)
 		const token = Auth.getToken()
 
-		if (!tournament.events.length) {
-			const requests = [`${API_ROOT}/tournaments/${id}`, `${API_ROOT}/tournaments/${id}/teams`].map(url =>
+		if (!Object.keys(tournament).length || !tournament.events || !Object.keys(events).length) {
+			const requests = [`${API_ROOT}/tournaments/${id}`, `${API_ROOT}/tournaments/${id}/teams`, `${API_ROOT}/events`].map(url =>
 				request(url, {
+					method: 'GET',
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},
-				}),
+				})
 			)
 
 			Promise.all(requests)
-				.then(([returnedTournament, teams]) => {
+				.then(([returnedTournament, teams, eventList]) => {
+					console.log('array to object', arrayToObject(eventList))
+					console.log('calling setCurrentTournament')
 					setCurrentTournament({
 						...returnedTournament,
 						teams,
 					})
+					console.log('called setCurrentTournament')
+					setEvents(arrayToObject(eventList))
+					console.log('called setEvents')
 				})
 				.catch(err => {
+					console.log(err)
 					setMessage(err.message, 'error')
+					showMessage()
 				})
 		}
 	}
@@ -126,12 +138,14 @@ class TournamentManagementPage extends React.Component {
 	}
 
 	render() {
-		const { tournament } = this.props
+		const { tournament, events } = this.props
 		const { redirectToLogin, numAwards } = this.state
 		const { teams } = tournament
 
 		if (redirectToLogin) return <Redirect to="/users/login" />
-		if (!tournament.events.length || !teams) return null
+		if (!tournament.events || !teams || !Object.keys(events).length) return null
+
+		console.log(events)
 
 		return (
 			<div>
@@ -271,12 +285,12 @@ class TournamentManagementPage extends React.Component {
 					</Grid.Column>
 				</Grid>
 				<Grid>
-					{tournament.events.map(event => {
-						if (this.matchesEventsFilter(event)) {
+					{tournament.events.map(eventId => {
+						if (this.matchesEventsFilter(events[eventId])) {
 							return (
 								<TournamentEventCard
-									key={event._id}
-									{...event}
+									key={events[eventId]._id}
+									{...events[eventId]}
 									tournamentId={tournament._id}
 								/>
 							)
@@ -302,6 +316,11 @@ TournamentManagementPage.propTypes = {
 		state: PropTypes.string.isRequired,
 		date: PropTypes.string.isRequired,
 	}).isRequired,
+	events: PropTypes.arrayOf(PropTypes.shape({
+		_id: PropTypes.string.isRequired,
+		name: PropTypes.string.isRequired,
+		category: PropTypes.string.isRequired,
+	})).isRequired,
 }
 
 TournamentManagementPage.defaultProps = {
@@ -310,10 +329,14 @@ TournamentManagementPage.defaultProps = {
 
 const mapStateToProps = state => ({
 	tournament: state.tournaments.currentTournament,
+	events: state.events.eventList,
 })
 
 const mapDispatchToProps = dispatch => ({
 	setCurrentTournament: tournament => dispatch(setCurrentTournament(tournament)),
+	setEvents: events => dispatch(setEvents(events)),
+	setMessage: (message, type) => dispatch(setMessage(message, type)),
+	showMessage: () => dispatch(showMessage()),
 })
 
 export default connect(
