@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Form, Message } from 'semantic-ui-react'
+import { Form } from 'semantic-ui-react'
 import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import Auth from '../../modules/Auth'
@@ -8,6 +8,9 @@ import request from '../../modules/request'
 import { API_ROOT } from '../../config'
 import { setUser } from '../../actions/userActions'
 import { setMessage, showMessage } from '../../actions/messageActions'
+import { setTournaments } from '../../actions/tournamentActions'
+import { setEvents } from '../../actions/eventActions'
+import arrayToObject from '../../modules/arrayToObject'
 
 class LoginForm extends React.Component {
 	constructor(props) {
@@ -24,7 +27,7 @@ class LoginForm extends React.Component {
 	handleSubmit = e => {
 		e.preventDefault()
 
-		const { setUser, setMessage, showMessage } = this.props
+		const { setUser, setMessage, showMessage, setTournaments, setEvents } = this.props
 		const { email, password } = this.state
 		const payload = {
 			email,
@@ -41,12 +44,30 @@ class LoginForm extends React.Component {
 			.then(response => {
 				Auth.storeToken(response.token)
 				setUser(response.user)
+
+				const requests = [`${API_ROOT}/tournaments`, `${API_ROOT}/events`].map(url =>
+					request(url, {
+						headers: {
+							Authorization: `Bearer ${response.token}`,
+						},
+					}),
+				)
+
+				Promise.all(requests)
+					.then(([tournamentList, eventList]) => {
+						setTournaments(arrayToObject(tournamentList))
+						setEvents(arrayToObject(eventList))
+					})
+					.catch(err => {
+						setMessage(err.message, 'error')
+						showMessage()
+					})
+
 				this.setState({
 					redirect: true,
 				})
 			})
 			.catch(err => {
-				console.log(err.message)
 				setMessage(err.message, 'error')
 				showMessage()
 			})
@@ -92,6 +113,8 @@ const mapDispatchToProps = dispatch => ({
 	setUser: user => dispatch(setUser(user)),
 	setMessage: (message, type) => dispatch(setMessage(message, type)),
 	showMessage: () => dispatch(showMessage()),
+	setTournaments: tournaments => dispatch(setTournaments(tournaments)),
+	setEvents: events => dispatch(setEvents(events)),
 })
 
 export default connect(

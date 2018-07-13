@@ -1,10 +1,8 @@
 const defaultState = {
 	modalOpen: false,
 	editing: false,
-	currentTournament: {
-		events: [],
-	},
-	tournamentList: [],
+	currentTournament: {},
+	tournamentList: {},
 }
 
 export default (state = defaultState, action) => {
@@ -37,10 +35,11 @@ export default (state = defaultState, action) => {
 		case 'UPDATE_TOURNAMENT': {
 			const { tournamentList } = state
 			const updatedTournament = action.payload
-			const updatedList = tournamentList.map(tournament => {
-				if (tournament._id === updatedTournament._id) return updatedTournament
-				return tournament
-			})
+			const updatedList = {
+				...tournamentList,
+				[updatedTournament._id]: updatedTournament,
+			}
+
 			return {
 				...state,
 				tournamentList: updatedList,
@@ -49,7 +48,10 @@ export default (state = defaultState, action) => {
 		case 'ADD_TOURNAMENT':
 			return {
 				...state,
-				tournamentList: [action.payload, ...state.tournamentList],
+				tournamentList: {
+					...state.tournamentList,
+					[action.payload._id]: action.payload,
+				},
 			}
 		case 'OPEN_TOURNAMENTS_MODAL':
 			return {

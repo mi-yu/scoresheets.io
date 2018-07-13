@@ -2,7 +2,7 @@ const defaultState = {
 	modalOpen: false,
 	editing: false,
 	currentEvent: {},
-	eventList: [],
+	eventList: {},
 }
 
 export default (state = defaultState, action) => {
@@ -31,15 +31,18 @@ export default (state = defaultState, action) => {
 		case 'ADD_EVENT':
 			return {
 				...state,
-				eventList: [action.payload, ...state.eventList],
+				eventList: {
+					...state.eventList,
+					[action.payload._id]: action.payload,
+				},
 			}
 		case 'UPDATE_EVENT': {
 			const { eventList } = state
 			const updatedEvent = action.payload
-			const updatedList = eventList.map(event => {
-				if (event._id === updatedEvent._id) return updatedEvent
-				return event
-			})
+			const updatedList = {
+				...eventList,
+				[updatedEvent._id]: updatedEvent,
+			}
 			return {
 				...state,
 				eventList: updatedList,
@@ -48,10 +51,10 @@ export default (state = defaultState, action) => {
 		case 'REMOVE_EVENT': {
 			const { eventList } = state
 			const removedEvent = action.payload
-			const updatedList = eventList.filter(event => event._id !== removedEvent._id)
+			const { [removedEvent._id]: val, rest } = eventList
 			return {
 				...state,
-				eventList: updatedList,
+				eventList: rest,
 			}
 		}
 		case 'OPEN_EVENTS_MODAL':

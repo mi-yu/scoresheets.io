@@ -76,33 +76,32 @@ class TournamentsModal extends React.Component {
 
 	handleQuickAddEvent = key => {
 		const { events, currentTournament, setCurrentTournament } = this.props
+		const eventKeys = Object.keys(events)
 		let newEvents = events
 		switch (key) {
 			case 0: // only B events
-				newEvents = events.filter(
-					event => event.division.includes('B') && !event.stateEvent,
+				newEvents = eventKeys.filter(
+					id => events[id].division.includes('B') && !events[id].stateEvent,
 				)
 				break
 			case 1: // only C events
-				newEvents = events.filter(
-					event => event.division.includes('C') && !event.stateEvent,
+				newEvents = eventKeys.filter(
+					id => events[id].division.includes('C') && !events[id].stateEvent,
 				)
 				break
 			case 2: // B events + trials
-				newEvents = events.filter(event => event.division.includes('B'))
+				newEvents = eventKeys.filter(id => events[id].division.includes('B'))
 				break
 			case 3: // C events + trials
-				newEvents = events.filter(event => event.division.includes('C'))
+				newEvents = eventKeys.filter(id => events[id].division.includes('C'))
 				break
 			case 4: // only B/C events
-				newEvents = events.filter(event => !event.stateEvent)
+				newEvents = eventKeys.filter(id => !events[id].stateEvent)
 				break
 			case 5:
 			default:
 				break
 		}
-
-		newEvents = newEvents.map(event => event._id)
 
 		setCurrentTournament({
 			...currentTournament,
@@ -124,7 +123,7 @@ class TournamentsModal extends React.Component {
 		} = this.props
 
 		if (events) {
-			eventsOptions = events.map(event => ({ text: event.name, value: event._id }))
+			eventsOptions = Object.keys(events).map(id => ({ text: events[id].name, value: id }))
 		} else {
 			return <Redirect to="/admin/dashboard" />
 		}

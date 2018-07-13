@@ -13,6 +13,7 @@ import { setTournaments } from '../actions/tournamentActions'
 import { setEvents } from '../actions/eventActions'
 import { setMessage, showMessage } from '../actions/messageActions'
 import request from '../modules/request'
+import arrayToObject from '../modules/arrayToObject'
 
 class DashboardPage extends React.Component {
 	state = {
@@ -34,8 +35,8 @@ class DashboardPage extends React.Component {
 
 			Promise.all(requests)
 				.then(([tournamentList, eventList]) => {
-					setTournaments(tournamentList)
-					setEvents(eventList)
+					setTournaments(arrayToObject(tournamentList))
+					setEvents(arrayToObject(eventList))
 				})
 				.catch(err => {
 					setMessage(err.message, 'error')
@@ -60,8 +61,8 @@ class DashboardPage extends React.Component {
 				</Header>
 				<TournamentsModal />
 				<Grid>
-					{tournaments.map(tournament => (
-						<TournamentCard key={tournament._id} tournament={{ ...tournament }} />
+					{Object.keys(tournaments).map(id => (
+						<TournamentCard key={id} tournament={{ ...tournaments[id] }} />
 					))}
 				</Grid>
 				<Divider />
@@ -71,7 +72,7 @@ class DashboardPage extends React.Component {
 				</Header>
 				<EventsModal />
 				<Grid>
-					{events.map(event => <EventCard key={event._id} event={{ ...event }} />)}
+					{Object.keys(events).map(id => <EventCard key={id} event={{ ...events[id] }} />)}
 				</Grid>
 			</div>
 		)
