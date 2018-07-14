@@ -50,13 +50,16 @@ class TournamentManagementPage extends React.Component {
 		const token = Auth.getToken()
 
 		if (!Object.keys(tournament).length || !tournament.events) {
-			const requests = [`${API_ROOT}/tournaments/${id}`, `${API_ROOT}/tournaments/${id}/teams`].map(url =>
+			const requests = [
+				`${API_ROOT}/tournaments/${id}`,
+				`${API_ROOT}/tournaments/${id}/teams`,
+			].map(url =>
 				request(url, {
 					method: 'GET',
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},
-				})
+				}),
 			)
 
 			Promise.all(requests)
@@ -73,7 +76,7 @@ class TournamentManagementPage extends React.Component {
 		}
 	}
 
-	setCurrentTeam = (teamId) => {
+	setCurrentTeam = teamId => {
 		const { tournament } = this.props
 		const team = tournament.teams.find(t => t._id === teamId)
 		this.setState({
@@ -113,6 +116,17 @@ class TournamentManagementPage extends React.Component {
 		})
 	}
 
+	removeTeam = removed => {
+		const { tournament, setCurrentTournament } = this.props
+		const { teams } = tournament
+		const filtered = teams.filter(team => team._id !== removed._id)
+
+		setCurrentTournament({
+			...tournament,
+			teams: filtered,
+		})
+	}
+
 	openTeamsModal = () => {
 		this.setState({
 			teamModalOpen: true,
@@ -125,9 +139,10 @@ class TournamentManagementPage extends React.Component {
 		})
 	}
 
-	handleChange = (e, { name, value }) => this.setState({
-		[name]: value,
-	})
+	handleChange = (e, { name, value }) =>
+		this.setState({
+			[name]: value,
+		})
 
 	handleFilter = (e, { name, value }) => {
 		this.setState({ [name]: value.toLowerCase() })
@@ -136,17 +151,17 @@ class TournamentManagementPage extends React.Component {
 	matchesTeamsFilter = team => {
 		const { teamsFilter } = this.state
 		return (
-			teamsFilter === ''
-			|| team.school.toLowerCase().includes(teamsFilter)
-			|| (team.division.toLowerCase() + team.teamNumber).includes(teamsFilter)
+			teamsFilter === '' ||
+			team.school.toLowerCase().includes(teamsFilter) ||
+			(team.division.toLowerCase() + team.teamNumber).includes(teamsFilter)
 		)
 	}
 
 	matchesEventsFilter = event => {
 		const { eventsFilter } = this.state
 		return (
-			event.name.toLowerCase().includes(eventsFilter)
-			|| event.category.toLowerCase().includes(eventsFilter)
+			event.name.toLowerCase().includes(eventsFilter) ||
+			event.category.toLowerCase().includes(eventsFilter)
 		)
 	}
 
@@ -160,15 +175,9 @@ class TournamentManagementPage extends React.Component {
 
 		return (
 			<div>
-				<Header as="h1">
-					{tournament.name}
-				</Header>
-				<p>
-					{new Date(tournament.date).toLocaleDateString()}
-				</p>
-				<p>
-					{`${tournament.city}, ${tournament.state}`}
-				</p>
+				<Header as="h1">{tournament.name}</Header>
+				<p>{new Date(tournament.date).toLocaleDateString()}</p>
+				<p>{`${tournament.city}, ${tournament.state}`}</p>
 				<Button
 					primary
 					as={Link}
@@ -217,9 +226,7 @@ class TournamentManagementPage extends React.Component {
 				<Divider />
 				<Grid>
 					<Grid.Column floated="left" width={4}>
-						<Header as="h2">
-							{'Teams'}
-						</Header>
+						<Header as="h2">{'Teams'}</Header>
 					</Grid.Column>
 					<Grid.Column floated="right" width={4} textAlign="right">
 						<Input
@@ -255,24 +262,36 @@ class TournamentManagementPage extends React.Component {
 				</Button>
 				{teams.length > 0 && (
 					<div>
-						<Header as="h3">
-							{'B Teams'}
-						</Header>
+						<Header as="h3">{'B Teams'}</Header>
 						<Grid>
 							{teams.map(team => {
 								if (team.division === 'B' && this.matchesTeamsFilter(team)) {
-									return <TeamCard key={team._id} team={team} setCurrentTeam={this.setCurrentTeam} />
+									return (
+										<TeamCard
+											key={team._id}
+											team={team}
+											setCurrentTeam={this.setCurrentTeam}
+											tournamentId={tournament._id}
+											removeTeam={this.removeTeam}
+										/>
+									)
 								}
 								return null
 							})}
 						</Grid>
-						<Header as="h3">
-							{'C Teams'}
-						</Header>
+						<Header as="h3">{'C Teams'}</Header>
 						<Grid>
 							{teams.map(team => {
 								if (team.division === 'C' && this.matchesTeamsFilter(team)) {
-									return <TeamCard key={team._id} team={team} setCurrentTeam={this.setCurrentTeam} />
+									return (
+										<TeamCard
+											key={team._id}
+											team={team}
+											setCurrentTeam={this.setCurrentTeam}
+											tournamentId={tournament._id}
+											removeTeam={this.removeTeam}
+										/>
+									)
 								}
 								return null
 							})}
@@ -282,9 +301,7 @@ class TournamentManagementPage extends React.Component {
 				<Divider />
 				<Grid>
 					<Grid.Column floated="left" width={4}>
-						<Header as="h2">
-							{'Events'}
-						</Header>
+						<Header as="h2">{'Events'}</Header>
 					</Grid.Column>
 					<Grid.Column floated="right" width={4} textAlign="right">
 						<Input
@@ -327,11 +344,13 @@ TournamentManagementPage.propTypes = {
 		state: PropTypes.string.isRequired,
 		date: PropTypes.string.isRequired,
 	}).isRequired,
-	events: PropTypes.arrayOf(PropTypes.shape({
-		_id: PropTypes.string.isRequired,
-		name: PropTypes.string.isRequired,
-		category: PropTypes.string.isRequired,
-	})).isRequired,
+	events: PropTypes.arrayOf(
+		PropTypes.shape({
+			_id: PropTypes.string.isRequired,
+			name: PropTypes.string.isRequired,
+			category: PropTypes.string.isRequired,
+		}),
+	).isRequired,
 }
 
 TournamentManagementPage.defaultProps = {

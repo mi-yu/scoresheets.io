@@ -56,7 +56,7 @@ const routes = [
 	},
 
 	{
-		path: '/scoresheets/:tournamentId/scores/:division/:eventId',
+		path: '/tournaments/:tournamentId/scores/:division/:eventId',
 		component: ScoreEntryPage,
 	},
 ]

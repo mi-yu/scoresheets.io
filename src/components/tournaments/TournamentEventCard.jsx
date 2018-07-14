@@ -58,7 +58,7 @@ const TournamentEventCard = ({
 							fluid
 							basic
 							as={Link}
-							to={`/scoresheets/${tournamentId}/scores/${division}/${_id}`}
+							to={`/tournaments/${tournamentId}/scores/${division}/${_id}`}
 						>
 							Manage Scores
 						</Button>
@@ -67,14 +67,14 @@ const TournamentEventCard = ({
 							<Button
 								color="blue"
 								as={Link}
-								to={`/scoresheets/${tournamentId}/scores/B/${_id}`}
+								to={`/tournaments/${tournamentId}/scores/B/${_id}`}
 							>
 								B Scores
 							</Button>
 							<Button
 								color="blue"
 								as={Link}
-								to={`/scoresheets/${tournamentId}/scores/C/${_id}`}
+								to={`/tournaments/${tournamentId}/scores/C/${_id}`}
 							>
 								C Scores
 							</Button>

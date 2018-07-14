@@ -2,42 +2,46 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Header, Button, Table, Form, Icon } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
+import request from '../modules/request'
+import { setMessage } from '../actions/messageActions'
 import { API_ROOT } from '../config'
 
 const tierOptions = [...Array(5)].map((n, i) => ({ value: i + 1, text: String(i + 1) }))
 
-export default class ScoreEntryPage extends React.Component {
-	constructor(props) {
-		super(props)
-		this.state = {
-			setMessage: props.setMessage,
-		}
+class ScoreEntryPage extends React.Component {
+	state = {
+		scoresheetEntry: {
+			scores: [],
+		},
+		loading: true,
 	}
 
 	componentDidMount() {
-		const { setMessage } = this.state
+		const { setMessage } = this.props
 		const { tournamentId, eventId, division } = this.props.match.params
 		const token = Auth.getToken()
+		const urls = [`${API_ROOT}/tournaments/${tournamentId}/scoresheets/${division}/${eventId}`]
 
-		fetch(`${API_ROOT}/scoresheets/${tournamentId}/scores/${division}/${eventId}`, {
-			method: 'GET',
-			headers: new Headers({
-				Authorization: `Bearer ${token}`,
+		const requests = urls.map(url =>
+			request(url, {
+				method: 'GET',
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
 			}),
-		})
-			.then(data => {
-				if (data.ok) return data.json()
-				throw new Error()
-			})
-			.then(res => {
+		)
+
+		Promise.all(requests)
+			.then(([scoresheet]) => {
 				this.setState({
-					scoresheetEntry: res.scoresheetEntry,
-					teams: res.teams,
+					scoresheetEntry: scoresheet,
+					loading: false,
 				})
 			})
 			.catch(err => {
-				setMessage(err, 'error')
+				setMessage(err.message, 'error')
 			})
 	}
 
@@ -98,8 +102,8 @@ export default class ScoreEntryPage extends React.Component {
 	}
 
 	render() {
-		const { scoresheetEntry } = this.state
-		if (!scoresheetEntry) return null
+		const { scoresheetEntry, loading } = this.state
+		if (loading) return null
 		return (
 			<div>
 				<Header as="h1">{scoresheetEntry.event.name}</Header>
@@ -127,8 +131,6 @@ export default class ScoreEntryPage extends React.Component {
 							{scoresheetEntry.scores.map((score, i) => (
 								<Table.Row>
 									<Table.Cell>
-										{' '}
-										div_teamnumber (school)
 										{`${score.team.division}${score.team.teamNumber} (${
 											score.team.school
 										})`}
@@ -235,3 +237,12 @@ ScoreEntryPage.propTypes = {
 ScoreEntryPage.defaultProps = {
 	match: undefined,
 }
+
+const mapDispatchToProps = dispatch => ({
+	setMessage: (message, type) => dispatch(setMessage(message, type)),
+})
+
+export default connect(
+	null,
+	mapDispatchToProps,
+)(ScoreEntryPage)
