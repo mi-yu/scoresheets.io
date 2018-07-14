@@ -16,22 +16,14 @@ const TournamentCard = ({ tournament, setCurrentTournament, openTournamentsModal
 		<Grid.Column width={4}>
 			<Card>
 				<Card.Content>
-					<Card.Header>
-						{name}
-					</Card.Header>
+					<Card.Header>{name}</Card.Header>
 					<Card.Meta>
 						{`${city}, ${state} on ${new Date(date).toLocaleDateString()}`}
 					</Card.Meta>
 				</Card.Content>
 				<Card.Content extra>
 					<div className="ui two buttons">
-						<Button
-							as={Link}
-							color="blue"
-							to={{
-								pathname: `/tournaments/${_id}/manage`,
-							}}
-						>
+						<Button as={Link} color="blue" to={`/tournaments/${_id}/manage`}>
 							{'Manage'}
 						</Button>
 						<Button

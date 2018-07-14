@@ -40,40 +40,42 @@ class TournamentManagementPage extends React.Component {
 			teamModalOpen: false,
 			editingTeam: false,
 			currentTeam: {},
+			loading: true,
 		}
 	}
 
 	componentDidMount() {
 		// eslint-disable-next-line
 		const { id } = this.props.match.params
-		const { tournament, setCurrentTournament, setMessage } = this.props
+		const { setCurrentTournament, setMessage } = this.props
 		const token = Auth.getToken()
 
-		if (!Object.keys(tournament).length || !tournament.events) {
-			const requests = [
-				`${API_ROOT}/tournaments/${id}`,
-				`${API_ROOT}/tournaments/${id}/teams`,
-			].map(url =>
-				request(url, {
-					method: 'GET',
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				}),
-			)
+		const requests = [
+			`${API_ROOT}/tournaments/${id}`,
+			`${API_ROOT}/tournaments/${id}/teams`,
+		].map(url =>
+			request(url, {
+				method: 'GET',
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}),
+		)
 
-			Promise.all(requests)
-				.then(([returnedTournament, teams]) => {
-					setCurrentTournament({
-						...returnedTournament,
-						teams,
-					})
+		Promise.all(requests)
+			.then(([returnedTournament, teams]) => {
+				setCurrentTournament({
+					...returnedTournament,
+					teams,
 				})
-				.catch(err => {
-					setMessage(err.message, 'error')
-					showMessage()
+				this.setState({
+					loading: false,
 				})
-		}
+			})
+			.catch(err => {
+				setMessage(err.message, 'error')
+				showMessage()
+			})
 	}
 
 	setCurrentTeam = teamId => {
@@ -167,11 +169,19 @@ class TournamentManagementPage extends React.Component {
 
 	render() {
 		const { tournament, events } = this.props
-		const { redirectToLogin, numAwards, teamModalOpen, editingTeam, currentTeam } = this.state
-		const { teams } = tournament
+		const {
+			redirectToLogin,
+			numAwards,
+			teamModalOpen,
+			editingTeam,
+			currentTeam,
+			loading,
+		} = this.state
 
 		if (redirectToLogin) return <Redirect to="/users/login" />
-		if (!tournament.events || !teams) return null
+		if (loading) return null
+
+		const { teams } = tournament
 
 		return (
 			<div>
@@ -343,7 +353,7 @@ TournamentManagementPage.propTypes = {
 		city: PropTypes.string.isRequired,
 		state: PropTypes.string.isRequired,
 		date: PropTypes.string.isRequired,
-	}).isRequired,
+	}),
 	events: PropTypes.arrayOf(
 		PropTypes.shape({
 			_id: PropTypes.string.isRequired,
@@ -354,12 +364,13 @@ TournamentManagementPage.propTypes = {
 }
 
 TournamentManagementPage.defaultProps = {
-	match: undefined,
+	match: {},
+	tournament: {},
 }
 
 const mapStateToProps = state => ({
-	tournament: state.tournaments.currentTournament,
 	events: state.events.eventList,
+	tournament: state.tournaments.currentTournament,
 })
 
 const mapDispatchToProps = dispatch => ({
