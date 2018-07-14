@@ -45,6 +45,13 @@ class ScoreEntryPage extends React.Component {
 			})
 	}
 
+	getScores = scoresheet => ({
+		scores: scoresheet.scores.map(score => ({
+			...score,
+			team: score.team._id,
+		})),
+	})
+
 	handleChange = (e, { scoreindex, name, value }) => {
 		const { scoresheetEntry } = this.state
 		const { scores } = scoresheetEntry
@@ -68,36 +75,31 @@ class ScoreEntryPage extends React.Component {
 	}
 
 	submitScores = () => {
-		const { scoresheetEntry, setMessage } = this.state
-		const url = `${API_ROOT}/scoresheets/${scoresheetEntry._id}/update`
-		const eventName = scoresheetEntry.event.name
+		const { scoresheetEntry } = this.state
+		const { tournament, event, division } = scoresheetEntry
+		const { setMessage } = this.props
+		const url = `${API_ROOT}/tournaments/${tournament._id}/scoresheets/${division}/${event._id}`
 		const token = Auth.getToken()
-		const payload = JSON.stringify({
-			scores: scoresheetEntry.scores,
-			eventName,
-		})
 
-		fetch(url, {
-			method: 'POST',
-			headers: new Headers({
+		const payload = JSON.stringify(this.getScores(scoresheetEntry))
+
+		request(url, {
+			method: 'PATCH',
+			headers: {
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${token}`,
-			}),
+			},
 			body: payload,
 		})
-			.then(data => {
-				if (data.ok) return data.json()
-				throw new Error()
-			})
-			.then(res => {
-				if (res.message.error) setMessage(res.message.error, 'error')
-				else {
-					setMessage(res.message.success, 'success')
-					this.setState(this.state)
-				}
+			.then(updated => {
+				setMessage(`Successfully updated scores for ${event.name} ${division}`, 'success')
+				this.setState({
+					scoresheetEntry: updated,
+				})
 			})
 			.catch(err => {
-				setMessage(err, 'error')
+				console.log(err)
+				setMessage(err.message, 'error')
 			})
 	}
 

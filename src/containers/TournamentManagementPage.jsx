@@ -193,7 +193,6 @@ class TournamentManagementPage extends React.Component {
 					as={Link}
 					to={{
 						pathname: `/tournaments/${tournament._id}/B/results`,
-						state: { tournament: { ...tournament } },
 					}}
 				>
 					<Icon name="trophy" />
@@ -204,7 +203,6 @@ class TournamentManagementPage extends React.Component {
 					as={Link}
 					to={{
 						pathname: `/tournaments/${tournament._id}/C/results`,
-						state: { tournament: { ...tournament } },
 					}}
 				>
 					<Icon name="trophy" />

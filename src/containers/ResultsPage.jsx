@@ -2,37 +2,43 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Icon, Table, Header } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
 import { API_ROOT } from '../config'
+import request from '../modules/request'
 
-export default class ResultsPage extends React.Component {
+class ResultsPage extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
 			...props,
-			division: props.match.params.division,
-			tournament: { ...props.location.state.tournament },
 		}
 	}
 
 	componentDidMount() {
-		const { tournament, division } = this.state
+		const { division, tournamentId } = this.props.match.params
 		const token = Auth.getToken()
 
-		fetch(`${API_ROOT}/tournaments/${tournament._id}/${division}/results`, {
-			method: 'GET',
-			headers: new Headers({
-				Authorization: `Bearer ${token}`,
+		const urls = [
+			`${API_ROOT}/tournaments/${tournamentId}/scoresheets?division=${division}`,
+			`${API_ROOT}/tournaments/${tournamentId}/teams?division=${division}`,
+			`${API_ROOT}/tournaments/${tournamentId}`,
+		]
+		const requests = urls.map(url =>
+			request(url, {
+				method: 'GET',
+				headers: new Headers({
+					Authorization: `Bearer ${token}`,
+				}),
 			}),
-		})
-			.then(data => {
-				if (data.ok) return data.json()
-				throw new Error()
-			})
-			.then(res => {
+		)
+
+		Promise.all(requests)
+			.then(([entries, teams, tournament]) => {
 				this.setState({
-					entries: res.entries,
-					teams: res.teams,
+					entries,
+					teams,
+					tournament,
 				})
 			})
 			.catch(err => {
@@ -40,9 +46,39 @@ export default class ResultsPage extends React.Component {
 			})
 	}
 
+	populateScores = (entries, teams) => {
+		let totalScore = 0
+		teams.forEach(team => {
+			team.scores = []
+			entries.forEach(entry => {
+				entry.scores.forEach(score => {
+					if (score.team._id === team._id) {
+						team.scores.push(score.rank || 0)
+						totalScore += score.rank || 0
+					}
+				})
+			})
+			team.totalScore = totalScore
+			totalScore = 0
+		})
+
+		teams.sort((t1, t2) => Number(t1.totalScore) - Number(t2.totalScore))
+
+		teams.forEach((team, index) => {
+			team.rank = index + 1
+		})
+
+		return teams
+	}
+
 	render() {
-		const { entries, tournament, division, teams } = this.state
+		const { match } = this.props
+		const { division } = match.params
+		const { entries, teams, tournament } = this.state
 		if (!entries) return null
+
+		const populatedTeams = this.populateScores(entries, teams)
+
 		return (
 			<div>
 				<Header as="h1">Division {division} Results</Header>
@@ -68,7 +104,7 @@ export default class ResultsPage extends React.Component {
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
-						{teams.map(team => (
+						{populatedTeams.map(team => (
 							<Table.Row key={team._id}>
 								<Table.Cell>
 									{team.division}
@@ -100,3 +136,12 @@ ResultsPage.defaultProps = {
 	match: undefined,
 	location: undefined,
 }
+
+const mapStateToProps = state => ({
+	tournament: state.tournaments.currentTournament,
+})
+
+export default connect(
+	mapStateToProps,
+	null,
+)(ResultsPage)

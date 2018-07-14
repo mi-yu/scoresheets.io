@@ -46,7 +46,7 @@ const routes = [
 	},
 
 	{
-		path: '/tournaments/:id/:division/results',
+		path: '/tournaments/:tournamentId/:division/results',
 		component: ResultsPage,
 	},
 
