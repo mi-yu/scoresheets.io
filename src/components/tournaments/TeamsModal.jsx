@@ -1,12 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Button, Modal, Form } from 'semantic-ui-react'
+import { connect } from 'react-redux'
 import OpenModalButton from '../modals/OpenModalButton'
 import Auth from '../../modules/Auth'
 import { API_ROOT } from '../../config'
 import request from '../../modules/request'
+import { setMessage, showMessage } from '../../actions/messageActions';
 
-export default class TeamsModal extends React.Component {
+class TeamsModal extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
@@ -23,19 +25,6 @@ export default class TeamsModal extends React.Component {
 		}
 	}
 
-	openModal = () => {
-		this.setState({
-			modalOpen: true,
-		})
-	}
-
-	closeModal = () => {
-		this.state.closeModalParent()
-		this.setState({
-			modalOpen: false,
-		})
-	}
-
 	handleChange = (e, { name, value }) => {
 		this.setState({
 			...this.state,
@@ -47,17 +36,20 @@ export default class TeamsModal extends React.Component {
 	}
 
 	handleSubmitEvent = () => {
-		const { editingTeam, currentTeam, updateTeam, setMessage, tournament, schools } = this.state
+		const { setMessage, showMessage } = this.props
+		const { editing, currentTeam, updateTeam, tournament, closeModal } = this.state
 		const tournamentId = tournament._id
 		const teamId = currentTeam._id
-		const teamDiv = currentTeam.division
-		const url = editingTeam
-			? `${API_ROOT}/tournaments/${tournamentId}/edit/${teamDiv}/${teamId}`
-			: `${API_ROOT}/tournaments/${tournamentId}/edit/addTeam`
+
+		const url = editing
+			? `${API_ROOT}/tournaments/${tournamentId}/teams/${teamId}`
+			: `${API_ROOT}/tournaments/${tournamentId}/teams`
+		const method = editing ? 'PATCH' : 'POST'
+
 		const token = Auth.getToken()
 
 		request(url, {
-			method: 'POST',
+			method,
 			headers: new Headers({
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${token}`,
@@ -65,20 +57,21 @@ export default class TeamsModal extends React.Component {
 			body: JSON.stringify(currentTeam),
 		})
 			.then(res => {
-				if (res.message.success) {
-					setMessage(res.message.success, 'success')
-					updateTeam(res.newTeam)
-				} else setMessage(res.message.error, 'error')
-				this.closeModal()
+				const message = editing ? `Successfully updated ${res.school}.` : `Succesfully created ${res.school}`
+				setMessage(message, 'success')
+				showMessage()
+				updateTeam(res)
+				closeModal()
 			})
 			.catch(err => {
-				this.closeModal()
-				setMessage(err, 'error')
+				closeModal()
+				setMessage(err.message, 'error')
+				showMessage()
 			})
 	}
 
 	render() {
-		const { modalOpen, currentTeam, clearCurrentTeam, schools } = this.state
+		const { modalOpen, currentTeam, clearCurrentTeam, closeModal } = this.state
 
 		return (
 			<Modal
@@ -91,7 +84,7 @@ export default class TeamsModal extends React.Component {
 				}
 				closeIcon
 				open={modalOpen}
-				onClose={this.closeModal}
+				onClose={closeModal}
 			>
 				<Modal.Header>
 					{currentTeam.school ? `Edit Team: ${currentTeam.school}` : 'New Team'}
@@ -100,22 +93,17 @@ export default class TeamsModal extends React.Component {
 					<Form>
 						<Form.Field required>
 							<label htmlFor="school">School</label>
-							<Form.Dropdown
+							<Form.Input
 								required
-								search
-								selection
-								allowAdditions
 								name="school"
 								value={currentTeam.school}
 								onChange={this.handleChange}
-								options={schools.map(school => ({ text: school, value: school }))}
 							/>
 						</Form.Field>
 						<Form.Field>
 							<label htmlFor="identifier">Identifier (optional)</label>
 							<small>
-								Use this to distinguish between two teams from the same school (team
-								A/B/C, team Red/Green, etc)
+								{'Use this to distinguish between two teams from the same school (team A/B/C, team Red/Green, etc)'}
 							</small>
 							<Form.Input
 								required
@@ -146,7 +134,7 @@ export default class TeamsModal extends React.Component {
 					</Form>
 				</Modal.Content>
 				<Modal.Actions>
-					<Button onClick={this.closeModal}>Cancel</Button>
+					<Button onClick={closeModal}>Cancel</Button>
 					<Button color="green" onClick={this.handleSubmitEvent}>
 						Submit
 					</Button>
@@ -155,6 +143,11 @@ export default class TeamsModal extends React.Component {
 		)
 	}
 }
+
+const mapDispatchToProps = dispatch => ({
+	setMessage: (message, type) => dispatch(setMessage(message, type)),
+	showMessage: () => dispatch(showMessage()),
+})
 
 TeamsModal.propTypes = {
 	modalOpen: PropTypes.bool.isRequired,
@@ -165,3 +158,5 @@ TeamsModal.propTypes = {
 		teamNumber: PropTypes.number.isRequired,
 	}).isRequired,
 }
+
+export default connect(null, mapDispatchToProps)(TeamsModal)

@@ -10,8 +10,6 @@ import TeamCard from '../components/tournaments/TeamCard'
 import TeamsModal from '../components/tournaments/TeamsModal'
 import { API_ROOT } from '../config'
 import { setCurrentTournament } from '../actions/tournamentActions'
-import { setEvents } from '../actions/eventActions'
-import arrayToObject from '../modules/arrayToObject'
 import { setMessage, showMessage } from '../actions/messageActions'
 
 const awardsOptions = [
@@ -39,19 +37,20 @@ class TournamentManagementPage extends React.Component {
 		this.state = {
 			eventsFilter: '',
 			teamsFilter: '',
-			teams: [],
+			teamModalOpen: false,
+			editingTeam: false,
+			currentTeam: {},
 		}
 	}
 
 	componentDidMount() {
 		// eslint-disable-next-line
 		const { id } = this.props.match.params
-		const { tournament, setCurrentTournament, setMessage, events, setEvents } = this.props
-		console.log('events before fetches', events)
+		const { tournament, setCurrentTournament, setMessage } = this.props
 		const token = Auth.getToken()
 
-		if (!Object.keys(tournament).length || !tournament.events || !Object.keys(events).length) {
-			const requests = [`${API_ROOT}/tournaments/${id}`, `${API_ROOT}/tournaments/${id}/teams`, `${API_ROOT}/events`].map(url =>
+		if (!Object.keys(tournament).length || !tournament.events) {
+			const requests = [`${API_ROOT}/tournaments/${id}`, `${API_ROOT}/tournaments/${id}/teams`].map(url =>
 				request(url, {
 					method: 'GET',
 					headers: {
@@ -61,27 +60,22 @@ class TournamentManagementPage extends React.Component {
 			)
 
 			Promise.all(requests)
-				.then(([returnedTournament, teams, eventList]) => {
-					console.log('array to object', arrayToObject(eventList))
-					console.log('calling setCurrentTournament')
+				.then(([returnedTournament, teams]) => {
 					setCurrentTournament({
 						...returnedTournament,
 						teams,
 					})
-					console.log('called setCurrentTournament')
-					setEvents(arrayToObject(eventList))
-					console.log('called setEvents')
 				})
 				.catch(err => {
-					console.log(err)
 					setMessage(err.message, 'error')
 					showMessage()
 				})
 		}
 	}
 
-	setCurrentTeam = (e, id) => {
-		const team = this.state.teams.find(t => t._id === id)
+	setCurrentTeam = (teamId) => {
+		const { tournament } = this.props
+		const team = tournament.teams.find(t => t._id === teamId)
 		this.setState({
 			editingTeam: true,
 			currentTeam: team,
@@ -98,18 +92,36 @@ class TournamentManagementPage extends React.Component {
 	}
 
 	updateTeam = updatedTeam => {
-		const { teams } = this.state
-		const index = teams.map(team => team._id).indexOf(updatedTeam._id)
-		if (index > -1) teams[index] = updatedTeam
-		else {
-			teams.push(updatedTeam)
-			teams.sort((teamA, teamB) => teamA.teamNumber > teamB.teamNumber)
-		}
-		this.setState({ teams })
+		const { tournament, setCurrentTournament } = this.props
+		const { teams } = tournament
+		const { editingTeam } = this.state
+		// const index = teams.map(team => team._id).indexOf(updatedTeam._id)
+		// if (index > -1) teams[index] = updatedTeam
+		// else {
+		// 	teams.push(updatedTeam)
+		// 	teams.sort((teamA, teamB) => teamA.teamNumber > teamB.teamNumber)
+		// }
+		const updatedTeams = editingTeam ?
+			teams.map(team => team._id === updatedTeam._id ? updatedTeam : team) :
+			[...teams, updatedTeam].sort((t1, t2) => t1.teamNumber > t2.teamNumber)
+
+
+		setCurrentTournament({
+			...tournament,
+			teams: updatedTeams,
+		})
 	}
 
-	closeModalParent = () => {
-		this.setState({ editingTeam: false, teamModalOpen: false })
+	openTeamsModal = () => {
+		this.setState({
+			teamModalOpen: true,
+		})
+	}
+
+	closeTeamsModal = () => {
+		this.setState({
+			teamModalOpen: false,
+		})
 	}
 
 	handleChange = (e, { name, value }) => this.setState({
@@ -139,13 +151,11 @@ class TournamentManagementPage extends React.Component {
 
 	render() {
 		const { tournament, events } = this.props
-		const { redirectToLogin, numAwards } = this.state
+		const { redirectToLogin, numAwards, teamModalOpen, editingTeam, currentTeam } = this.state
 		const { teams } = tournament
 
 		if (redirectToLogin) return <Redirect to="/users/login" />
-		if (!tournament.events || !teams || !Object.keys(events).length) return null
-
-		console.log(events)
+		if (!tournament.events || !teams) return null
 
 		return (
 			<div>
@@ -219,17 +229,16 @@ class TournamentManagementPage extends React.Component {
 						/>
 					</Grid.Column>
 				</Grid>
-				{/* <TeamsModal
-					currentTeam={currentTeam}
+				<TeamsModal
 					tournament={tournament}
-					schools={schools}
-					editingTeam={editingTeam}
 					modalOpen={teamModalOpen}
-					closeModalParent={this.closeModalParent}
-					updateTeam={this.updateTeam}
+					openModal={this.openTeamsModal}
+					closeModal={this.closeTeamsModal}
+					editing={editingTeam}
+					currentTeam={currentTeam}
 					clearCurrentTeam={this.clearCurrentTeam}
-					setMessage={this.state.setMessage}
-				/> */}
+					updateTeam={this.updateTeam}
+				/>
 				<Button
 					as={Link}
 					to={{
@@ -250,7 +259,7 @@ class TournamentManagementPage extends React.Component {
 						<Grid>
 							{teams.map(team => {
 								if (team.division === 'B' && this.matchesTeamsFilter(team)) {
-									return <TeamCard key={team._id} team={team} />
+									return <TeamCard key={team._id} team={team} setCurrentTeam={this.setCurrentTeam} />
 								}
 								return null
 							})}
@@ -261,7 +270,7 @@ class TournamentManagementPage extends React.Component {
 						<Grid>
 							{teams.map(team => {
 								if (team.division === 'C' && this.matchesTeamsFilter(team)) {
-									return <TeamCard key={team._id} team={team} />
+									return <TeamCard key={team._id} team={team} setCurrentTeam={this.setCurrentTeam} />
 								}
 								return null
 							})}
@@ -334,7 +343,6 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
 	setCurrentTournament: tournament => dispatch(setCurrentTournament(tournament)),
-	setEvents: events => dispatch(setEvents(events)),
 	setMessage: (message, type) => dispatch(setMessage(message, type)),
 	showMessage: () => dispatch(showMessage()),
 })
