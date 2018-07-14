@@ -37,7 +37,7 @@ class TeamsModal extends React.Component {
 
 	handleSubmitEvent = () => {
 		const { setMessage, showMessage } = this.props
-		const { editing, currentTeam, updateTeam, tournament, closeModal } = this.state
+		const { editing, currentTeam, updateTeam, addTeams, tournament, closeModal } = this.state
 		const tournamentId = tournament._id
 		const teamId = currentTeam._id
 
@@ -54,13 +54,17 @@ class TeamsModal extends React.Component {
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${token}`,
 			}),
-			body: JSON.stringify(currentTeam),
+			body: JSON.stringify({
+				...currentTeam,
+				tournament: tournamentId,
+			}),
 		})
 			.then(res => {
-				const message = editing ? `Successfully updated ${res.school}.` : `Succesfully created ${res.school}`
+				const message = editing ? `Successfully updated ${currentTeam.school}.` : `Succesfully created ${currentTeam.school}`
 				setMessage(message, 'success')
 				showMessage()
-				updateTeam(res)
+				if (editing) updateTeam(res)
+				else addTeams(res)
 				closeModal()
 			})
 			.catch(err => {
@@ -71,13 +75,13 @@ class TeamsModal extends React.Component {
 	}
 
 	render() {
-		const { modalOpen, currentTeam, clearCurrentTeam, closeModal } = this.state
+		const { modalOpen, currentTeam, clearCurrentTeam, closeModal, editing } = this.state
 
 		return (
 			<Modal
 				trigger={
 					<OpenModalButton
-						onClick={() => clearCurrentTeam()}
+						onClick={clearCurrentTeam}
 						text="New Team"
 						icon="plus"
 					/>
@@ -87,7 +91,7 @@ class TeamsModal extends React.Component {
 				onClose={closeModal}
 			>
 				<Modal.Header>
-					{currentTeam.school ? `Edit Team: ${currentTeam.school}` : 'New Team'}
+					{editing ? `Edit Team: ${currentTeam.school}` : 'New Team'}
 				</Modal.Header>
 				<Modal.Content>
 					<Form>

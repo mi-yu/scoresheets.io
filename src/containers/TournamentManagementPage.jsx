@@ -94,21 +94,22 @@ class TournamentManagementPage extends React.Component {
 	updateTeam = updatedTeam => {
 		const { tournament, setCurrentTournament } = this.props
 		const { teams } = tournament
-		const { editingTeam } = this.state
-		// const index = teams.map(team => team._id).indexOf(updatedTeam._id)
-		// if (index > -1) teams[index] = updatedTeam
-		// else {
-		// 	teams.push(updatedTeam)
-		// 	teams.sort((teamA, teamB) => teamA.teamNumber > teamB.teamNumber)
-		// }
-		const updatedTeams = editingTeam ?
-			teams.map(team => team._id === updatedTeam._id ? updatedTeam : team) :
-			[...teams, updatedTeam].sort((t1, t2) => t1.teamNumber > t2.teamNumber)
-
+		const combined = teams.map(team => (team._id === updatedTeam._id ? updatedTeam : team))
 
 		setCurrentTournament({
 			...tournament,
-			teams: updatedTeams,
+			teams: combined,
+		})
+	}
+
+	addTeams = newTeams => {
+		const { tournament, setCurrentTournament } = this.props
+		const { teams } = tournament
+		const combined = [...teams, ...newTeams].sort((t1, t2) => t1.teamNumber > t2.teamNumber)
+
+		setCurrentTournament({
+			...tournament,
+			teams: combined,
 		})
 	}
 
@@ -238,6 +239,7 @@ class TournamentManagementPage extends React.Component {
 					currentTeam={currentTeam}
 					clearCurrentTeam={this.clearCurrentTeam}
 					updateTeam={this.updateTeam}
+					addTeams={this.addTeams}
 				/>
 				<Button
 					as={Link}
