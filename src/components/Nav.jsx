@@ -49,13 +49,15 @@ class Nav extends Component {
 					color="black"
 				>
 					<Item
-						name="Scribe"
+						name="Scoresheets"
 						style={
-							activeItem.includes('scribe') || activeItem === '' ? activeStyle : {}
+							activeItem.includes('Scoresheets') || activeItem === ''
+								? activeStyle
+								: {}
 						}
 					>
 						<Link to="/" onClick={this.handleClick}>
-							Scribe
+							Scoresheets
 						</Link>
 					</Item>
 
