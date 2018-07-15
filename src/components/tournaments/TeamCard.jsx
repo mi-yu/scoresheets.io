@@ -20,7 +20,7 @@ class TeamCard extends React.Component {
 			},
 		})
 			.then(deleted => {
-				setMessage(`Successfully deleted team ${deleted.school}`)
+				setMessage(`Successfully deleted team ${deleted.school}`, 'info')
 				removeTeam(deleted)
 			})
 			.catch(err => {

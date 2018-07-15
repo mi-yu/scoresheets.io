@@ -253,14 +253,7 @@ class TournamentManagementPage extends React.Component {
 					updateTeam={this.updateTeam}
 					addTeams={this.addTeams}
 				/>
-				<Button
-					as={Link}
-					to={{
-						pathname: `/tournaments/${tournament._id}/edit/bulkAddTeams`,
-						state: { tournament: { ...tournament } },
-					}}
-					color="green"
-				>
+				<Button as={Link} to={`/tournaments/${tournament._id}/teams/add`} color="green">
 					<Icon name="plus" />
 					<Icon name="zip" />
 					{'Bulk Add Teams'}

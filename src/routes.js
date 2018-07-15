@@ -41,7 +41,7 @@ const routes = [
 	},
 
 	{
-		path: '/tournaments/:id/edit/bulkAddTeams',
+		path: '/tournaments/:id/teams/add',
 		component: BulkAddTeamsPage,
 	},
 

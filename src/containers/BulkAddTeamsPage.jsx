@@ -2,8 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Form, Button, Icon, Table, Header } from 'semantic-ui-react'
 import { Redirect, Link } from 'react-router-dom'
+import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
 import { API_ROOT } from '../config'
+import request from '../modules/request'
+import { setMessage } from '../actions/messageActions'
 
 const divisionOptions = [
 	{
@@ -16,27 +19,44 @@ const divisionOptions = [
 	},
 ]
 
-export default class BulkAddTeamsPage extends React.Component {
+class BulkAddTeamsPage extends React.Component {
 	constructor(props) {
 		super(props)
 		const formData = []
 		for (let i = 0; i < 10; i += 1) {
 			formData.push({
 				teamNumber: undefined,
-				tournament: props.location.state.tournament._id,
+				tournament: props.match.params.id,
 				school: '',
 				identifier: '',
 				division: '',
 			})
 		}
 		this.state = {
-			tournament: { ...props.location.state.tournament },
-			schools: props.location.state.schools.map(school => ({ text: school, value: school })),
-			setMessage: props.setMessage,
 			redirectToManagePage: false,
 			options: divisionOptions,
 			formData,
 		}
+	}
+
+	componentDidMount() {
+		const { setMessage } = this.props
+		const token = Auth.getToken()
+		const url = `${API_ROOT}/tournaments/${this.props.match.params.id}`
+
+		request(url, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		})
+			.then(tournament => {
+				this.setState({
+					tournament,
+				})
+			})
+			.catch(err => {
+				setMessage(err.message, 'error')
+			})
 	}
 
 	handleAddRows = n => {
@@ -44,7 +64,7 @@ export default class BulkAddTeamsPage extends React.Component {
 		for (let i = 0; i < n; i += 1) {
 			newRows.push({
 				teamNumber: undefined,
-				tournament: this.state.tournament._id,
+				tournament: this.props.match.params.id,
 				school: '',
 				identifier: '',
 				division: '',
@@ -77,41 +97,50 @@ export default class BulkAddTeamsPage extends React.Component {
 
 	validateRow = row => row.teamNumber !== 0 && row.school !== '' && row.division !== ''
 
+	isEmpty = row => row.teamNumber !== 0 || row.school !== '' || row.division !== ''
+
 	handleSubmit = () => {
-		const { tournament, setMessage, formData } = this.state
-		const url = `${API_ROOT}/tournaments/${tournament._id}/edit/bulkAddTeams`
+		const { setMessage } = this.props
+		const { tournament, formData } = this.state
+		const url = `${API_ROOT}/tournaments/${tournament._id}/teams`
 		const token = Auth.getToken()
 
-		fetch(url, {
+		try {
+			formData.forEach(row => {
+				if (!this.validateRow(row) && !this.isEmpty(row)) throw new Error()
+			})
+		} catch (e) {
+			return setMessage(
+				'There are problems with the form, please make sure every team has a division, team number, and school.',
+			)
+		}
+
+		const filteredRows = formData.filter(row => this.validateRow(row))
+
+		request(url, {
 			method: 'POST',
 			headers: new Headers({
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${token}`,
 			}),
-			body: JSON.stringify(formData.filter(row => this.validateRow(row))),
+			body: JSON.stringify(filteredRows),
 		})
-			.then(data => {
-				if (data.ok) return data.json()
-				throw new Error('An unknown error occurred while trying to create teams.')
-			})
-			.then(res => {
-				if (res.message.success) {
-					setMessage(res.message.success, 'success')
-					this.setState({
-						redirectToManagePage: res.redirect,
-					})
-				} else setMessage(res.message.error, 'error')
+			.then(() => {
+				setMessage(`Successfully created ${filteredRows.length} teams`, 'success')
+				this.setState({
+					redirectToManagePage: true,
+				})
 			})
 			.catch(err => {
-				setMessage(`An unknown error occurred: ${err.toString()}`, 'error')
+				setMessage(err.message, 'error')
 			})
 
 		// TODO: better error handling
 	}
 
 	render() {
-		const { tournament, formData, redirectToManagePage, schools, options } = this.state
-
+		const { tournament, formData, redirectToManagePage } = this.state
+		if (!tournament) return null
 		if (redirectToManagePage) return <Redirect to={`/tournaments/${tournament._id}/manage`} />
 
 		return (
@@ -127,47 +156,15 @@ export default class BulkAddTeamsPage extends React.Component {
 					<Table celled>
 						<Table.Header>
 							<Table.Row>
+								<Table.HeaderCell width={3}>Division</Table.HeaderCell>
 								<Table.HeaderCell width={2}>Team Number</Table.HeaderCell>
 								<Table.HeaderCell width={8}>School</Table.HeaderCell>
 								<Table.HeaderCell width={3}>Identifier</Table.HeaderCell>
-								<Table.HeaderCell width={3}>Division</Table.HeaderCell>
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
 							{formData.map((r, i) => (
 								<Table.Row key={i}>
-									<Table.Cell>
-										<Form.Input
-											name="teamNumber"
-											row={i}
-											fluid
-											value={formData[i].teamNumber}
-											onChange={this.handleChange}
-										/>
-									</Table.Cell>
-									<Table.Cell>
-										<Form.Dropdown
-											required
-											row={i}
-											search
-											selection
-											allowAdditions
-											name="school"
-											value={formData[i].school}
-											onChange={this.handleChange}
-											onAddItem={this.handleAddition}
-											options={options}
-										/>
-									</Table.Cell>
-									<Table.Cell>
-										<Form.Input
-											name="identifier"
-											row={i}
-											fluid
-											value={formData[i].identifier}
-											onChange={this.handleChange}
-										/>
-									</Table.Cell>
 									<Table.Cell>
 										<Form.Dropdown
 											name="division"
@@ -177,6 +174,34 @@ export default class BulkAddTeamsPage extends React.Component {
 											selection
 											options={divisionOptions}
 											value={formData[i].division}
+											onChange={this.handleChange}
+										/>
+									</Table.Cell>
+									<Table.Cell>
+										<Form.Input
+											name="teamNumber"
+											row={i}
+											fluid
+											type="number"
+											value={formData[i].teamNumber}
+											onChange={this.handleChange}
+										/>
+									</Table.Cell>
+									<Table.Cell>
+										<Form.Input
+											required
+											row={i}
+											name="school"
+											value={formData[i].school}
+											onChange={this.handleChange}
+										/>
+									</Table.Cell>
+									<Table.Cell>
+										<Form.Input
+											name="identifier"
+											row={i}
+											fluid
+											value={formData[i].identifier}
 											onChange={this.handleChange}
 										/>
 									</Table.Cell>
@@ -221,3 +246,12 @@ BulkAddTeamsPage.propTypes = {
 BulkAddTeamsPage.defaultProps = {
 	location: undefined,
 }
+
+const mapDispatchToProps = dispatch => ({
+	setMessage: (message, type) => dispatch(setMessage(message, type)),
+})
+
+export default connect(
+	null,
+	mapDispatchToProps,
+)(BulkAddTeamsPage)
