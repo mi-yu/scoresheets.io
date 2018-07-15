@@ -51,17 +51,14 @@ class Base extends React.Component {
 			<div>
 				<Router>
 					<div>
-						<Nav />
+						<Nav hidden={window.location.pathname.includes('slideshow')} />
 						<Container>
 							{routes.map(route => (
 								<Route
 									exact
 									path={route.path}
 									render={props => (
-										<route.component
-											{...props}
-											setMessage={setMessage}
-										/>
+										<route.component {...props} setMessage={setMessage} />
 									)}
 								/>
 							))}

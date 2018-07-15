@@ -222,10 +222,7 @@ class TournamentManagementPage extends React.Component {
 						primary
 						labelPosition="right"
 						as={Link}
-						to={{
-							pathname: `/tournaments/${tournament._id}/slideshow`,
-							state: { tournament },
-						}}
+						to={`/tournaments/${tournament._id}/slideshow?numAwards=${numAwards || 4}`}
 					>
 						{'Start Awards Presentation'}
 						<Icon name="right arrow" />

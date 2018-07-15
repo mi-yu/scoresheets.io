@@ -6,6 +6,13 @@ export const setMessage = (message, type) => dispatch => {
 			type,
 		},
 	})
+
+	// Hide message automatically after 5 seconds
+	setTimeout(() => {
+		dispatch({
+			type: 'HIDE_MESSAGE',
+		})
+	}, 5000)
 }
 
 export const showMessage = () => dispatch => {

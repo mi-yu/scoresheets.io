@@ -30,9 +30,11 @@ class Nav extends Component {
 
 	render() {
 		const { activeItem } = this.state
-		const { user } = this.props
+		const { user, hidden } = this.props
 
 		const loggedIn = Auth.isAuthenticated()
+
+		if (hidden) return null
 
 		return (
 			<Container style={{ paddingTop: '0' }}>
@@ -48,12 +50,13 @@ class Nav extends Component {
 				>
 					<Item
 						name="Scribe"
-						onClick={this.handleClick}
 						style={
 							activeItem.includes('scribe') || activeItem === '' ? activeStyle : {}
 						}
 					>
-						<Link to="/">Scribe</Link>
+						<Link to="/" onClick={this.handleClick}>
+							Scribe
+						</Link>
 					</Item>
 
 					{loggedIn ? (
@@ -61,21 +64,22 @@ class Nav extends Component {
 							<Item
 								name="Dashboard"
 								style={activeItem.includes('dashboard') ? activeStyle : {}}
-								onClick={this.handleClick}
 							>
-								<Link to="/admin/dashboard">Dashboard</Link>
+								<Link to="/admin/dashboard" onClick={this.handleClick}>
+									Dashboard
+								</Link>
 							</Item>
 							<Item
 								name="Profile"
 								style={activeItem.includes('profile') ? activeStyle : {}}
-								onClick={this.handleClick}
 							>
-								<Link to="/profile">Profile</Link>
+								<Link to="/profile" onClick={this.handleClick}>
+									Profile
+								</Link>
 							</Item>
 							<Item
 								name="Logout"
 								style={activeItem.includes('logout') ? activeStyle : {}}
-								onClick={this.handleClick}
 							>
 								<Link to="/" onClick={this.handleLogout}>
 									Logout
@@ -87,16 +91,18 @@ class Nav extends Component {
 							<Item
 								name="Login"
 								style={activeItem.includes('login') ? activeStyle : {}}
-								onClick={this.handleClick}
 							>
-								<Link to="/users/login">Login</Link>
+								<Link to="/users/login" onClick={this.handleClick}>
+									Login
+								</Link>
 							</Item>
 							<Item
 								name="Register"
 								style={activeItem.includes('register') ? activeStyle : {}}
-								onClick={this.handleClick}
 							>
-								<Link to="/users/register">Register</Link>
+								<Link to="/users/register" onClick={this.handleClick}>
+									Register
+								</Link>
 							</Item>
 						</Menu.Menu>
 					)}
