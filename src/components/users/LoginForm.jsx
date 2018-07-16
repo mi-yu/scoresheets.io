@@ -44,37 +44,19 @@ class LoginForm extends React.Component {
 			.then(response => {
 				Auth.storeToken(response.token)
 				setUser(response.user)
-
-				const requests = [`${API_ROOT}/tournaments`, `${API_ROOT}/events`].map(url =>
-					request(url, {
-						headers: {
-							Authorization: `Bearer ${response.token}`,
-						},
-					}),
-				)
-
-				Promise.all(requests)
-					.then(([tournamentList, eventList]) => {
-						setTournaments(arrayToObject(tournamentList))
-						setEvents(arrayToObject(eventList))
-					})
-					.catch(err => {
-						setMessage(err.message, 'error')
-						showMessage()
-					})
-
 				this.setState({
 					redirect: true,
 				})
 			})
 			.catch(err => {
 				setMessage(err.message, 'error')
-				showMessage()
 			})
 	}
 
 	render() {
 		const { password, email, redirect } = this.state
+
+		if (redirect) return <Redirect to="/admin/dashboard" />
 
 		return (
 			<div>
@@ -99,7 +81,6 @@ class LoginForm extends React.Component {
 					</Form.Field>
 					<Form.Button content="Submit" color="blue" />
 				</Form>
-				{redirect && <Redirect to="/profile" />}
 			</div>
 		)
 	}

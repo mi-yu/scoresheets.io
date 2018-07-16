@@ -66,6 +66,7 @@ class EventsModal extends React.Component {
 				closeEventsModal()
 			})
 			.catch(err => {
+				console.log(err)
 				setMessage(err.message, 'error')
 			})
 	}

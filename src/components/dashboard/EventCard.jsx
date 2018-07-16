@@ -4,7 +4,7 @@ import { Card, Label, Button, Grid } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { setCurrentEvent, openEventsModal, setEditing } from '../../actions/eventActions'
 
-const EventCard = ({ event, setCurrentEvent, openEventsModal, setEditing }) => {
+const EventCard = ({ event, setCurrentEvent, openEventsModal, setEditing, user }) => {
 	const { name, category, stateEvent, impound, division } = event
 	let color = ''
 	switch (category) {
@@ -47,19 +47,21 @@ const EventCard = ({ event, setCurrentEvent, openEventsModal, setEditing }) => {
 						{impound && <Label size="tiny">impound</Label>}
 					</Card.Description>
 				</Card.Content>
-				<Card.Content>
-					<Button
-						fluid
-						color="blue"
-						onClick={() => {
-							setCurrentEvent(event)
-							setEditing(true)
-							openEventsModal()
-						}}
-					>
-						Edit
-					</Button>
-				</Card.Content>
+				{user.group === 'admin' && (
+					<Card.Content>
+						<Button
+							fluid
+							color="blue"
+							onClick={() => {
+								setCurrentEvent(event)
+								setEditing(true)
+								openEventsModal()
+							}}
+						>
+							Edit
+						</Button>
+					</Card.Content>
+				)}
 			</Card>
 		</Grid.Column>
 	)
@@ -79,6 +81,10 @@ EventCard.propTypes = {
 	setEditing: PropTypes.func.isRequired,
 }
 
+const mapStateToProps = state => ({
+	user: state.users.currentUser,
+})
+
 const mapDispatchToProps = dispatch => ({
 	setCurrentEvent: event => dispatch(setCurrentEvent(event)),
 	openEventsModal: () => dispatch(openEventsModal()),
@@ -86,6 +92,6 @@ const mapDispatchToProps = dispatch => ({
 })
 
 export default connect(
-	null,
+	mapStateToProps,
 	mapDispatchToProps,
 )(EventCard)

@@ -5,6 +5,7 @@ import { Link, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
 import { setUser } from '../actions/userActions'
+import { clearCurrentTournament, setTournaments } from '../actions/tournamentActions'
 
 const activeStyle = {
 	borderBottom: '1px solid black',
@@ -22,9 +23,11 @@ class Nav extends Component {
 	handleClick = e => this.setState({ activeItem: e.target.innerHTML.toLowerCase() })
 
 	handleLogout = () => {
-		const { setUser } = this.props
+		const { setUser, clearCurrentTournament, setTournaments } = this.props
 		Auth.removeToken()
 		setUser({})
+		clearCurrentTournament()
+		setTournaments({})
 		return <Redirect to="/" />
 	}
 
@@ -51,7 +54,7 @@ class Nav extends Component {
 					<Item
 						name="Scoresheets"
 						style={
-							activeItem.includes('Scoresheets') || activeItem === ''
+							activeItem.includes('scoresheets') || activeItem === '/'
 								? activeStyle
 								: {}
 						}
@@ -124,6 +127,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
 	setUser: user => dispatch(setUser(user)),
+	clearCurrentTournament: () => dispatch(clearCurrentTournament()),
+	setTournaments: tournament => dispatch(setTournaments(tournament)),
 })
 
 export default connect(

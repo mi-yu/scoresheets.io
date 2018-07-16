@@ -7,6 +7,7 @@ import Nav from './Nav'
 import routes from '../routes'
 import { setMessage, hideMessage, showMessage } from '../actions/messageActions'
 import { setEvents } from '../actions/eventActions'
+import { setUser } from '../actions/userActions'
 import request from '../modules/request'
 import arrayToObject from '../modules/arrayToObject'
 import Auth from '../modules/Auth'
@@ -25,15 +26,26 @@ const translateMessageType = type => {
 
 class Base extends React.Component {
 	componentDidMount() {
-		const { events, setEvents, showMessage } = this.props
+		const { events, setEvents, showMessage, user, setUser } = this.props
 		const token = Auth.getToken()
-		if (!Object.keys(events).length && token) {
-			request(`${API_ROOT}/events`, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-				.then(res => setEvents(arrayToObject(res)))
+		const urls = []
+		if (!Object.keys(events).length && token) urls.push(`${API_ROOT}/events`)
+		if (!Object.keys(user).length && token) urls.push(`${API_ROOT}/users/me`)
+
+		if (urls.length) {
+			const requests = urls.map(url =>
+				request(url, {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}),
+			)
+
+			Promise.all(requests)
+				.then(([resEvents, resUser]) => {
+					setEvents(arrayToObject(resEvents))
+					setUser(resUser)
+				})
 				.catch(err => {
 					setMessage(err.message, 'error')
 					showMessage()
@@ -89,6 +101,7 @@ const mapStateToProps = state => ({
 	messageVisible: state.messages.visible,
 	messageType: state.messages.type,
 	events: state.events.eventList,
+	user: state.users.currentUser,
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -96,6 +109,7 @@ const mapDispatchToProps = dispatch => ({
 	setMessage: (message, type) => dispatch(setMessage(message, type)),
 	showMessage: () => dispatch(showMessage()),
 	setEvents: events => dispatch(setEvents(events)),
+	setUser: user => dispatch(setUser(user)),
 })
 
 export default connect(

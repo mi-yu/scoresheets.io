@@ -8,6 +8,7 @@
 		"arrow-body-style": 1,
 		"implicit-arrow-linebreak": 1,
 		"jsx-a11y/label-has-for": 1,
+		"react/jsx-one-expression-per-line": 0,
 		"func-names": ["error", "never"],
 		"no-tabs": 0,
 		"indent": [

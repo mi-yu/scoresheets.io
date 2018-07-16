@@ -22,10 +22,24 @@ class DashboardPage extends React.Component {
 
 	componentDidMount() {
 		// eslint-disable-next-line
-		const { setEvents, setTournaments, setMessage, showMessage, tournaments, events } = this.props
+		const {
+			setEvents,
+			setTournaments,
+			setMessage,
+			showMessage,
+			tournaments,
+			events,
+			user,
+		} = this.props
+
+		if (!Object.keys(user).length) return null
+
 		if (!tournaments.length || !events.length) {
 			const token = Auth.getToken()
-			const requests = [`${API_ROOT}/tournaments`, `${API_ROOT}/events`].map(url =>
+			const requests = [
+				`${API_ROOT}/tournaments?${user.group !== 'admin' ? `userId=${user._id}` : null}`,
+				`${API_ROOT}/events`,
+			].map(url =>
 				request(url, {
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -49,16 +63,14 @@ class DashboardPage extends React.Component {
 	}
 
 	render() {
-		const { tournaments, events } = this.props
+		const { tournaments, events, user } = this.props
 		const { redirectToLogin } = this.state
 		if (!tournaments || !events) return null
-		if (redirectToLogin) return <Redirect to="/users/login" />
+		if (redirectToLogin || !Auth.isAuthenticated()) return <Redirect to="/users/login" />
 
 		return (
 			<div>
-				<Header as="h1">
-					{'Tournaments'}
-				</Header>
+				<Header as="h1">Tournaments</Header>
 				<TournamentsModal />
 				<Grid>
 					{Object.keys(tournaments).map(id => (
@@ -67,12 +79,12 @@ class DashboardPage extends React.Component {
 				</Grid>
 				<Divider />
 
-				<Header as="h1">
-					{'2017-18 Season Events'}
-				</Header>
-				<EventsModal />
+				<Header as="h1">2017-18 Season Events</Header>
+				{user.group === 'admin' && <EventsModal />}
 				<Grid>
-					{Object.keys(events).map(id => <EventCard key={id} event={{ ...events[id] }} />)}
+					{Object.keys(events).map(id => (
+						<EventCard key={id} event={{ ...events[id] }} />
+					))}
 				</Grid>
 			</div>
 		)
@@ -92,6 +104,7 @@ const mapStateToProps = state => ({
 	currentEvent: state.events.currentEvent,
 	tournamentsModalOpen: state.tournaments.modalOpen,
 	eventsModalOpen: state.events.modalOpen,
+	user: state.users.currentUser,
 })
 
 const mapDispatchToProps = dispatch => ({
