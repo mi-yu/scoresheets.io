@@ -33,12 +33,11 @@ class Base extends React.Component {
 		if (!Object.keys(user).length && token) urls.push(`${API_ROOT}/users/me`)
 
 		if (urls.length) {
-			const requests = urls.map(url =>
-				request(url, {
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				}),
+			const requests = urls.map(url => request(url, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}),
 			)
 
 			Promise.all(requests)
@@ -54,7 +53,7 @@ class Base extends React.Component {
 	}
 
 	render() {
-		const { message, messageType, messageVisible, hideMessage, setMessage, events } = this.props
+		const { message, messageType, messageVisible, messageDetails, hideMessage, setMessage, events } = this.props
 		const messageColor = translateMessageType(messageType)
 
 		if (!Object.keys(events).length && Auth.isAuthenticated()) return null
@@ -77,9 +76,19 @@ class Base extends React.Component {
 							{messageVisible && (
 								<Message
 									onDismiss={hideMessage}
-									content={message}
 									color={messageColor}
-								/>
+								>
+									{message}
+									{messageDetails.length ? (
+										<Message.List style={{
+											textAlign: 'center',
+										}}
+										>
+											{messageDetails.map(detail => <span>{detail}<br /></span>)}
+										</Message.List>
+									) : null
+									}
+								</Message>
 							)}
 						</Container>
 					</div>
@@ -94,12 +103,18 @@ Base.propTypes = {
 	messageType: PropTypes.string.isRequired,
 	messageVisible: PropTypes.bool.isRequired,
 	hideMessage: PropTypes.func.isRequired,
+	messageDetails: PropTypes.arrayOf(PropTypes.string),
+}
+
+Base.defaultProps = {
+	messageDetails: [],
 }
 
 const mapStateToProps = state => ({
 	message: state.messages.message,
 	messageVisible: state.messages.visible,
 	messageType: state.messages.type,
+	messageDetails: state.messages.details,
 	events: state.events.eventList,
 	user: state.users.currentUser,
 })
