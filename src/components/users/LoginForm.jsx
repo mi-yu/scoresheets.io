@@ -7,9 +7,7 @@ import Auth from '../../modules/Auth'
 import request from '../../modules/request'
 import { API_ROOT } from '../../config'
 import { setUser } from '../../actions/userActions'
-import { setMessage, showMessage } from '../../actions/messageActions'
-import { setTournaments } from '../../actions/tournamentActions'
-import { setEvents } from '../../actions/eventActions'
+import { setMessage } from '../../actions/messageActions'
 import arrayToObject from '../../modules/arrayToObject'
 
 class LoginForm extends React.Component {
@@ -24,10 +22,8 @@ class LoginForm extends React.Component {
 
 	handleChange = (e, { name, value }) => this.setState({ [name]: value })
 
-	handleSubmit = e => {
-		e.preventDefault()
-
-		const { setUser, setMessage, showMessage, setTournaments, setEvents } = this.props
+	handleSubmit = () => {
+		const { setUser, setMessage } = this.props
 		const { email, password } = this.state
 		const payload = {
 			email,
@@ -56,10 +52,9 @@ class LoginForm extends React.Component {
 	render() {
 		const { password, email, redirect } = this.state
 
-		if (redirect) return <Redirect to="/admin/dashboard" />
-
 		return (
 			<div>
+				{redirect && <Redirect to="/admin/dashboard" />}
 				<Form onSubmit={this.handleSubmit}>
 					<Form.Field required>
 						<label htmlFor="email">Email</label>
@@ -93,9 +88,6 @@ LoginForm.propTypes = {
 const mapDispatchToProps = dispatch => ({
 	setUser: user => dispatch(setUser(user)),
 	setMessage: (message, type) => dispatch(setMessage(message, type)),
-	showMessage: () => dispatch(showMessage()),
-	setTournaments: tournaments => dispatch(setTournaments(tournaments)),
-	setEvents: events => dispatch(setEvents(events)),
 })
 
 export default connect(
