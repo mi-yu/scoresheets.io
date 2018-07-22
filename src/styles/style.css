@@ -42,3 +42,7 @@
 	width: 15px;
 	height: 150px;
 }
+
+.ui.card {
+	min-height: 9em;
+}

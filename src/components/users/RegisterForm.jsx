@@ -17,7 +17,7 @@ class RegisterForm extends React.Component {
 			lastName: '',
 			password: '',
 			email: '',
-			redirectToDashboard: false,
+			redirectToLogin: false,
 			submitDisabled: false,
 		}
 	}
@@ -37,7 +37,7 @@ class RegisterForm extends React.Component {
 
 	handleSubmit = () => {
 		const { setMessage, setUser } = this.props
-		const { redirectToDashboard, ...rest } = this.state
+		const { redirectToLogin, ...rest } = this.state
 		const url = `${API_ROOT}/users`
 
 		request(url, {
@@ -51,7 +51,7 @@ class RegisterForm extends React.Component {
 				setMessage('Registration successful', 'success')
 				setUser(user)
 				this.setState({
-					redirectToDashboard: true,
+					redirectToLogin: true,
 				})
 			})
 			.catch(err => {
@@ -102,8 +102,8 @@ class RegisterForm extends React.Component {
 	}
 
 	render() {
-		const { group, firstName, lastName, password, email, redirectToDashboard, submitDisabled } = this.state
-		if (redirectToDashboard) return <Redirect to="/admin/dashboard" />
+		const { group, firstName, lastName, password, email, redirectToLogin, submitDisabled } = this.state
+		if (redirectToLogin) return <Redirect to="/users/login" />
 
 		return (
 			<Form>
