@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Grid, Header, Divider } from 'semantic-ui-react'
+import { Grid, Header, Divider, Card, Button } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 import Auth from '../modules/Auth'
@@ -29,15 +29,12 @@ class DashboardPage extends React.Component {
 			showMessage,
 			tournaments,
 			events,
-			user,
 		} = this.props
 
-		if (!Object.keys(user).length) return null
-
-		if (!tournaments.length || !events.length) {
+		if (!Object.keys(tournaments).length || !Object.keys(events).length) {
 			const token = Auth.getToken()
 			const requests = [
-				`${API_ROOT}/tournaments?${user.group !== 'admin' ? `userId=${user._id}` : null}`,
+				`${API_ROOT}/tournaments`,
 				`${API_ROOT}/events`,
 			].map(url =>
 				request(url, {
@@ -71,21 +68,30 @@ class DashboardPage extends React.Component {
 		return (
 			<div>
 				<Header as="h1">Tournaments</Header>
-				<TournamentsModal />
 				<Grid>
+					{/* <Card>
+						<Card.Content>
+							<TournamentsModal as={Button} />
+						</Card.Content>
+					</Card> */}
 					{Object.keys(tournaments).map(id => (
 						<TournamentCard key={id} tournament={{ ...tournaments[id] }} />
 					))}
 				</Grid>
-				<Divider />
 
-				<Header as="h1">2017-18 Season Events</Header>
-				{user.group === 'admin' && <EventsModal />}
-				<Grid>
-					{Object.keys(events).map(id => (
-						<EventCard key={id} event={{ ...events[id] }} />
-					))}
-				</Grid>
+				{user.group === 'admin' && (
+					<div>
+						<Divider />
+						<Header as="h1">2017-18 Season Events</Header>
+						<EventsModal />
+						<Grid>
+							{Object.keys(events).map(id => (
+								<EventCard key={id} event={{ ...events[id] }} />
+							))}
+						</Grid>
+					</div>
+				)
+				}
 			</div>
 		)
 	}
