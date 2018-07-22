@@ -18,6 +18,7 @@ class RegisterForm extends React.Component {
 			password: '',
 			email: '',
 			redirectToDashboard: false,
+			submitDisabled: false,
 		}
 	}
 
@@ -30,6 +31,7 @@ class RegisterForm extends React.Component {
 	handleGroupSelect = group => {
 		this.setState({
 			group,
+			submitDisabled: group === 'supervisor',
 		})
 	}
 
@@ -72,11 +74,11 @@ class RegisterForm extends React.Component {
 	renderDirectorFields = () => {
 		return (
 			<div>
-				<Form.Field>
+				{/* <Form.Field>
 					<label htmlFor="director specific fields">
 						Tell us a little about your tournament (optional)
 					</label>
-				</Form.Field>
+				</Form.Field> */}
 			</div>
 		)
 	}
@@ -84,27 +86,30 @@ class RegisterForm extends React.Component {
 	renderSupervisorFields = () => {
 		const { tournamentCode } = this.state
 		return (
-			<Form.Field required>
-				<label htmlFor="tournament code">Tournament code</label>
-				<Form.Input
-					name="tournamentCode"
-					value={tournamentCode}
-					onChange={this.handleChange}
-				/>
-				<small>Ask your tournament director for this code.</small>
-			</Form.Field>
+			<div>
+				<p>Coming soon!</p>
+				<Form.Field disabled>
+					<label htmlFor="tournament code">Tournament code</label>
+					<Form.Input
+						name="tournamentCode"
+						value={tournamentCode}
+						onChange={this.handleChange}
+					/>
+					<small>Ask your tournament director for this code.</small>
+				</Form.Field>
+			</div>
 		)
 	}
 
 	render() {
-		const { group, firstName, lastName, password, email, redirectToDashboard } = this.state
+		const { group, firstName, lastName, password, email, redirectToDashboard, submitDisabled } = this.state
 		if (redirectToDashboard) return <Redirect to="/admin/dashboard" />
 
 		return (
 			<Form>
 				<Form.Field required>
 					<label htmlFor="email">Email</label>
-					<Form.Input name="email" value={email} onChange={this.handleChange} />
+					<Form.Input name="email" value={email} onChange={this.handleChange} required />
 				</Form.Field>
 				<Form.Field required>
 					<label htmlFor="password">Password</label>
@@ -113,6 +118,7 @@ class RegisterForm extends React.Component {
 						name="password"
 						value={password}
 						onChange={this.handleChange}
+						required
 					/>
 				</Form.Field>
 				<Form.Group>
@@ -122,11 +128,12 @@ class RegisterForm extends React.Component {
 							name="firstName"
 							value={firstName}
 							onChange={this.handleChange}
+							required
 						/>
 					</Form.Field>
 					<Form.Field width={8} required>
 						<label htmlFor="last name">Last Name</label>
-						<Form.Input name="lastName" value={lastName} onChange={this.handleChange} />
+						<Form.Input name="lastName" value={lastName} onChange={this.handleChange} required />
 					</Form.Field>
 				</Form.Group>
 				<Form.Field required>
@@ -148,7 +155,7 @@ class RegisterForm extends React.Component {
 				</Form.Field>
 				{group === 'director' && this.renderDirectorFields()}
 				{group === 'supervisor' && this.renderSupervisorFields()}
-				<Button color="green" onClick={this.handleSubmit}>
+				<Button color="green" onClick={this.handleSubmit} disabled={submitDisabled}>
 					Submit
 				</Button>
 			</Form>

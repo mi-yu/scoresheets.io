@@ -26,18 +26,17 @@ const translateMessageType = type => {
 
 class Base extends React.Component {
 	componentDidMount() {
-		const { events, setEvents, showMessage, user, setUser } = this.props
-		const token = Auth.getToken()
-		const urls = []
-		if (!Object.keys(events).length && token) urls.push(`${API_ROOT}/events`)
-		if (!Object.keys(user).length && token) urls.push(`${API_ROOT}/users/me`)
+		const { setEvents, showMessage, setUser } = this.props
 
-		if (urls.length) {
-			const requests = urls.map(url => request(url, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			}),
+		if (Auth.isAuthenticated()) {
+			const token = Auth.getToken()
+			const urls = [`${API_ROOT}/events`, `${API_ROOT}/users/me`]
+			const requests = urls.map(url => request(
+				url, {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}),
 			)
 
 			Promise.all(requests)
@@ -53,10 +52,8 @@ class Base extends React.Component {
 	}
 
 	render() {
-		const { message, messageType, messageVisible, messageDetails, hideMessage, setMessage, events } = this.props
+		const { message, messageType, messageVisible, hideMessage, setMessage } = this.props
 		const messageColor = translateMessageType(messageType)
-
-		if (!Object.keys(events).length && Auth.isAuthenticated()) return null
 
 		return (
 			<div>
@@ -114,9 +111,6 @@ const mapStateToProps = state => ({
 	message: state.messages.message,
 	messageVisible: state.messages.visible,
 	messageType: state.messages.type,
-	messageDetails: state.messages.details,
-	events: state.events.eventList,
-	user: state.users.currentUser,
 })
 
 const mapDispatchToProps = dispatch => ({
