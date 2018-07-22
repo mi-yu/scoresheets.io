@@ -24,13 +24,12 @@ class ScoreEntryPage extends React.Component {
 		const token = Auth.getToken()
 		const urls = [`${API_ROOT}/tournaments/${tournamentId}/scoresheets/${division}/${eventId}`]
 
-		const requests = urls.map(url =>
-			request(url, {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			}),
+		const requests = urls.map(url => request(url, {
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		}),
 		)
 
 		Promise.all(requests)
@@ -44,13 +43,6 @@ class ScoreEntryPage extends React.Component {
 				setMessage(err.message, 'error')
 			})
 	}
-
-	getScores = scoresheet => ({
-		scores: scoresheet.scores.map(score => ({
-			...score,
-			team: score.team._id,
-		})),
-	})
 
 	handleChange = (e, { scoreindex, name, value }) => {
 		const { scoresheetEntry } = this.state
@@ -81,26 +73,75 @@ class ScoreEntryPage extends React.Component {
 		const url = `${API_ROOT}/tournaments/${tournament._id}/scoresheets/${division}/${event._id}`
 		const token = Auth.getToken()
 
-		const payload = JSON.stringify(this.getScores(scoresheetEntry))
+		const payload = scoresheetEntry
+		if (!payload.scores) {
+			return setMessage('Please fill in some scores before submitting.', 'info')
+		}
 
-		request(url, {
-			method: 'PATCH',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-			body: payload,
-		})
-			.then(updated => {
-				setMessage(`Successfully updated scores for ${event.name} ${division}`, 'success')
-				this.setState({
-					scoresheetEntry: updated,
+		this.validateScores(payload.scores)
+			.then(() => {
+				request(url, {
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify({
+						scores: payload.scores,
+					}),
 				})
+					.then(updated => {
+						setMessage(`Successfully updated scores for ${event.name} ${division}`, 'success')
+						this.setState({
+							scoresheetEntry: updated,
+						})
+					})
+					.catch(err => {
+						setMessage(err.message, 'error')
+					})
 			})
-			.catch(err => {
-				console.log(err)
-				setMessage(err.message, 'error')
+			.catch(errors => {
+				setMessage('There are unbroken ties:', 'error', this.translateScoresError(errors))
 			})
+	}
+
+	translateScoresError = errors => errors.map(error => `${error.scoreA.team.school} is tied with ${error.scoreB.team.school}`)
+
+	validateScores = scores => {
+		const errors = []
+
+		for (let scoreAIndex = 0; scoreAIndex < scores.length; scoreAIndex += 1) {
+			for (let scoreBIndex = scoreAIndex + 1; scoreBIndex < scores.length; scoreBIndex += 1) {
+				const scoreA = scores[scoreAIndex]
+				const scoreB = scores[scoreBIndex]
+
+				if (Number(scoreA.rawScore) === Number(scoreB.rawScore)
+					&& Number(scoreA.tiebreaker) === Number(scoreB.tiebreaker)
+					&& Number(scoreA.tier) === Number(scoreB.tier)) {
+					/* eslint-disable */
+					const { dq_a, noShow_a, participationOnly_a, dropped_a } = scoreA
+					const { dq_b, noShow_b, participationOnly_b, dropped_b } = scoreB
+
+					if (
+						!dq_a && !dq_b && !noShow_a && !noShow_b
+						&& !participationOnly_a && !participationOnly_b
+						&& !dropped_a && !dropped_b
+						/* eslint-enable */
+					) {
+						// TODO: add better messages
+						errors.push({
+							scoreA,
+							scoreB,
+						})
+					}
+				}
+			}
+		}
+
+		return new Promise((resolve, reject) => {
+			if (errors.length) return reject(errors)
+			return resolve()
+		})
 	}
 
 	render() {
@@ -241,7 +282,7 @@ ScoreEntryPage.defaultProps = {
 }
 
 const mapDispatchToProps = dispatch => ({
-	setMessage: (message, type) => dispatch(setMessage(message, type)),
+	setMessage: (message, type, details) => dispatch(setMessage(message, type, details)),
 })
 
 export default connect(

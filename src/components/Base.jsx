@@ -73,9 +73,19 @@ class Base extends React.Component {
 							{messageVisible && (
 								<Message
 									onDismiss={hideMessage}
-									content={message}
 									color={messageColor}
-								/>
+								>
+									{message}
+									{messageDetails.length ? (
+										<Message.List style={{
+											textAlign: 'center',
+										}}
+										>
+											{messageDetails.map(detail => <span>{detail}<br /></span>)}
+										</Message.List>
+									) : null
+									}
+								</Message>
 							)}
 						</Container>
 					</div>
@@ -90,6 +100,11 @@ Base.propTypes = {
 	messageType: PropTypes.string.isRequired,
 	messageVisible: PropTypes.bool.isRequired,
 	hideMessage: PropTypes.func.isRequired,
+	messageDetails: PropTypes.arrayOf(PropTypes.string),
+}
+
+Base.defaultProps = {
+	messageDetails: [],
 }
 
 const mapStateToProps = state => ({

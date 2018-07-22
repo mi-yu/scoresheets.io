@@ -11,6 +11,7 @@ export default (state = defaultState, action) => {
 				...state,
 				message: action.payload.message,
 				type: action.payload.type,
+				details: action.payload.details,
 				visible: true,
 			}
 		case 'SHOW_MESSAGE':

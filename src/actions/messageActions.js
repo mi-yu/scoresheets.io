@@ -1,9 +1,10 @@
-export const setMessage = (message, type) => dispatch => {
+export const setMessage = (message, type, details) => dispatch => {
 	dispatch({
 		type: 'SET_MESSAGE',
 		payload: {
 			message,
 			type,
+			details,
 		},
 	})
 
