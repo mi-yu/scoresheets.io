@@ -69,11 +69,16 @@ class DashboardPage extends React.Component {
 			<div>
 				<Header as="h1">Tournaments</Header>
 				<Grid>
-					{/* <Card>
-						<Card.Content>
-							<TournamentsModal as={Button} />
-						</Card.Content>
-					</Card> */}
+					<Grid.Column width={4}>
+						<Card>
+							<Card.Content style={{ textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+								{Object.keys(tournaments).length === 0 && (
+									<span>Looks like you don't have any tournaments, let's add one!</span>
+								)}
+								<TournamentsModal as={Button} />
+							</Card.Content>
+						</Card>
+					</Grid.Column>
 					{Object.keys(tournaments).map(id => (
 						<TournamentCard key={id} tournament={{ ...tournaments[id] }} />
 					))}
