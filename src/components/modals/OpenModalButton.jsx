@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Button, Icon } from 'semantic-ui-react'
 
 const OpenModalButton = ({ onClick, text, icon }) => (
-	<Button color="green" icon onClick={onClick} className="padded-button">
+	<Button color="green" icon onClick={onClick} className="padded-button" >
 		<Icon name={icon} />
 		{text}
 	</Button>
