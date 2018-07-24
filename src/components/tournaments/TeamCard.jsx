@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Card, Button, Grid, Icon } from 'semantic-ui-react'
+import { Card, Button, Grid, Icon, Modal } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import request from '../../modules/request'
 import Auth from '../../modules/Auth'
@@ -8,6 +8,16 @@ import { API_ROOT } from '../../config'
 import { setMessage } from '../../actions/messageActions'
 
 class TeamCard extends React.Component {
+	state = {
+		modalOpen: false,
+	}
+
+	closeModal = () => {
+		this.setState({
+			modalOpen: false,
+		})
+	}
+
 	handleDeleteTeam = () => {
 		const { setMessage, tournamentId, team, removeTeam } = this.props
 		const token = Auth.getToken()
@@ -28,10 +38,34 @@ class TeamCard extends React.Component {
 			})
 	}
 
+	renderDeleteTeamModal = () => {
+		const { modalOpen } = this.state
+		const { team } = this.props
+		return (
+			<Modal size="tiny" open={modalOpen} onClose={this.closeModal}>
+				<Modal.Header>Delete Team {`${team.school} ${team.identifier || ''}`}</Modal.Header>
+				<Modal.Content>
+					<p>
+						Are you sure you want to delete team
+						<strong> {`${team.school} ${team.identifier || ''}`}</strong>
+						?
+					</p>
+					<p>This action will delete all associated scores, and cannot be reversed</p>
+				</Modal.Content>
+				<Modal.Actions>
+					<Button onClick={this.closeModal}>Cancel</Button>
+					<Button negative onClick={this.handleDeleteTeam}>Yes, I want to delete {`${team.school} ${team.identifier || ''}`}</Button>
+				</Modal.Actions>
+			</Modal>
+		)
+	}
+
 	render() {
+		const { modalOpen } = this.state
 		const { team, setCurrentTeam } = this.props
 		return (
 			<Grid.Column width={4}>
+				{modalOpen && this.renderDeleteTeamModal()}
 				<Card>
 					<Card.Content>
 						<Card.Header>{`${team.division}${team.teamNumber}`}</Card.Header>
@@ -43,15 +77,22 @@ class TeamCard extends React.Component {
 						<Button.Group basic>
 							<Button icon>
 								<Icon name="trophy" />
-								{'Scores'}
+								Scores
 							</Button>
 							<Button icon onClick={() => setCurrentTeam(team._id)}>
 								<Icon name="edit" />
-								{'Edit'}
+								Edit
 							</Button>
-							<Button icon onClick={this.handleDeleteTeam}>
+							<Button
+								icon
+								onClick={() => {
+									this.setState({
+										modalOpen: true,
+									})
+								}}
+							>
 								<Icon name="delete" />
-								{'Delete'}
+								Delete
 							</Button>
 						</Button.Group>
 					</Card.Content>
