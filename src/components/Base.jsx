@@ -52,7 +52,7 @@ class Base extends React.Component {
 	}
 
 	render() {
-		const { message, messageType, messageVisible, hideMessage, setMessage } = this.props
+		const { message, messageType, messageVisible, hideMessage, setMessage, messageDetails } = this.props
 		const messageColor = translateMessageType(messageType)
 
 		return (
@@ -111,6 +111,7 @@ const mapStateToProps = state => ({
 	message: state.messages.message,
 	messageVisible: state.messages.visible,
 	messageType: state.messages.type,
+	messageDetails: state.messages.details,
 })
 
 const mapDispatchToProps = dispatch => ({

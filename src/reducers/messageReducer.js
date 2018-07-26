@@ -2,6 +2,7 @@ const defaultState = {
 	message: '',
 	type: 'info',
 	visible: false,
+	details: [],
 }
 
 export default (state = defaultState, action) => {
