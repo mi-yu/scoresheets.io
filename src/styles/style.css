@@ -1,48 +1,82 @@
+* {
+  box-sizing: border-box; }
+
+h1, p {
+  color: #333; }
+
+#main-nav {
+  position: fixed;
+  top: 0;
+  height: 4.5em;
+  background-color: transparent;
+  border: none; }
+  #main-nav .item {
+    height: 100%;
+    padding-left: 0.5em !important;
+    padding-right: 0.5em !important;
+    margin-left: 0.5em;
+    margin-right: 0.5em; }
+    #main-nav .item.active {
+      background-color: transparent; }
+    #main-nav .item:hover {
+      color: #b3b3b3; }
+  #main-nav a {
+    color: #333;
+    font-size: 1.2em; }
+  #main-nav.menu-home .item, #main-nav.menu-home a {
+    color: white; }
+  #main-nav.menu-home .item:hover {
+    color: #e8e8e8; }
+
+#home-page {
+  min-height: 100vh;
+  width: 100%;
+  z-index: -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: linear-gradient(to top left, #2fdaf8, #6495ED); }
+  #home-page section {
+    margin-top: 10em;
+    margin-bottom: 10em; }
+  #home-page .header {
+    font-size: 2.8em;
+    color: whitesmoke; }
+  #home-page p {
+    font-size: 1.6em;
+    line-height: 1.6em;
+    color: whitesmoke; }
+  #home-page #home-hero-wrapper {
+    width: 60%; }
+  #home-page #hero-text {
+    max-width: 50%; }
+
 .container {
-	padding-top: 50px;
-}
-
-.container-wide {
-	width: 80%;
-	margin: 0 auto;
-}
-
-.active-link {
-	border-bottom: 1px solid black;
-	color: black;
-}
-
-.menu a {
-	color: #333 !important;
-}
+  padding-top: 6.75em; }
 
 /* temp modals fix */
 .ui.page.modals.transition.visible {
-	padding-top: 10% !important;
-	display: flex !important;
-}
+  padding-top: 10% !important;
+  display: flex !important; }
 
 .padded-button {
-	margin-top: 1.5em !important;
-	margin-bottom: 1.5em !important;
-}
+  margin-top: 1.5em !important;
+  margin-bottom: 1.5em !important; }
 
 .message {
-	position: fixed !important;
-	margin-bottom: 2em !important;
-	bottom: 0 !important;
-	width: 500px !important;
-	z-index: 100 !important;
-	text-align: center !important;
-}
+  position: fixed !important;
+  margin-bottom: 2em !important;
+  bottom: 0 !important;
+  width: 500px !important;
+  z-index: 100 !important;
+  text-align: center !important; }
 
 .column-header {
-	transform: rotate(-90deg) translateY(45%) translateX(-500%);
-	white-space: nowrap;
-	width: 15px;
-	height: 150px;
-}
+  transform: rotate(-90deg) translateY(45%) translateX(-500%);
+  white-space: nowrap;
+  width: 1em;
+  height: 10em; }
 
 .ui.card {
-	min-height: 9em;
-}
+  min-height: 9em; }

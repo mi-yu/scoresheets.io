@@ -7,11 +7,6 @@ import Auth from '../modules/Auth'
 import { setUser } from '../actions/userActions'
 import { clearCurrentTournament, setTournaments } from '../actions/tournamentActions'
 
-const activeStyle = {
-	borderBottom: '1px solid black',
-	color: 'black',
-}
-
 class Nav extends Component {
 	constructor(props) {
 		super(props)
@@ -33,92 +28,90 @@ class Nav extends Component {
 
 	render() {
 		const { activeItem } = this.state
-		const { user, hidden } = this.props
+		const { hidden } = this.props
 
 		const loggedIn = Auth.isAuthenticated()
 
+		// TODO: get this to actually work
 		if (hidden) return null
 
 		return (
-			<Container style={{ paddingTop: '0' }}>
-				<Menu
-					borderless
-					attached="top"
-					style={{
-						borderLeft: 'none',
-						borderRight: 'none',
-						borderTop: 'none',
-					}}
-					color="black"
-				>
-					<Item
-						name="Scoresheets"
-						style={
-							activeItem.includes('scoresheets') || activeItem === '/'
-								? activeStyle
-								: {}
-						}
-					>
-						<Link to="/" onClick={this.handleClick}>
+			<Menu
+				id="main-nav"
+				borderless
+				attached="top"
+				color="black"
+				className={activeItem.includes('scoresheets') || activeItem === '/' ? 'menu-home' : ''}
+			>
+				<Container style={{ paddingTop: '0' }}>
+					<Link to="/" onClick={this.handleClick}>
+						<Item
+							name="Scoresheets"
+							className={
+								activeItem.includes('scoresheets') || activeItem === '/'
+									? 'active'
+									: ''
+							}
+						>
 							Scoresheets
-						</Link>
-					</Item>
+						</Item>
+					</Link>
 
 					{loggedIn ? (
 						<Menu.Menu borderless position="right" color="black">
-							<Item
-								name="Dashboard"
-								style={activeItem.includes('dashboard') ? activeStyle : {}}
-							>
-								<Link to="/admin/dashboard" onClick={this.handleClick}>
+							<Link to="/admin/dashboard" onClick={this.handleClick}>
+								<Item
+									name="Dashboard"
+									className={activeItem.includes('dashboard') ? 'active' : ''}
+								>
 									Dashboard
-								</Link>
-							</Item>
-							<Item
-								name="Profile"
-								style={activeItem.includes('profile') ? activeStyle : {}}
-							>
-								<Link to="/profile" onClick={this.handleClick}>
+								</Item>
+							</Link>
+							<Link to="/profile" onClick={this.handleClick}>
+								<Item
+									name="Profile"
+									className={activeItem.includes('profile') ? 'active' : ''}
+								>
 									Profile
-								</Link>
-							</Item>
-							<Item
-								name="Logout"
-								style={activeItem.includes('logout') ? activeStyle : {}}
-							>
-								<Link to="/" onClick={this.handleLogout}>
+								</Item>
+							</Link>
+							<Link to="/" onClick={this.handleLogout}>
+								<Item
+									name="Logout"
+								>
 									Logout
-								</Link>
-							</Item>
+								</Item>
+							</Link>
 						</Menu.Menu>
 					) : (
-						<Menu.Menu borderless position="right" color="black">
-							<Item
-								name="Login"
-								style={activeItem.includes('login') ? activeStyle : {}}
-							>
+							<Menu.Menu borderless position="right" color="black">
 								<Link to="/users/login" onClick={this.handleClick}>
-									Login
+									<Item
+										name="Login"
+										className={activeItem.includes('login') ? 'active' : ''}
+									>
+										Login
+									</Item>
 								</Link>
-							</Item>
-							<Item
-								name="Register"
-								style={activeItem.includes('register') ? activeStyle : {}}
-							>
 								<Link to="/users/register" onClick={this.handleClick}>
-									Register
+									<Item
+										name="Register"
+										className={activeItem.includes('register') ? 'active' : ''}
+									>
+										Register
+									</Item>
 								</Link>
-							</Item>
-						</Menu.Menu>
-					)}
-				</Menu>
-			</Container>
+							</Menu.Menu>
+						)}
+				</Container>
+			</Menu>
 		)
 	}
 }
 
 Nav.propTypes = {
 	setUser: PropTypes.func.isRequired,
+	hidden: PropTypes.bool.isRequired,
 }
 
 const mapStateToProps = state => ({
