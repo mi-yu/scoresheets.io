@@ -4,4 +4,7 @@
 Science Olympiad tournament management system
 
 ### To run locally:
-`yarn start`
+After running `yarn start:dev` in scoresheets-server:
+1. Clone the scoresheets.io repository to your local machine
+2. Run `yarn install` to install dependencies
+3. Run `yarn start`, server should start up at `localhost:3000`
