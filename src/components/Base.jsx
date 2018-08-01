@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { Route, BrowserRouter as Router } from 'react-router-dom'
 import { Container, Message } from 'semantic-ui-react'
 import Nav from './Nav'
+import HomePage from '../containers/HomePage'
 import routes from '../routes'
 import { setMessage, hideMessage, showMessage } from '../actions/messageActions'
 import { setEvents } from '../actions/eventActions'
@@ -60,34 +61,33 @@ class Base extends React.Component {
 				<Router>
 					<div>
 						<Nav hidden={window.location.pathname.includes('slideshow')} />
-						<Container>
-							{routes.map(route => (
-								<Route
-									exact
-									path={route.path}
-									render={props => (
-										<route.component {...props} setMessage={setMessage} />
-									)}
-								/>
-							))}
-							{messageVisible && (
-								<Message
-									onDismiss={hideMessage}
-									color={messageColor}
-								>
-									{message}
-									{messageDetails.length ? (
-										<Message.List style={{
-											textAlign: 'center',
-										}}
-										>
-											{messageDetails.map(detail => <span>{detail}<br /></span>)}
-										</Message.List>
-									) : null
-									}
-								</Message>
-							)}
-						</Container>
+						<Route exact path="/" component={HomePage} />
+						{routes.map(route => (
+							<Route
+								exact
+								path={route.path}
+								render={props => (
+									<Container><route.component {...props} setMessage={setMessage} /></Container>
+								)}
+							/>
+						))}
+						{messageVisible && (
+							<Message
+								onDismiss={hideMessage}
+								color={messageColor}
+							>
+								{message}
+								{messageDetails.length ? (
+									<Message.List style={{
+										textAlign: 'center',
+									}}
+									>
+										{messageDetails.map(detail => <span>{detail}<br /></span>)}
+									</Message.List>
+								) : null
+								}
+							</Message>
+						)}
 					</div>
 				</Router>
 			</div>

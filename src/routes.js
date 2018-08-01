@@ -11,11 +11,6 @@ import RegisterPage from './containers/RegisterPage'
 
 const routes = [
 	{
-		path: '/',
-		component: HomePage,
-	},
-
-	{
 		path: '/users/login',
 		component: LoginPage,
 	},

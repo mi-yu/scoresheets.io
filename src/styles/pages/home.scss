@@ -1,0 +1,34 @@
+#home-page {
+    min-height: 100vh;
+    width: 100%;
+    z-index: -1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background: linear-gradient(to top left, $color-blue, $color-purple);
+
+    section {
+        margin-top: 10em;
+        margin-bottom: 10em;
+    }
+
+    .header {
+        font-size: 2.8em;
+        color: $color-white;
+    }
+
+    p {
+        font-size: 1.6em;
+        line-height: 1.6em;
+        color: $color-white;
+    }
+
+    #home-hero-wrapper {
+        width: 60%;
+    }
+
+    #hero-text {
+        max-width: 50%;
+    }
+}

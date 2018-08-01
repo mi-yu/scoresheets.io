@@ -3,6 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"dependencies": {
+		"node-sass-chokidar": "^1.3.3",
 		"prop-types": "^15.6.0",
 		"qs": "^6.5.2",
 		"react": "^16.2.0",
@@ -19,10 +20,14 @@
 		"spectacle": "^4.2.3"
 	},
 	"scripts": {
-		"start": "react-scripts start",
-		"build": "export REACT_APP_API_ROOT=https://soscribe.herokuapp.com && react-scripts build",
+		"start-js": "react-scripts start",
+		"start": "npm-run-all -p watch-css start-js",
+		"build-js": "react-scripts build",
+		"build": "export REACT_APP_API_ROOT=https://soscribe.herokuapp.com && npm-run-all build-css build-js",
 		"test": "react-scripts test --env=jsdom",
 		"eject": "react-scripts eject",
+		"build-css": "node-sass-chokidar src/styles/style.scss -o src/styles",
+		"watch-css": "npm run build-css && node-sass-chokidar src/styles/style.scss -o src/styles --watch --recursive",
 		"deploy": "CI=false && yarn build && aws s3 sync build/ s3://scoresheets.io --delete"
 	},
 	"proxy": "http://localhost:5000",

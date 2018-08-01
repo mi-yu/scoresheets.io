@@ -1,0 +1,40 @@
+#main-nav {
+    position: fixed;
+    top: 0;
+    height: $nav-height;
+    background-color: transparent;
+    border: none;
+
+    .item {
+        height: 100%;
+        padding-left: 0.5em !important;
+        padding-right: 0.5em !important;
+        margin-left: 0.5em;
+        margin-right: 0.5em;
+
+        &.active {
+            background-color: transparent;
+        }
+
+        &:hover {
+            color: lighten($color-black, 50%);
+        }
+    }
+
+    a {
+        color: $color-black;
+        font-size: 1.2em;
+    }
+
+    &.menu-home {
+        .item, a {
+            color: lighten($color-white, 5%);
+        }
+
+        .item:hover {
+            color: darken($color-white, 5%);
+        }
+    }
+}
+
+
