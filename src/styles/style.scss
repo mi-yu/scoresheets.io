@@ -21,8 +21,9 @@
 
 .message {
 	position: fixed !important;
-	margin-bottom: 2em !important;
-	bottom: 0 !important;
+	margin: 2em !important;
+	top: $nav-height !important;
+	right: 0 !important;
 	width: 500px !important;
 	z-index: 100 !important;
 	text-align: center !important;
