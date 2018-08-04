@@ -161,6 +161,7 @@ class TournamentManagementPage extends React.Component {
 
 	matchesEventsFilter = event => {
 		const { eventsFilter } = this.state
+		if (!event) return false
 		return (
 			event.name.toLowerCase().includes(eventsFilter) ||
 			event.category.toLowerCase().includes(eventsFilter)

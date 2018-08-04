@@ -40,7 +40,6 @@ class Nav extends Component {
 				id="main-nav"
 				borderless
 				attached="top"
-				color="black"
 				className={activeItem.includes('scoresheets') || activeItem === '/' ? 'menu-home' : ''}
 			>
 				<Container style={{ paddingTop: '0' }}>
@@ -54,11 +53,12 @@ class Nav extends Component {
 							}
 						>
 							Scoresheets
+							<div className="nav-version">alpha</div>
 						</Item>
 					</Link>
 
 					{loggedIn ? (
-						<Menu.Menu borderless position="right" color="black">
+						<Menu.Menu borderless position="right">
 							<Link to="/admin/dashboard" onClick={this.handleClick}>
 								<Item
 									name="Dashboard"
@@ -84,7 +84,7 @@ class Nav extends Component {
 							</Link>
 						</Menu.Menu>
 					) : (
-							<Menu.Menu borderless position="right" color="black">
+							<Menu.Menu borderless position="right">
 								<Link to="/users/login" onClick={this.handleClick}>
 									<Item
 										name="Login"
