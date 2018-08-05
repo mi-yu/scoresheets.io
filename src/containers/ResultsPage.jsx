@@ -134,7 +134,7 @@ class ResultsPage extends React.Component {
 								<Table.Cell>
 									{team.division}
 									{team.teamNumber}{' '}
-									{team.school + (team.identifier ? ` ${team.identifier}` : '')}
+									{`(${team.displayName})`}
 								</Table.Cell>
 								{team.scores.map(score => <Table.Cell>{score}</Table.Cell>)}
 								<Table.Cell>{team.totalScore}</Table.Cell>

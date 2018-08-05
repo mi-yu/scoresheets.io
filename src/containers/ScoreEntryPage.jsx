@@ -105,7 +105,7 @@ class ScoreEntryPage extends React.Component {
 			})
 	}
 
-	translateScoresError = errors => errors.map(error => `${error.scoreA.team.school} is tied with ${error.scoreB.team.school}`)
+	translateScoresError = errors => errors.map(error => `${error.scoreA.team.displayName} is tied with ${error.scoreB.team.displayName}`)
 
 	validateScores = scores => {
 		const errors = []
@@ -175,8 +175,8 @@ class ScoreEntryPage extends React.Component {
 								<Table.Row>
 									<Table.Cell>
 										{`${score.team.division}${score.team.teamNumber} (${
-											score.team.school
-										})`}
+											score.team.displayName
+											})`}
 									</Table.Cell>
 									<Table.Cell>
 										<Form.Input

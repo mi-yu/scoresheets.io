@@ -77,7 +77,7 @@ class TournamentsModal extends React.Component {
 	handleQuickAddEvent = key => {
 		const { events, currentTournament, setCurrentTournament } = this.props
 		const eventKeys = Object.keys(events)
-		let newEvents = events
+		let newEvents = eventKeys
 		switch (key) {
 			case 0: // only B events
 				newEvents = eventKeys.filter(
@@ -107,6 +107,12 @@ class TournamentsModal extends React.Component {
 			...currentTournament,
 			events: newEvents,
 		})
+	}
+
+	sortTournamentEvents = (tournamentEvents) => {
+		const { events } = this.props
+		if (!tournamentEvents) return null
+		return tournamentEvents.sort((idA, idB) => events[idA].name.localeCompare(events[idB].name))
 	}
 
 	render() {
@@ -195,7 +201,7 @@ class TournamentsModal extends React.Component {
 								search
 								name="events"
 								options={eventsOptions}
-								value={currentTournament.events}
+								value={this.sortTournamentEvents(currentTournament.events)}
 								onChange={this.handleChange}
 							/>
 						</Form.Field>

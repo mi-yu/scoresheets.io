@@ -43,18 +43,18 @@ class TeamCard extends React.Component {
 		const { team } = this.props
 		return (
 			<Modal size="tiny" open={modalOpen} onClose={this.closeModal}>
-				<Modal.Header>Delete Team {`${team.school} ${team.identifier || ''}`}</Modal.Header>
+				<Modal.Header>Delete Team {team.displayName}</Modal.Header>
 				<Modal.Content>
 					<p>
 						Are you sure you want to delete team
-						<strong> {`${team.school} ${team.identifier || ''}`}</strong>
+						<strong> {team.displayName}</strong>
 						?
 					</p>
 					<p>This action will delete all associated scores, and cannot be reversed</p>
 				</Modal.Content>
 				<Modal.Actions>
 					<Button onClick={this.closeModal}>Cancel</Button>
-					<Button negative onClick={this.handleDeleteTeam}>Yes, I want to delete {`${team.school} ${team.identifier || ''}`}</Button>
+					<Button negative onClick={this.handleDeleteTeam}>Yes, I want to delete {team.displayName}</Button>
 				</Modal.Actions>
 			</Modal>
 		)
@@ -70,7 +70,7 @@ class TeamCard extends React.Component {
 					<Card.Content>
 						<Card.Header>{`${team.division}${team.teamNumber}`}</Card.Header>
 						<Card.Description>
-							{`${team.school} ${team.identifier || ''}`}
+							{team.displayName}
 						</Card.Description>
 					</Card.Content>
 					<Card.Content>
