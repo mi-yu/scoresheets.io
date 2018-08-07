@@ -60,7 +60,8 @@ class TeamsModal extends React.Component {
 			}),
 		})
 			.then(res => {
-				const message = editing ? `Successfully updated ${currentTeam.school}.` : `Succesfully created ${currentTeam.school}`
+				const { division, teamNumber } = currentTeam
+				const message = editing ? `Successfully updated team ${division}${teamNumber}.` : `Succesfully created team ${division}${teamNumber}`
 				setMessage(message, 'success')
 				showMessage()
 				if (editing) updateTeam(res)
@@ -69,10 +70,15 @@ class TeamsModal extends React.Component {
 			})
 			.catch(err => {
 				closeModal()
-				setMessage(err.message, 'error')
-				showMessage()
+				if (err.name === 'BulkWriteError') {
+					setMessage('There was a problem with team creation:', 'error', this.translateBulkWriteError(err.errors))
+				} else {
+					setMessage(err.message, 'error')
+				}
 			})
 	}
+
+	translateBulkWriteError = (errs) => errs.map(err => `Team ${err.op.division}${err.op.teamNumber} already exists\n`)
 
 	render() {
 		const { modalOpen, currentTeam, clearCurrentTeam, closeModal, editing } = this.state
@@ -149,7 +155,7 @@ class TeamsModal extends React.Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-	setMessage: (message, type) => dispatch(setMessage(message, type)),
+	setMessage: (message, type, details) => dispatch(setMessage(message, type, details)),
 	showMessage: () => dispatch(showMessage()),
 })
 

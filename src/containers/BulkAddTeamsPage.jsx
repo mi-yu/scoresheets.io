@@ -132,11 +132,18 @@ class BulkAddTeamsPage extends React.Component {
 				})
 			})
 			.catch(err => {
-				setMessage(err.message, 'error')
+				if (err.name === 'BulkWriteError') {
+					setMessage('There were the following problems with team creation:', 'error', this.translateBulkWriteError(err.errors))
+				} else {
+					setMessage(err.message, 'error')
+				}
 			})
 
 		// TODO: better error handling
 	}
+
+	translateBulkWriteError = (errs) => errs.map(err => `Team ${err.op.division}${err.op.teamNumber} already exists\n`)
+
 
 	render() {
 		const { tournament, formData, redirectToManagePage } = this.state
@@ -248,7 +255,7 @@ BulkAddTeamsPage.defaultProps = {
 }
 
 const mapDispatchToProps = dispatch => ({
-	setMessage: (message, type) => dispatch(setMessage(message, type)),
+	setMessage: (message, type, details) => dispatch(setMessage(message, type, details)),
 })
 
 export default connect(
