@@ -149,7 +149,7 @@ class ScoreEntryPage extends React.Component {
 		if (loading) return null
 
 		// Sort by team number when scores are not yet ranked, otherwise sort by rank
-		const scores = !scoresheetEntry.scores[0].rank
+		const scores = !scoresheetEntry.scores.length || !scoresheetEntry.scores[0].rank
 			? scoresheetEntry.scores.sort((scoreA, scoreB) => scoreA.team.teamNumber - scoreB.team.teamNumber)
 			: scoresheetEntry.scores
 
