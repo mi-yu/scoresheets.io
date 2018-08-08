@@ -1,4 +1,3 @@
-import HomePage from './containers/HomePage'
 import LoginPage from './containers/LoginPage'
 import ProfilePage from './containers/ProfilePage'
 import DashboardPage from './containers/DashboardPage'

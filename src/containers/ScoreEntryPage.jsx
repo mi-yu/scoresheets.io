@@ -119,8 +119,8 @@ class ScoreEntryPage extends React.Component {
 					&& Number(scoreA.tiebreaker) === Number(scoreB.tiebreaker)
 					&& Number(scoreA.tier) === Number(scoreB.tier)) {
 					/* eslint-disable */
-					const { dq_a, noShow_a, participationOnly_a, dropped_a } = scoreA
-					const { dq_b, noShow_b, participationOnly_b, dropped_b } = scoreB
+					const { dq: dq_a, noShow: noShow_a, participationOnly: participationOnly_a, dropped: dropped_a } = scoreA
+					const { dq: dq_b, noShow: noShow_b, participationOnly: participationOnly_b, dropped: dropped_b } = scoreB
 
 					if (
 						!dq_a && !dq_b && !noShow_a && !noShow_b
@@ -147,6 +147,12 @@ class ScoreEntryPage extends React.Component {
 	render() {
 		const { scoresheetEntry, loading } = this.state
 		if (loading) return null
+
+		// Sort by team number when scores are not yet ranked, otherwise sort by rank
+		const scores = !scoresheetEntry.scores[0].rank
+			? scoresheetEntry.scores.sort((scoreA, scoreB) => scoreA.team.teamNumber - scoreB.team.teamNumber)
+			: scoresheetEntry.scores
+
 		return (
 			<div>
 				<Header as="h1">{scoresheetEntry.event.name}</Header>
@@ -171,7 +177,7 @@ class ScoreEntryPage extends React.Component {
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
-							{scoresheetEntry.scores.map((score, i) => (
+							{scores.map((score, i) => (
 								<Table.Row>
 									<Table.Cell>
 										{`${score.team.division}${score.team.teamNumber} (${

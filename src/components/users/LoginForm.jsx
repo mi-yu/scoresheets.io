@@ -8,7 +8,6 @@ import request from '../../modules/request'
 import { API_ROOT } from '../../config'
 import { setUser } from '../../actions/userActions'
 import { setMessage } from '../../actions/messageActions'
-import arrayToObject from '../../modules/arrayToObject'
 
 class LoginForm extends React.Component {
 	constructor(props) {
