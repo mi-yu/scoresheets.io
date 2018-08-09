@@ -16,6 +16,8 @@ class ScoreEntryPage extends React.Component {
 			scores: [],
 		},
 		loading: true,
+		sortBy: null,
+		sortDir: null,
 	}
 
 	componentDidMount() {
@@ -65,6 +67,35 @@ class ScoreEntryPage extends React.Component {
 		scores[scoreindex] = { ...scores[scoreindex], [name]: checked }
 		this.setState({ scoresheetEntry: { ...scoresheetEntry, scores } })
 	}
+
+	handleSort = (clickedCol) => () => {
+		const { sortBy, sortDir, scoresheetEntry } = this.state
+		const { scores } = scoresheetEntry
+
+		let sortedScores
+
+		if (sortBy !== clickedCol) {
+			if (clickedCol === 'teamNumber') {
+				sortedScores = scores.sort((a, b) => a.team.teamNumber - b.team.teamNumber)
+			} else if (clickedCol === 'rawScore') {
+				sortedScores = scores.sort((a, b) => a.rawScore - b.rawScore)
+			} else if (clickedCol === 'rank') {
+				sortedScores = scores.sort((a, b) => a.rank - b.rank)
+			}
+		} else {
+			sortedScores = scores.reverse()
+		}
+
+		this.setState({
+			sortBy: clickedCol,
+			sortDir: sortDir === 'ascending' ? 'descending' : 'ascending',
+			scoresheetEntry: {
+				...scoresheetEntry,
+				scores: sortedScores,
+			},
+		})
+	}
+
 
 	submitScores = () => {
 		const { scoresheetEntry } = this.state
@@ -145,13 +176,9 @@ class ScoreEntryPage extends React.Component {
 	}
 
 	render() {
-		const { scoresheetEntry, loading } = this.state
+		const { scoresheetEntry, loading, sortDir, sortBy } = this.state
+		const { scores } = scoresheetEntry
 		if (loading) return null
-
-		// Sort by team number when scores are not yet ranked, otherwise sort by rank
-		const scores = !scoresheetEntry.scores.length || !scoresheetEntry.scores[0].rank
-			? scoresheetEntry.scores.sort((scoreA, scoreB) => scoreA.team.teamNumber - scoreB.team.teamNumber)
-			: scoresheetEntry.scores
 
 		return (
 			<div>
@@ -163,17 +190,50 @@ class ScoreEntryPage extends React.Component {
 					</Link>
 				</Header>
 				<Form>
-					<Table celled>
+					<Table celled sortable>
 						<Table.Header>
 							<Table.Row>
 								{/* TODO: make sortable */}
-								<Table.HeaderCell width={3}>Team (School)</Table.HeaderCell>
-								<Table.HeaderCell width={2}>Raw Score</Table.HeaderCell>
-								<Table.HeaderCell width={2}>Tiebreaker</Table.HeaderCell>
-								<Table.HeaderCell width={2}>Tier</Table.HeaderCell>
-								<Table.HeaderCell width={3}>Drops/Penalties</Table.HeaderCell>
-								<Table.HeaderCell width={3}>Notes</Table.HeaderCell>
-								<Table.HeaderCell>Rank</Table.HeaderCell>
+								<Table.HeaderCell
+									sorted={sortBy === 'teamNumber' ? sortDir : null}
+									onClick={this.handleSort('teamNumber')}
+									width={3}
+								>
+									Team (School)
+								</Table.HeaderCell>
+								<Table.HeaderCell
+									sorted={sortBy === 'rawScore' ? sortDir : null}
+									onClick={this.handleSort('rawScore')}
+									width={2}
+								>
+									Raw Score
+								</Table.HeaderCell>
+								<Table.HeaderCell
+									width={2}
+								>
+									Tiebreaker
+								</Table.HeaderCell>
+								<Table.HeaderCell
+									width={2}
+								>
+									Tier
+								</Table.HeaderCell>
+								<Table.HeaderCell
+									width={3}
+								>
+									Drops/Penalties
+								</Table.HeaderCell>
+								<Table.HeaderCell
+									width={3}
+								>
+									Notes
+								</Table.HeaderCell>
+								<Table.HeaderCell
+									sorted={sortBy === 'rank' ? sortDir : null}
+									onClick={this.handleSort('rank')}
+								>
+									Rank
+								</Table.HeaderCell>
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
