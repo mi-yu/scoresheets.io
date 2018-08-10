@@ -47,9 +47,6 @@ const TournamentEventCard = ({
 						{division.split('').map(div => <Label size="tiny">{div}</Label>)}
 						{stateEvent && <Label size="tiny">trial</Label>}
 						{impound && <Label size="tiny">impound</Label>}
-						<Label size="tiny" color={finished ? 'green' : 'grey'}>
-							{finished ? 'finished' : 'in progress'}
-						</Label>
 					</Card.Description>
 				</Card.Content>
 				<Card.Content>
@@ -69,15 +66,15 @@ const TournamentEventCard = ({
 								as={Link}
 								to={`/tournaments/${tournamentId}/scores/B/${_id}`}
 							>
-								B Scores
-							</Button>
+									B Scores
+								</Button>
 							<Button
 								color="blue"
 								as={Link}
 								to={`/tournaments/${tournamentId}/scores/C/${_id}`}
 							>
-								C Scores
-							</Button>
+									C Scores
+								</Button>
 						</Button.Group>
 					)}
 				</Card.Content>

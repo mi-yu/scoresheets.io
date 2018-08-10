@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Header, Button, Table, Form, Icon } from 'semantic-ui-react'
+import { Header, Button, Table, Form, Icon, Checkbox } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
@@ -175,6 +175,42 @@ class ScoreEntryPage extends React.Component {
 		})
 	}
 
+	toggleScoresheetLock = () => {
+		const { scoresheetEntry } = this.state
+		const { locked: originalLocked, event, tournament, division } = scoresheetEntry
+		this.setState({
+			scoresheetEntry: {
+				...scoresheetEntry,
+				locked: !originalLocked,
+			},
+		})
+
+		const token = Auth.getToken()
+		const url = `${API_ROOT}/tournaments/${tournament._id}/scoresheets/${division}/${event._id}`
+		request(url, {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify({
+				locked: !originalLocked,
+			}),
+		})
+			.then(() => {
+				setMessage(`Successfully locked scores for ${event.name} ${division}`, 'success')
+			})
+			.catch(err => {
+				this.setState({
+					scoresheetEntry: {
+						...scoresheetEntry,
+						locked: originalLocked,
+					},
+				})
+				setMessage(err.message, 'error')
+			})
+	}
+
 	render() {
 		const { scoresheetEntry, loading, sortDir, sortBy } = this.state
 		const { scores } = scoresheetEntry
@@ -183,13 +219,19 @@ class ScoreEntryPage extends React.Component {
 		return (
 			<div>
 				<Header as="h1">{scoresheetEntry.event.name}</Header>
-				<Header color="blue">
-					<Link to={`/tournaments/${scoresheetEntry.tournament._id}/manage`}>
-						<Icon name="long arrow left" />
-						{scoresheetEntry.tournament.name}
-					</Link>
-				</Header>
-				<Form>
+				<div
+					style={{
+						margin: '1em 0',
+					}}
+				>
+					<label style={{ display: 'block' }}>Locked</label>
+					<Checkbox toggle name="locked" checked={scoresheetEntry.locked} onChange={this.toggleScoresheetLock} />
+				</div>
+				<Link to={`/tournaments/${scoresheetEntry.tournament._id}/manage`}>
+					<Icon name="long arrow left" />
+					{`Back to ${scoresheetEntry.tournament.name}`}
+				</Link>
+				<Form style={{ margin: '2em 0' }}>
 					<Table celled sortable>
 						<Table.Header>
 							<Table.Row>
@@ -242,7 +284,7 @@ class ScoreEntryPage extends React.Component {
 									<Table.Cell>
 										{`${score.team.division}${score.team.teamNumber} (${
 											score.team.displayName
-											})`}
+										})`}
 									</Table.Cell>
 									<Table.Cell>
 										<Form.Input
