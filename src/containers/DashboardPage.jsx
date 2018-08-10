@@ -36,12 +36,11 @@ class DashboardPage extends React.Component {
 			const requests = [
 				`${API_ROOT}/tournaments`,
 				`${API_ROOT}/events`,
-			].map(url =>
-				request(url, {
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				}),
+			].map(url => request(url, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}),
 			)
 
 			Promise.all(requests)
@@ -90,9 +89,11 @@ class DashboardPage extends React.Component {
 						<Header as="h1">2017-18 Season Events</Header>
 						<EventsModal />
 						<Grid>
-							{Object.keys(events).map(id => (
-								<EventCard key={id} event={{ ...events[id] }} />
-							))}
+							{Object.keys(events)
+								.sort((a, b) => events[a].name.localeCompare(events[b].name))
+								.map(id => (
+									<EventCard key={id} event={{ ...events[id] }} />
+								))}
 						</Grid>
 					</div>
 				)

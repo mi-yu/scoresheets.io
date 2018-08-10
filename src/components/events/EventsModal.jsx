@@ -64,9 +64,9 @@ class EventsModal extends React.Component {
 				clearCurrentEvent()
 				setEditing(false)
 				closeEventsModal()
+				setMessage(`Successfully ${editing ? 'updated' : 'created'} event ${currentEvent.name}.`, 'success')
 			})
 			.catch(err => {
-				console.log(err)
 				setMessage(err.message, 'error')
 			})
 	}
@@ -78,12 +78,13 @@ class EventsModal extends React.Component {
 			clearCurrentEvent,
 			openEventsModal,
 			closeEventsModal,
+			setEditing,
 		} = this.props
 
 		return (
 			<Modal
 				trigger={(
-<OpenModalButton
+					<OpenModalButton
 						onClick={() => {
 							openEventsModal()
 							clearCurrentEvent()
@@ -92,7 +93,7 @@ class EventsModal extends React.Component {
 						text="New Event"
 						icon="plus"
 					/>
-)}
+				)}
 				closeIcon
 				open={modalOpen}
 				onClose={closeEventsModal}
