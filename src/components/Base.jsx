@@ -13,6 +13,7 @@ import request from '../modules/request'
 import arrayToObject from '../modules/arrayToObject'
 import Auth from '../modules/Auth'
 import { API_ROOT } from '../config'
+import Footer from '../containers/Footer'
 
 const translateMessageType = type => {
 	switch (type) {
@@ -88,6 +89,7 @@ class Base extends React.Component {
 								}
 							</Message>
 						)}
+						<Footer />
 					</div>
 				</Router>
 			</div>

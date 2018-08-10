@@ -46,7 +46,7 @@ class EventsModal extends React.Component {
 			setEditing,
 			addEvent,
 		} = this.props
-		const url = editing ? `${API_ROOT}/events/${currentEvent._id}` : '/events'
+		const url = editing ? `${API_ROOT}/events/${currentEvent._id}` : `${API_ROOT}/events`
 		const method = editing ? 'PATCH' : 'POST'
 		const token = Auth.getToken()
 
@@ -82,8 +82,8 @@ class EventsModal extends React.Component {
 
 		return (
 			<Modal
-				trigger={
-					<OpenModalButton
+				trigger={(
+<OpenModalButton
 						onClick={() => {
 							openEventsModal()
 							clearCurrentEvent()
@@ -92,7 +92,7 @@ class EventsModal extends React.Component {
 						text="New Event"
 						icon="plus"
 					/>
-				}
+)}
 				closeIcon
 				open={modalOpen}
 				onClose={closeEventsModal}
