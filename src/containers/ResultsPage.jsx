@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Icon, Table, Header } from 'semantic-ui-react'
+import { Breadcrumb, Table } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
@@ -35,8 +35,9 @@ class ResultsPage extends React.Component {
 
 		Promise.all(requests)
 			.then(([entries, teams, tournament]) => {
+				const sortedEntries = entries.sort((a, b) => a.event.name.localeCompare(b.event.name))
 				this.setState({
-					entries,
+					entries: sortedEntries,
 					teams,
 					tournament,
 				})
@@ -106,13 +107,17 @@ class ResultsPage extends React.Component {
 
 		return (
 			<div>
-				<Header as="h1">Division {division} Results</Header>
-				<Header color="blue">
-					<Link to={`/tournaments/${tournament._id}/manage`}>
-						<Icon name="long arrow left" />
-						{tournament.name}
-					</Link>
-				</Header>
+				<Breadcrumb>
+					<Breadcrumb.Section>
+						<Link to={`/tournaments/${tournament._id}/manage`}>
+							{tournament.name}
+						</Link>
+					</Breadcrumb.Section>
+					<Breadcrumb.Divider />
+					<Breadcrumb.Section>
+						Division {division} Results
+					</Breadcrumb.Section>
+				</Breadcrumb>
 				<Table celled collapsing size="small" compact>
 					<Table.Header>
 						<Table.Row>
