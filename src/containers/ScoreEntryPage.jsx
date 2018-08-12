@@ -64,7 +64,16 @@ class ScoreEntryPage extends React.Component {
 	handleCheck = (e, { scoreindex, name, checked }) => {
 		const { scoresheetEntry } = this.state
 		const { scores } = scoresheetEntry
-		scores[scoreindex] = { ...scores[scoreindex], [name]: checked }
+
+		// Allow only one checkbox to be checked at a time.
+		const newCheckedState = {
+			dq: name === 'dq' ? checked : false,
+			noShow: name === 'noShow' ? checked : false,
+			participationOnly: name === 'participationOnly' ? checked : false,
+			dropped: name === 'dropped' ? checked : false,
+		}
+
+		scores[scoreindex] = { ...scores[scoreindex], ...newCheckedState }
 		this.setState({ scoresheetEntry: { ...scoresheetEntry, scores } })
 	}
 
@@ -284,7 +293,7 @@ class ScoreEntryPage extends React.Component {
 									<Table.Cell>
 										{`${score.team.division}${score.team.teamNumber} (${
 											score.team.displayName
-										})`}
+											})`}
 									</Table.Cell>
 									<Table.Cell>
 										<Form.Input
