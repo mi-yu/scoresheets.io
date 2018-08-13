@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Redirect, Link } from 'react-router-dom'
-import { Grid, Header, Divider, Button, Icon, Dropdown, Input } from 'semantic-ui-react'
+import { Grid, Header, Divider, Button, Icon, Dropdown, Input, Table } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
 import request from '../modules/request'
@@ -41,6 +41,7 @@ class TournamentManagementPage extends React.Component {
 			editingTeam: false,
 			currentTeam: {},
 			loading: true,
+			teamDisplayFormat: 'rows',
 		}
 	}
 
@@ -53,13 +54,12 @@ class TournamentManagementPage extends React.Component {
 		const requests = [
 			`${API_ROOT}/tournaments/${id}`,
 			`${API_ROOT}/tournaments/${id}/teams`,
-		].map(url =>
-			request(url, {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			}),
+		].map(url => request(url, {
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		}),
 		)
 
 		Promise.all(requests)
@@ -141,21 +141,26 @@ class TournamentManagementPage extends React.Component {
 		})
 	}
 
-	handleChange = (e, { name, value }) =>
-		this.setState({
-			[name]: value,
-		})
+	handleChange = (e, { name, value }) => this.setState({
+		[name]: value,
+	})
 
 	handleFilter = (e, { name, value }) => {
 		this.setState({ [name]: value.toLowerCase() })
 	}
 
+	handleTeamsViewToggle = (e, { name }) => {
+		this.setState({
+			teamDisplayFormat: name,
+		})
+	}
+
 	matchesTeamsFilter = team => {
 		const { teamsFilter } = this.state
 		return (
-			teamsFilter === '' ||
-			team.school.toLowerCase().includes(teamsFilter) ||
-			(team.division.toLowerCase() + team.teamNumber).includes(teamsFilter)
+			teamsFilter === ''
+			|| team.school.toLowerCase().includes(teamsFilter)
+			|| (team.division.toLowerCase() + team.teamNumber).includes(teamsFilter)
 		)
 	}
 
@@ -163,8 +168,8 @@ class TournamentManagementPage extends React.Component {
 		const { eventsFilter } = this.state
 		if (!event) return false
 		return (
-			event.name.toLowerCase().includes(eventsFilter) ||
-			event.category.toLowerCase().includes(eventsFilter)
+			event.name.toLowerCase().includes(eventsFilter)
+			|| event.category.toLowerCase().includes(eventsFilter)
 		)
 	}
 
@@ -177,6 +182,7 @@ class TournamentManagementPage extends React.Component {
 			editingTeam,
 			currentTeam,
 			loading,
+			teamDisplayFormat,
 		} = this.state
 
 		if (redirectToLogin) return <Redirect to="/users/login" />
@@ -231,10 +237,34 @@ class TournamentManagementPage extends React.Component {
 				</Button.Group>
 				<Divider />
 				<Grid>
-					<Grid.Column floated="left" width={4}>
-						<Header as="h2">{'Teams'}</Header>
+					<Grid.Column floated="left" width={8}>
+						<Header as="h2" floated="left">Teams</Header>
+						<TeamsModal
+							tournament={tournament}
+							modalOpen={teamModalOpen}
+							openModal={this.openTeamsModal}
+							closeModal={this.closeTeamsModal}
+							editing={editingTeam}
+							currentTeam={currentTeam}
+							clearCurrentTeam={this.clearCurrentTeam}
+							updateTeam={this.updateTeam}
+							addTeams={this.addTeams}
+						/>
+						<Button as={Link} to={`/tournaments/${tournament._id}/teams/add`} color="green">
+							<Icon name="plus" />
+							<Icon name="zip" />
+							{'Bulk Add Teams'}
+						</Button>
 					</Grid.Column>
-					<Grid.Column floated="right" width={4} textAlign="right">
+					<Grid.Column floated="right" width={8} textAlign="right">
+						<Button.Group style={{ marginRight: '1rem' }}>
+							<Button icon name="rows" active={teamDisplayFormat === 'rows'} onClick={this.handleTeamsViewToggle}>
+								<Icon name="align justify" />
+							</Button>
+							<Button icon name="grid" active={teamDisplayFormat === 'grid'} onClick={this.handleTeamsViewToggle}>
+								<Icon name="grid layout" />
+							</Button>
+						</Button.Group>
 						<Input
 							name="teamsFilter"
 							placeholder="Filter teams..."
@@ -243,64 +273,106 @@ class TournamentManagementPage extends React.Component {
 						/>
 					</Grid.Column>
 				</Grid>
-				<TeamsModal
-					tournament={tournament}
-					modalOpen={teamModalOpen}
-					openModal={this.openTeamsModal}
-					closeModal={this.closeTeamsModal}
-					editing={editingTeam}
-					currentTeam={currentTeam}
-					clearCurrentTeam={this.clearCurrentTeam}
-					updateTeam={this.updateTeam}
-					addTeams={this.addTeams}
-				/>
-				<Button as={Link} to={`/tournaments/${tournament._id}/teams/add`} color="green">
-					<Icon name="plus" />
-					<Icon name="zip" />
-					{'Bulk Add Teams'}
-				</Button>
 				{teams.length > 0 && (
 					<div>
-						<Header as="h3">{'B Teams'}</Header>
-						<Grid>
-							{teams.map(team => {
-								if (team.division === 'B' && this.matchesTeamsFilter(team)) {
-									return (
-										<TeamCard
-											key={team._id}
-											team={team}
-											setCurrentTeam={this.setCurrentTeam}
-											tournamentId={tournament._id}
-											removeTeam={this.removeTeam}
-										/>
-									)
-								}
-								return null
-							})}
-						</Grid>
-						<Header as="h3">{'C Teams'}</Header>
-						<Grid>
-							{teams.map(team => {
-								if (team.division === 'C' && this.matchesTeamsFilter(team)) {
-									return (
-										<TeamCard
-											key={team._id}
-											team={team}
-											setCurrentTeam={this.setCurrentTeam}
-											tournamentId={tournament._id}
-											removeTeam={this.removeTeam}
-										/>
-									)
-								}
-								return null
-							})}
-						</Grid>
+						<Header as="h3">B Teams</Header>
+						{teamDisplayFormat === 'grid' ? (
+							<Grid>
+								{teams.map(team => {
+									if (team.division === 'B' && this.matchesTeamsFilter(team)) {
+										return (
+											<TeamCard
+												key={team._id}
+												team={team}
+												setCurrentTeam={this.setCurrentTeam}
+												tournamentId={tournament._id}
+												removeTeam={this.removeTeam}
+											/>
+										)
+									}
+									return null
+								})}
+							</Grid>
+						) : (
+								<Table basic>
+									<Table.Header>
+										<Table.Row>
+											<Table.HeaderCell width={2}>Team Number</Table.HeaderCell>
+											<Table.HeaderCell>School</Table.HeaderCell>
+											<Table.HeaderCell>Actions</Table.HeaderCell>
+										</Table.Row>
+									</Table.Header>
+
+									<Table.Body>
+										{
+											teams.map(team => {
+												if (team.division === 'B' && this.matchesTeamsFilter(team)) {
+													return (
+														<Table.Row>
+															<Table.Cell>{`${team.division}${team.teamNumber}`}</Table.Cell>
+															<Table.Cell>{team.displayName}</Table.Cell>
+															<Table.Cell>{team.teamNumber}</Table.Cell>
+														</Table.Row>
+													)
+												}
+												return null
+											})
+										}
+									</Table.Body>
+								</Table>
+							)}
+						<Header as="h3">C Teams</Header>
+						{teamDisplayFormat === 'grid' ? (
+							<Grid>
+								{teams.map(team => {
+									if (team.division === 'C' && this.matchesTeamsFilter(team)) {
+										return (
+											<TeamCard
+												key={team._id}
+												team={team}
+												setCurrentTeam={this.setCurrentTeam}
+												tournamentId={tournament._id}
+												removeTeam={this.removeTeam}
+											/>
+										)
+									}
+									return null
+								})}
+							</Grid>
+						) : (
+								<Table basic>
+									<Table.Header>
+										<Table.Row>
+											<Table.HeaderCell width={2}>Team Number</Table.HeaderCell>
+											<Table.HeaderCell>School</Table.HeaderCell>
+											<Table.HeaderCell>Actions</Table.HeaderCell>
+										</Table.Row>
+									</Table.Header>
+
+									<Table.Body>
+										{
+											teams.map(team => {
+												if (team.division === 'C' && this.matchesTeamsFilter(team)) {
+													return (
+														<Table.Row>
+															<Table.Cell>{`${team.division}${team.teamNumber}`}</Table.Cell>
+															<Table.Cell>{team.displayName}</Table.Cell>
+															<Table.Cell>{team.teamNumber}</Table.Cell>
+														</Table.Row>
+													)
+												}
+												return null
+											})
+										}
+									</Table.Body>
+								</Table>
+							)}
 					</div>
 				)}
 				<Divider />
 				<Grid>
 					<Grid.Column floated="left" width={4}>
-						<Header as="h2">{'Events'}</Header>
+						<Header as="h2">Events</Header>
 					</Grid.Column>
 					<Grid.Column floated="right" width={4} textAlign="right">
 						<Input
