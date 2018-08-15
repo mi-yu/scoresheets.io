@@ -63,6 +63,44 @@ export default (state = defaultState, action) => {
 				...state,
 				modalOpen: false,
 			}
+		case 'ADD_TEAM': {
+			const { currentTournament } = state
+			const sortByTeamNumber = (a, b) => a.teamNumber - b.teamNumber
+			const newTeams = [currentTournament.teams, action.payload].sort(sortByTeamNumber)
+
+			return {
+				...state,
+				currentTournament: {
+					...currentTournament,
+					teams: newTeams,
+				},
+			}
+		}
+		case 'REMOVE_TEAM': {
+			const { currentTournament } = state
+			const filteredTeams = currentTournament.teams.filter(team => team._id !== action.payload)
+
+			return {
+				...state,
+				currentTournament: {
+					...currentTournament,
+					teams: filteredTeams,
+				},
+			}
+		}
+		case 'UPDATE_TEAM': {
+			const { currentTournament } = state
+			const mapTeamById = team => (team._id === action.payload._id ? action.payload : team)
+			const updatedTeams = currentTournament.teams.map(mapTeamById)
+
+			return {
+				...state,
+				currentTournament: {
+					...currentTournament,
+					teams: updatedTeams,
+				},
+			}
+		}
 		default:
 			return state
 	}
