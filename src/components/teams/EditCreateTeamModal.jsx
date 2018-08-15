@@ -2,32 +2,24 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Button, Modal, Form } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import OpenModalButton from '../modals/OpenModalButton'
 import Auth from '../../modules/Auth'
 import { API_ROOT } from '../../config'
 import request from '../../modules/request'
-import { setMessage, showMessage } from '../../actions/messageActions';
+import { setMessage } from '../../actions/messageActions'
+import { updateTeam, addTeam } from '../../actions/tournamentActions'
+import { hideEditCreateModal } from '../../actions/teamActions'
 
-class TeamsModal extends React.Component {
+class EditCreateTeamModal extends React.Component {
 	constructor(props) {
 		super(props)
+		const currentTeam = props.currentTournament.teams.find(team => team._id === props.currentTeamId)
 		this.state = {
-			...props,
-		}
-	}
-
-	componentWillReceiveProps(nextProps) {
-		if (this.state.modalOpen !== nextProps.modalOpen) {
-			this.setState({
-				...nextProps,
-				currentTeam: nextProps.currentTeam || {},
-			})
+			currentTeam,
 		}
 	}
 
 	handleChange = (e, { name, value }) => {
 		this.setState({
-			...this.state,
 			currentTeam: {
 				...this.state.currentTeam,
 				[name]: value,
@@ -36,9 +28,9 @@ class TeamsModal extends React.Component {
 	}
 
 	handleSubmitEvent = () => {
-		const { setMessage, showMessage } = this.props
-		const { editing, currentTeam, updateTeam, addTeams, tournament, closeModal } = this.state
-		const tournamentId = tournament._id
+		const { setMessage, addTeam, updateTeam, editing, currentTournament, hideEditCreateModal } = this.props
+		const { currentTeam } = this.state
+		const tournamentId = currentTournament._id
 		const teamId = currentTeam._id
 
 		const url = editing
@@ -62,14 +54,13 @@ class TeamsModal extends React.Component {
 			.then(res => {
 				const { division, teamNumber } = currentTeam
 				const message = editing ? `Successfully updated team ${division}${teamNumber}.` : `Succesfully created team ${division}${teamNumber}`
+				hideEditCreateModal()
 				setMessage(message, 'success')
-				showMessage()
 				if (editing) updateTeam(res)
-				else addTeams(res)
-				closeModal()
+				else addTeam(res)
 			})
 			.catch(err => {
-				closeModal()
+				hideEditCreateModal()
 				if (err.name === 'BulkWriteError') {
 					setMessage('There was a problem with team creation:', 'error', this.translateBulkWriteError(err.errors))
 				} else {
@@ -81,20 +72,16 @@ class TeamsModal extends React.Component {
 	translateBulkWriteError = (errs) => errs.map(err => `Team ${err.op.division}${err.op.teamNumber} already exists\n`)
 
 	render() {
-		const { modalOpen, currentTeam, clearCurrentTeam, closeModal, editing } = this.state
+		const { open, editing, hideEditCreateModal } = this.props
+		const { currentTeam } = this.state
+
+		if (!currentTeam) return null
 
 		return (
 			<Modal
-				trigger={
-					<OpenModalButton
-						onClick={clearCurrentTeam}
-						text="New Team"
-						icon="plus"
-					/>
-				}
 				closeIcon
-				open={modalOpen}
-				onClose={closeModal}
+				open={open}
+				onClose={hideEditCreateModal}
 			>
 				<Modal.Header>
 					{editing ? `Edit Team: ${currentTeam.school}` : 'New Team'}
@@ -144,7 +131,7 @@ class TeamsModal extends React.Component {
 					</Form>
 				</Modal.Content>
 				<Modal.Actions>
-					<Button onClick={closeModal}>Cancel</Button>
+					<Button onClick={hideEditCreateModal}>Cancel</Button>
 					<Button color="green" onClick={this.handleSubmitEvent}>
 						Submit
 					</Button>
@@ -154,19 +141,23 @@ class TeamsModal extends React.Component {
 	}
 }
 
-const mapDispatchToProps = dispatch => ({
-	setMessage: (message, type, details) => dispatch(setMessage(message, type, details)),
-	showMessage: () => dispatch(showMessage()),
+const mapStateToProps = state => ({
+	currentTeamId: state.teams.currentTeamId,
+	currentTournament: state.tournaments.currentTournament,
+	editing: state.teams.editing,
+	open: state.teams.editCreateModalOpen,
 })
 
-TeamsModal.propTypes = {
-	modalOpen: PropTypes.bool.isRequired,
-	currentTeam: PropTypes.shape({
-		_id: PropTypes.string.isRequired,
-		division: PropTypes.string.isRequired,
-		identifier: PropTypes.string.isRequired,
-		teamNumber: PropTypes.number.isRequired,
-	}).isRequired,
+const mapDispatchToProps = dispatch => ({
+	setMessage: (message, type, details) => dispatch(setMessage(message, type, details)),
+	updateTeam: (updatedTeam) => dispatch(updateTeam(updatedTeam)),
+	addTeam: (addedTeam) => dispatch(addTeam(addedTeam)),
+	hideEditCreateModal: () => dispatch(hideEditCreateModal()),
+})
+
+EditCreateTeamModal.propTypes = {
+	currentTeamId: PropTypes.string.isRequired,
+	open: PropTypes.bool.isRequired,
 }
 
-export default connect(null, mapDispatchToProps)(TeamsModal)
+export default connect(mapStateToProps, mapDispatchToProps)(EditCreateTeamModal)

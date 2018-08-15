@@ -1,16 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Redirect, Link } from 'react-router-dom'
-import { Grid, Header, Divider, Button, Icon, Dropdown, Input, Table } from 'semantic-ui-react'
+import { Grid, Header, Divider, Button, Icon, Dropdown, Input } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
 import request from '../modules/request'
 import TournamentEventCard from '../components/tournaments/TournamentEventCard'
-import TeamCard from '../components/tournaments/TeamCard'
-import TeamsModal from '../components/tournaments/TeamsModal'
 import { API_ROOT } from '../config'
 import { setCurrentTournament } from '../actions/tournamentActions'
 import { setMessage, showMessage } from '../actions/messageActions'
+import ConfirmDeleteTeamModal from '../components/teams/ConfirmDeleteTeamModal'
+import EditCreateTeamModal from '../components/teams/EditCreateTeamModal'
+import { showEditCreateModal, setEditingTeam } from '../actions/teamActions'
+import TeamGrid from '../components/teams/TeamGrid'
+import TeamTable from '../components/teams/TeamTable'
 
 const awardsOptions = [
 	{
@@ -37,9 +40,6 @@ class TournamentManagementPage extends React.Component {
 		this.state = {
 			eventsFilter: '',
 			teamsFilter: '',
-			teamModalOpen: false,
-			editingTeam: false,
-			currentTeam: {},
 			loading: true,
 			teamDisplayFormat: 'rows',
 		}
@@ -78,75 +78,10 @@ class TournamentManagementPage extends React.Component {
 			})
 	}
 
-	setCurrentTeam = teamId => {
-		const { tournament } = this.props
-		const team = tournament.teams.find(t => t._id === teamId)
-		this.setState({
-			editingTeam: true,
-			currentTeam: team,
-			teamModalOpen: true,
-		})
-	}
-
-	clearCurrentTeam = () => {
-		this.setState({
-			currentTeam: {},
-			editingTeam: false,
-			teamModalOpen: true,
-		})
-	}
-
-	updateTeam = updatedTeam => {
-		const { tournament, setCurrentTournament } = this.props
-		const { teams } = tournament
-		const combined = teams.map(team => (team._id === updatedTeam._id ? updatedTeam : team))
-
-		setCurrentTournament({
-			...tournament,
-			teams: combined,
-		})
-	}
-
-	addTeams = newTeams => {
-		const { tournament, setCurrentTournament } = this.props
-		const { teams } = tournament
-		const combined = [...teams, ...newTeams].sort((t1, t2) => t1.teamNumber > t2.teamNumber)
-
-		setCurrentTournament({
-			...tournament,
-			teams: combined,
-		})
-	}
-
-	removeTeam = removed => {
-		const { tournament, setCurrentTournament } = this.props
-		const { teams } = tournament
-		const filtered = teams.filter(team => team._id !== removed._id)
-
-		setCurrentTournament({
-			...tournament,
-			teams: filtered,
-		})
-	}
-
-	openTeamsModal = () => {
-		this.setState({
-			teamModalOpen: true,
-		})
-	}
-
-	closeTeamsModal = () => {
-		this.setState({
-			teamModalOpen: false,
-		})
-	}
-
-	handleChange = (e, { name, value }) => this.setState({
-		[name]: value,
-	})
-
 	handleFilter = (e, { name, value }) => {
-		this.setState({ [name]: value.toLowerCase() })
+		this.setState({
+			[name]: value.toLowerCase(),
+		})
 	}
 
 	handleTeamsViewToggle = (e, { name }) => {
@@ -174,13 +109,10 @@ class TournamentManagementPage extends React.Component {
 	}
 
 	render() {
-		const { tournament, events } = this.props
+		const { tournament, events, currentTeamId, setEditingTeam, showEditCreateModal } = this.props
 		const {
 			redirectToLogin,
 			numAwards,
-			teamModalOpen,
-			editingTeam,
-			currentTeam,
 			loading,
 			teamDisplayFormat,
 		} = this.state
@@ -189,9 +121,13 @@ class TournamentManagementPage extends React.Component {
 		if (loading) return null
 
 		const { teams } = tournament
+		const divBTeams = teams.filter(team => (team.division === 'B' && this.matchesTeamsFilter(team)))
+		const divCTeams = teams.filter(team => (team.division === 'C' && this.matchesTeamsFilter(team)))
 
 		return (
 			<div>
+				<ConfirmDeleteTeamModal />
+				<EditCreateTeamModal key={currentTeamId} />
 				<Header as="h1">{tournament.name}</Header>
 				<p>{new Date(tournament.date).toLocaleDateString()}</p>
 				<p>{`${tournament.city}, ${tournament.state}`}</p>
@@ -239,22 +175,6 @@ class TournamentManagementPage extends React.Component {
 				<Grid>
 					<Grid.Column floated="left" width={8}>
 						<Header as="h2" floated="left">Teams</Header>
-						<TeamsModal
-							tournament={tournament}
-							modalOpen={teamModalOpen}
-							openModal={this.openTeamsModal}
-							closeModal={this.closeTeamsModal}
-							editing={editingTeam}
-							currentTeam={currentTeam}
-							clearCurrentTeam={this.clearCurrentTeam}
-							updateTeam={this.updateTeam}
-							addTeams={this.addTeams}
-						/>
-						<Button as={Link} to={`/tournaments/${tournament._id}/teams/add`} color="green">
-							<Icon name="plus" />
-							<Icon name="zip" />
-							{'Bulk Add Teams'}
-						</Button>
 					</Grid.Column>
 					<Grid.Column floated="right" width={8} textAlign="right">
 						<Button.Group style={{ marginRight: '1rem' }}>
@@ -273,100 +193,35 @@ class TournamentManagementPage extends React.Component {
 						/>
 					</Grid.Column>
 				</Grid>
+				<Button
+					color="green"
+					onClick={() => {
+						setEditingTeam(false)
+						showEditCreateModal()
+					}}
+				>
+					<Icon name="plus" />
+					New Team
+				</Button>
+				<Button as={Link} to={`/tournaments/${tournament._id}/teams/add`} color="green">
+					<Icon name="plus" />
+					<Icon name="zip" />
+					Bulk Add Teams
+				</Button>
 				{teams.length > 0 && (
-					<div>
+					<div style={{ marginTop: '2em' }}>
 						<Header as="h3">B Teams</Header>
 						{teamDisplayFormat === 'grid' ? (
-							<Grid>
-								{teams.map(team => {
-									if (team.division === 'B' && this.matchesTeamsFilter(team)) {
-										return (
-											<TeamCard
-												key={team._id}
-												team={team}
-												setCurrentTeam={this.setCurrentTeam}
-												tournamentId={tournament._id}
-												removeTeam={this.removeTeam}
-											/>
-										)
-									}
-									return null
-								})}
-							</Grid>
+							<TeamGrid teams={divBTeams} />
 						) : (
-								<Table basic>
-									<Table.Header>
-										<Table.Row>
-											<Table.HeaderCell width={2}>Team Number</Table.HeaderCell>
-											<Table.HeaderCell>School</Table.HeaderCell>
-											<Table.HeaderCell>Actions</Table.HeaderCell>
-										</Table.Row>
-									</Table.Header>
-
-									<Table.Body>
-										{
-											teams.map(team => {
-												if (team.division === 'B' && this.matchesTeamsFilter(team)) {
-													return (
-														<Table.Row>
-															<Table.Cell>{`${team.division}${team.teamNumber}`}</Table.Cell>
-															<Table.Cell>{team.displayName}</Table.Cell>
-															<Table.Cell>{team.teamNumber}</Table.Cell>
-														</Table.Row>
-													)
-												}
-												return null
-											})
-										}
-									</Table.Body>
-								</Table>
-							)}
+							<TeamTable teams={divBTeams} />
+						)}
 						<Header as="h3">C Teams</Header>
 						{teamDisplayFormat === 'grid' ? (
-							<Grid>
-								{teams.map(team => {
-									if (team.division === 'C' && this.matchesTeamsFilter(team)) {
-										return (
-											<TeamCard
-												key={team._id}
-												team={team}
-												setCurrentTeam={this.setCurrentTeam}
-												tournamentId={tournament._id}
-												removeTeam={this.removeTeam}
-											/>
-										)
-									}
-									return null
-								})}
-							</Grid>
+							<TeamGrid teams={divCTeams} />
 						) : (
-								<Table basic>
-									<Table.Header>
-										<Table.Row>
-											<Table.HeaderCell width={2}>Team Number</Table.HeaderCell>
-											<Table.HeaderCell>School</Table.HeaderCell>
-											<Table.HeaderCell>Actions</Table.HeaderCell>
-										</Table.Row>
-									</Table.Header>
-
-									<Table.Body>
-										{
-											teams.map(team => {
-												if (team.division === 'C' && this.matchesTeamsFilter(team)) {
-													return (
-														<Table.Row>
-															<Table.Cell>{`${team.division}${team.teamNumber}`}</Table.Cell>
-															<Table.Cell>{team.displayName}</Table.Cell>
-															<Table.Cell>{team.teamNumber}</Table.Cell>
-														</Table.Row>
-													)
-												}
-												return null
-											})
-										}
-									</Table.Body>
-								</Table>
-							)}
+							<TeamTable teams={divCTeams} />
+						)}
 					</div>
 				)}
 				<Divider />
@@ -406,8 +261,6 @@ TournamentManagementPage.propTypes = {
 	match: PropTypes.shape({
 		params: PropTypes.object.isRequired,
 	}),
-	setMessage: PropTypes.func.isRequired,
-	setCurrentTournament: PropTypes.func.isRequired,
 	tournament: PropTypes.shape({
 		_id: PropTypes.string.isRequired,
 		name: PropTypes.string.isRequired,
@@ -422,6 +275,11 @@ TournamentManagementPage.propTypes = {
 			category: PropTypes.string.isRequired,
 		}),
 	).isRequired,
+	setMessage: PropTypes.func.isRequired,
+	setCurrentTournament: PropTypes.func.isRequired,
+	setEditingTeam: PropTypes.func.isRequired,
+	showEditCreateModal: PropTypes.func.isRequired,
+	currentTeamId: PropTypes.string.isRequired,
 }
 
 TournamentManagementPage.defaultProps = {
@@ -432,12 +290,15 @@ TournamentManagementPage.defaultProps = {
 const mapStateToProps = state => ({
 	events: state.events.eventList,
 	tournament: state.tournaments.currentTournament,
+	currentTeamId: state.teams.currentTeamId,
 })
 
 const mapDispatchToProps = dispatch => ({
 	setCurrentTournament: tournament => dispatch(setCurrentTournament(tournament)),
 	setMessage: (message, type) => dispatch(setMessage(message, type)),
 	showMessage: () => dispatch(showMessage()),
+	showEditCreateModal: () => dispatch(showEditCreateModal()),
+	setEditingTeam: (editing) => dispatch(setEditingTeam(editing)),
 })
 
 export default connect(
