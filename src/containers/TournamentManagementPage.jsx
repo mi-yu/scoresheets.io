@@ -132,6 +132,8 @@ class TournamentManagementPage extends React.Component {
 				<p>{new Date(tournament.date).toLocaleDateString()}</p>
 				<p>{`${tournament.city}, ${tournament.state}`}</p>
 				<Button
+					basic
+					size="tiny"
 					primary
 					as={Link}
 					to={{
@@ -139,9 +141,11 @@ class TournamentManagementPage extends React.Component {
 					}}
 				>
 					<Icon name="trophy" />
-					{'B Results'}
+					B Results
 				</Button>
 				<Button
+					basic
+					size="tiny"
 					primary
 					as={Link}
 					to={{
@@ -149,9 +153,9 @@ class TournamentManagementPage extends React.Component {
 					}}
 				>
 					<Icon name="trophy" />
-					{'C Results'}
+					C Results
 				</Button>
-				<Button.Group>
+				<Button.Group size="small">
 					<Dropdown
 						button
 						text={numAwards || 'Choose number of awards'}
@@ -194,6 +198,8 @@ class TournamentManagementPage extends React.Component {
 					</Grid.Column>
 				</Grid>
 				<Button
+					basic
+					size="tiny"
 					color="green"
 					onClick={() => {
 						setEditingTeam(false)
@@ -203,7 +209,7 @@ class TournamentManagementPage extends React.Component {
 					<Icon name="plus" />
 					New Team
 				</Button>
-				<Button as={Link} to={`/tournaments/${tournament._id}/teams/add`} color="green">
+				<Button size="tiny" basic as={Link} to={`/tournaments/${tournament._id}/teams/add`} color="green">
 					<Icon name="plus" />
 					<Icon name="zip" />
 					Bulk Add Teams

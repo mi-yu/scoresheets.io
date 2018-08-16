@@ -8,7 +8,7 @@ const TeamRow = ({ team }) => (
 		<Table.Cell>{`${team.division}${team.teamNumber}`}</Table.Cell>
 		<Table.Cell>{team.displayName}</Table.Cell>
 		<Table.Cell className="spacer-cell" />
-		<Table.Cell textAlign="center"><TeamActionsButtonGroup team={team} /></Table.Cell>
+		<Table.Cell><TeamActionsButtonGroup team={team} size="mini" /></Table.Cell>
 	</Table.Row>
 )
 

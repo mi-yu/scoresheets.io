@@ -136,7 +136,7 @@ class TournamentsModal extends React.Component {
 
 		return (
 			<Modal
-				trigger={
+				trigger={(
 					<OpenModalButton
 						onClick={() => {
 							openTournamentsModal()
@@ -146,7 +146,7 @@ class TournamentsModal extends React.Component {
 						text="New Tournament"
 						icon="plus"
 					/>
-				}
+				)}
 				closeIcon
 				open={modalOpen}
 				onClose={closeTournamentsModal}

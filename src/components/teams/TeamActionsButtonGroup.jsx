@@ -4,11 +4,27 @@ import { connect } from 'react-redux'
 import { Button, Icon } from 'semantic-ui-react'
 import { showConfirmDeleteModal, setCurrentTeam, setEditingTeam, showEditCreateModal } from '../../actions/teamActions'
 
-const TeamActionsButtonGroup = ({ team, showConfirmDeleteModal, setEditingTeam, setCurrentTeam, showEditCreateModal }) => (
-	<Button.Group basic>
-		<Button icon>
-			<Icon name="trophy" />
-			Scores
+const buttonStyle = {
+	display: 'flex',
+	alignItems: 'center',
+}
+
+const buttonTextStyle = {
+	marginLeft: '0.25em',
+}
+
+const TeamActionsButtonGroup = ({
+	team,
+	size,
+	showConfirmDeleteModal,
+	setEditingTeam,
+	setCurrentTeam,
+	showEditCreateModal,
+}) => (
+	<Button.Group basic size={size}>
+		<Button icon style={buttonStyle}>
+			<Icon name="trophy" size="small" />
+			<div style={buttonTextStyle}>Scores</div>
 		</Button>
 		<Button
 			icon
@@ -17,9 +33,10 @@ const TeamActionsButtonGroup = ({ team, showConfirmDeleteModal, setEditingTeam, 
 				setEditingTeam(true)
 				showEditCreateModal()
 			}}
+			style={buttonStyle}
 		>
-			<Icon name="edit" />
-			Edit
+			<Icon name="edit" size="small" />
+			<div style={buttonTextStyle}>Edit</div>
 		</Button>
 		<Button
 			icon
@@ -27,9 +44,10 @@ const TeamActionsButtonGroup = ({ team, showConfirmDeleteModal, setEditingTeam, 
 				showConfirmDeleteModal()
 				setCurrentTeam(team._id)
 			}}
+			style={buttonStyle}
 		>
-			<Icon name="delete" />
-			Delete
+			<Icon name="delete" size="small" />
+			<div style={buttonTextStyle}>Delete</div>
 		</Button>
 	</Button.Group>
 )
@@ -46,6 +64,15 @@ TeamActionsButtonGroup.propTypes = {
 		_id: PropTypes.string.isRequired,
 		name: PropTypes.string.isRequired,
 	}).isRequired,
+	size: PropTypes.string,
+	showConfirmDeleteModal: PropTypes.func.isRequired,
+	setEditingTeam: PropTypes.func.isRequired,
+	setCurrentTeam: PropTypes.func.isRequired,
+	showEditCreateModal: PropTypes.func.isRequired,
+}
+
+TeamActionsButtonGroup.defaultProps = {
+	size: 'small',
 }
 
 export default connect(null, mapDispatchToProps)(TeamActionsButtonGroup)

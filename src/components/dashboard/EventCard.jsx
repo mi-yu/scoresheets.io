@@ -37,8 +37,8 @@ const EventCard = ({ event, setCurrentEvent, openEventsModal, setEditing, user }
 						<Label size="tiny" color={color}>
 							{category}
 						</Label>
-						{division &&
-							division.split('').map(div => (
+						{division
+							&& division.split('').map(div => (
 								<Label key={div} size="tiny">
 									{div}
 								</Label>
@@ -51,7 +51,8 @@ const EventCard = ({ event, setCurrentEvent, openEventsModal, setEditing, user }
 					<Card.Content>
 						<Button
 							fluid
-							color="blue"
+							basic
+							size="small"
 							onClick={() => {
 								setCurrentEvent(event)
 								setEditing(true)
