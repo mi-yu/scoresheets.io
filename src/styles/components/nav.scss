@@ -1,7 +1,7 @@
 #main-nav {
     position: fixed;
     top: 0;
-    height: $nav-height;
+    height: $navHeight;
     background: darken(white, 1%);
     color: $color-black;
     border: none;
@@ -53,6 +53,45 @@
             color: ghostwhite;
             opacity: 0.5;
         }
+    }
+
+    &.nav-logged-in {
+        height: $navHeightSmaller;
+
+        a {
+            font-size: 1em;
+        }
+    }
+}
+
+#tournament-nav {
+    margin-top: $navHeightSmaller;
+
+    .item {
+        height: 100%;
+        padding-left: 0.5em !important;
+        padding-right: 0.5em !important;
+        margin-left: 0.5em;
+        margin-right: 0.5em;
+        color: lighten($color-black, 40%);
+
+        &.active {
+            background-color: transparent;
+        }
+
+        &:hover {
+            color: lighten($color-black, 50%);
+        }
+    }
+
+    .menu {
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        border-radius: 0;
+        box-shadow: none;
+        height: $navHeightSmaller;
+        background-color: desaturate(lighten($color-purple, 30%), 70%);
     }
 }
 

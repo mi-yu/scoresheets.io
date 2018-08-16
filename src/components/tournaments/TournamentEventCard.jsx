@@ -10,7 +10,6 @@ const TournamentEventCard = ({
 	stateEvent,
 	impound,
 	division,
-	finished,
 	tournamentId,
 }) => {
 	let color = ''
@@ -44,7 +43,7 @@ const TournamentEventCard = ({
 						<Label size="tiny" color={color}>
 							{category}
 						</Label>
-						{division.split('').map(div => <Label size="tiny">{div}</Label>)}
+						{division.split('').map(div => <Label key={div} size="tiny">{div}</Label>)}
 						{stateEvent && <Label size="tiny">trial</Label>}
 						{impound && <Label size="tiny">impound</Label>}
 					</Card.Description>
@@ -67,14 +66,14 @@ const TournamentEventCard = ({
 								to={`/tournaments/${tournamentId}/scores/B/${_id}`}
 							>
 									B Scores
-								</Button>
+							</Button>
 							<Button
 								color="blue"
 								as={Link}
 								to={`/tournaments/${tournamentId}/scores/C/${_id}`}
 							>
 									C Scores
-								</Button>
+							</Button>
 						</Button.Group>
 					)}
 				</Card.Content>
@@ -90,7 +89,6 @@ TournamentEventCard.propTypes = {
 	stateEvent: PropTypes.bool.isRequired,
 	impound: PropTypes.bool.isRequired,
 	division: PropTypes.oneOf(['B', 'C', 'BC']).isRequired,
-	finished: PropTypes.bool.isRequired,
 	tournamentId: PropTypes.string.isRequired,
 }
 

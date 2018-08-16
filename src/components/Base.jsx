@@ -3,17 +3,18 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Route, BrowserRouter as Router } from 'react-router-dom'
 import { Container, Message } from 'semantic-ui-react'
-import Nav from './Nav'
-import HomePage from '../containers/HomePage'
-import routes from '../routes'
 import { setMessage, hideMessage, showMessage } from '../actions/messageActions'
 import { setEvents } from '../actions/eventActions'
 import { setUser } from '../actions/userActions'
+import { API_ROOT } from '../config'
 import request from '../modules/request'
 import arrayToObject from '../modules/arrayToObject'
 import Auth from '../modules/Auth'
-import { API_ROOT } from '../config'
+import Nav from './Nav'
+import TournamentNav from './TournamentNav'
+import HomePage from '../containers/HomePage'
 import Footer from '../containers/Footer'
+import routes from '../routes'
 
 const translateMessageType = type => {
 	switch (type) {
@@ -62,12 +63,14 @@ class Base extends React.Component {
 				<Router>
 					<div>
 						<Nav hidden={window.location.pathname.includes('slideshow')} />
+						<Route path="/tournaments" component={TournamentNav} />
 						<Route exact path="/" component={HomePage} />
 						<Container>
 							{routes.map(route => (
 								<Route
 									exact
 									path={route.path}
+									key={route.path}
 									render={props => (
 										<route.component {...props} setMessage={setMessage} />
 									)}

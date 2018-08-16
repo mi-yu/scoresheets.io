@@ -26,11 +26,20 @@ class Nav extends Component {
 		return <Redirect to="/" />
 	}
 
+	calculateNavClassNames = () => {
+		const { activeItem } = this.state
+		const activeClass = activeItem.includes('scoresheets') || activeItem === '/' ? 'menu-home' : ''
+		const loggedInClass = Auth.isAuthenticated() ? 'nav-logged-in' : ''
+
+		return `${activeClass} ${loggedInClass}`
+	}
+
 	render() {
 		const { activeItem } = this.state
 		const { hidden } = this.props
 
 		const loggedIn = Auth.isAuthenticated()
+		const classNames = this.calculateNavClassNames()
 
 		// TODO: get this to actually work
 		if (hidden) return null
@@ -40,7 +49,7 @@ class Nav extends Component {
 				id="main-nav"
 				borderless
 				attached="top"
-				className={activeItem.includes('scoresheets') || activeItem === '/' ? 'menu-home' : ''}
+				className={classNames}
 			>
 				<Container style={{ paddingTop: '0' }}>
 					<Link to="/" onClick={this.handleClick}>
@@ -91,7 +100,7 @@ class Nav extends Component {
 										className={activeItem.includes('login') ? 'active' : ''}
 									>
 										Login
-									</Item>
+         </Item>
 								</Link>
 								<Link to="/users/register" onClick={this.handleClick}>
 									<Item
