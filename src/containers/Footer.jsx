@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 const footerStyle = {
 	height: '8em',
@@ -14,10 +15,19 @@ const tagStyle = {
 	fontSize: '75%',
 }
 
-const Footer = () => (
-	<footer style={footerStyle}>
-		<span style={tagStyle}>Made with ☕ and 💕 in ATX</span>
-	</footer>
-)
+const Footer = ({ hidden }) => {
+	if (!hidden) {
+		return (
+			<footer style={footerStyle}>
+				<span style={tagStyle}>Made with ☕ and 💕 in ATX</span>
+			</footer>
+		)
+	}
+	return null
+}
+
+Footer.propTypes = {
+	hidden: PropTypes.bool.isRequired,
+}
 
 export default Footer

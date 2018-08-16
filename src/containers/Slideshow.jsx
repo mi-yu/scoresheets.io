@@ -133,7 +133,9 @@ export default class Slideshow extends React.Component {
 			}
 		}
 
-		return sortedEntries
+		const filteredEntries = sortedEntries.filter(entry => entry.scores.length > 0)
+
+		return filteredEntries
 	}
 
 	getSweepstakesTeams = teams => {
@@ -157,7 +159,7 @@ export default class Slideshow extends React.Component {
 		const { topTeamsPerEvent, sweepstakes, tournament } = this.state
 		if (!topTeamsPerEvent) return null
 		return (
-			<Deck theme={theme} progress="none" controls={false}>
+			<Deck id="slideshow" theme={theme} progress="none" controls={false}>
 				<Slide transition={['fade']}>
 					<Heading size={1}>{tournament.name} Awards</Heading>
 					<Heading size={4}>{new Date(tournament.date).toLocaleDateString()}</Heading>

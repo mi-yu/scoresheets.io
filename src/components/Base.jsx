@@ -63,15 +63,17 @@ class Base extends React.Component {
 					<div>
 						<Nav hidden={window.location.pathname.includes('slideshow')} />
 						<Route exact path="/" component={HomePage} />
-						{routes.map(route => (
-							<Route
-								exact
-								path={route.path}
-								render={props => (
-									<Container><route.component {...props} setMessage={setMessage} /></Container>
-								)}
-							/>
-						))}
+						<Container>
+							{routes.map(route => (
+								<Route
+									exact
+									path={route.path}
+									render={props => (
+										<route.component {...props} setMessage={setMessage} />
+									)}
+								/>
+							))}
+						</Container>
 						{messageVisible && (
 							<Message
 								onDismiss={hideMessage}
@@ -89,7 +91,7 @@ class Base extends React.Component {
 								}
 							</Message>
 						)}
-						<Footer />
+						<Footer hidden={window.location.pathname.includes('slideshow')} />
 					</div>
 				</Router>
 			</div>

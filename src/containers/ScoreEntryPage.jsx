@@ -81,7 +81,7 @@ class ScoreEntryPage extends React.Component {
 	render() {
 		const { scoresheetEntry, loading } = this.state
 		const { scores } = scoresheetEntry
-		if (loading) return null
+		if (loading || !scores.length) return null
 
 		return (
 			<div>

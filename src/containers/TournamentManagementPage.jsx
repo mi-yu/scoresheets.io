@@ -170,6 +170,8 @@ class TournamentManagementPage extends React.Component {
 						labelPosition="right"
 						as={Link}
 						to={`/tournaments/${tournament._id}/slideshow?numAwards=${numAwards || 4}`}
+						rel="noopener noreferrer"
+						target="_blank"
 					>
 						{'Start Awards Presentation'}
 						<Icon name="right arrow" />
