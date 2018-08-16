@@ -155,7 +155,7 @@ class TournamentManagementPage extends React.Component {
 					<Icon name="trophy" />
 					C Results
 				</Button>
-				<Button.Group size="small">
+				<Button.Group size="tiny">
 					<Dropdown
 						button
 						text={numAwards || 'Choose number of awards'}
@@ -170,6 +170,8 @@ class TournamentManagementPage extends React.Component {
 						labelPosition="right"
 						as={Link}
 						to={`/tournaments/${tournament._id}/slideshow?numAwards=${numAwards || 4}`}
+						rel="noopener noreferrer"
+						target="_blank"
 					>
 						{'Start Awards Presentation'}
 						<Icon name="right arrow" />
@@ -177,11 +179,36 @@ class TournamentManagementPage extends React.Component {
 				</Button.Group>
 				<Divider />
 				<Grid>
-					<Grid.Column floated="left" width={8}>
+					<Grid.Column floated="left">
 						<Header as="h2" floated="left">Teams</Header>
 					</Grid.Column>
-					<Grid.Column floated="right" width={8} textAlign="right">
-						<Button.Group style={{ marginRight: '1rem' }}>
+					<Grid.Column width={12} textAlign="right">
+						<Button
+							basic
+							size="tiny"
+							color="green"
+							onClick={() => {
+								setEditingTeam(false)
+								showEditCreateModal()
+							}}
+							style={{ marginRight: '1em' }}
+						>
+							<Icon name="plus" />
+							New Team
+						</Button>
+						<Button
+							size="tiny"
+							basic
+							as={Link}
+							to={`/tournaments/${tournament._id}/teams/add`}
+							color="green"
+							style={{ marginRight: '1em' }}
+						>
+							<Icon name="plus" />
+							<Icon name="zip" />
+							Bulk Add Teams
+						</Button>
+						<Button.Group style={{ marginRight: '1rem' }} size="tiny">
 							<Button icon name="rows" active={teamDisplayFormat === 'rows'} onClick={this.handleTeamsViewToggle}>
 								<Icon name="align justify" />
 							</Button>
@@ -190,6 +217,7 @@ class TournamentManagementPage extends React.Component {
 							</Button>
 						</Button.Group>
 						<Input
+							size="small"
 							name="teamsFilter"
 							placeholder="Filter teams..."
 							icon="search"
@@ -197,23 +225,6 @@ class TournamentManagementPage extends React.Component {
 						/>
 					</Grid.Column>
 				</Grid>
-				<Button
-					basic
-					size="tiny"
-					color="green"
-					onClick={() => {
-						setEditingTeam(false)
-						showEditCreateModal()
-					}}
-				>
-					<Icon name="plus" />
-					New Team
-				</Button>
-				<Button size="tiny" basic as={Link} to={`/tournaments/${tournament._id}/teams/add`} color="green">
-					<Icon name="plus" />
-					<Icon name="zip" />
-					Bulk Add Teams
-				</Button>
 				{teams.length > 0 && (
 					<div style={{ marginTop: '2em' }}>
 						<Header as="h3">B Teams</Header>
@@ -237,6 +248,7 @@ class TournamentManagementPage extends React.Component {
 					</Grid.Column>
 					<Grid.Column floated="right" width={4} textAlign="right">
 						<Input
+							size="small"
 							name="eventsFilter"
 							placeholder="Filter events..."
 							icon="search"

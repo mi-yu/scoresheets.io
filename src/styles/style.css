@@ -42,6 +42,32 @@ h1, p {
     #main-nav.menu-home .nav-version {
       color: ghostwhite;
       opacity: 0.5; }
+  #main-nav.nav-logged-in {
+    height: 3.375em; }
+    #main-nav.nav-logged-in a {
+      font-size: 1em; }
+
+#tournament-nav {
+  margin-top: 3.375em; }
+  #tournament-nav .item {
+    height: 100%;
+    padding-left: 0.5em !important;
+    padding-right: 0.5em !important;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    color: #999999; }
+    #tournament-nav .item.active {
+      background-color: transparent; }
+    #tournament-nav .item:hover {
+      color: #b3b3b3; }
+  #tournament-nav .menu {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+    box-shadow: none;
+    height: 3.375em;
+    background-color: #f4f4f6; }
 
 #home-page {
   min-height: 100vh;
@@ -103,6 +129,8 @@ h1, p {
 
 .container {
   padding-top: 6.75em; }
+  .container.padded-less {
+    padding-top: 3.375em; }
 
 /* temp modals fix */
 .ui.page.modals.transition.visible {

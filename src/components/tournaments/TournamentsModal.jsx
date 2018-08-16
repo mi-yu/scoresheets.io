@@ -156,7 +156,7 @@ class TournamentsModal extends React.Component {
 						? `Edit Tournament: ${currentTournament.name}`
 						: 'New Tournament'}
 				</Modal.Header>
-				<Modal.Content>
+				<Modal.Content scrolling>
 					<Form>
 						<Form.Field required>
 							<label htmlFor="name">Tournament Name</label>

@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Button, Form, Table } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import Auth from '../../modules/Auth'
@@ -305,6 +306,15 @@ class ScoreEntryForm extends React.Component {
 			</Form>
 		)
 	}
+}
+
+ScoreEntryForm.propTypes = {
+	scoresheetEntry: PropTypes.shape({
+		_id: PropTypes.string.isRequired,
+		tournament: PropTypes.string.isRequired,
+		division: PropTypes.string.isRequired,
+	}).isRequired,
+	setMessage: PropTypes.func.isRequired,
 }
 
 const mapDispatchToProps = dispatch => ({

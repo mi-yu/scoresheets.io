@@ -5,7 +5,11 @@
 @import 'pages/home';
 
 .container {
-	padding-top: $nav-height*1.5;
+	padding-top: $navHeight * 1.5;
+
+	&.padded-less {
+		padding-top: $navHeight * 0.75;
+	}
 }
 
 /* temp modals fix */
@@ -22,7 +26,7 @@
 .message {
 	position: fixed !important;
 	margin: 2em !important;
-	top: $nav-height !important;
+	top: $navHeight !important;
 	right: 0 !important;
 	width: 500px !important;
 	z-index: 100 !important;
