@@ -50,3 +50,24 @@ export const closeTournamentsModal = () => dispatch => {
 		type: 'CLOSE_TOURNAMENTS_MODAL',
 	})
 }
+
+export const addTeam = (newTeam) => dispatch => {
+	dispatch({
+		type: 'ADD_TEAM',
+		payload: newTeam,
+	})
+}
+
+export const removeTeam = (teamId) => dispatch => {
+	dispatch({
+		type: 'REMOVE_TEAM',
+		payload: teamId,
+	})
+}
+
+export const updateTeam = (updatedTeam) => dispatch => {
+	dispatch({
+		type: 'UPDATE_TEAM',
+		payload: updatedTeam,
+	})
+}

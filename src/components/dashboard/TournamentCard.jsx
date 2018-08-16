@@ -21,10 +21,10 @@ const TournamentCard = ({ tournament, setCurrentTournament, openTournamentsModal
 						{`${city}, ${state} on ${new Date(date).toLocaleDateString()}`}
 					</Card.Meta>
 				</Card.Content>
-				<Card.Content extra>
-					<div className="ui two buttons">
-						<Button as={Link} color="blue" to={`/tournaments/${_id}/manage`}>
-							{'Manage'}
+				<Card.Content extra textAlign="center">
+					<Button.Group basic fluid size="small">
+						<Button as={Link} to={`/tournaments/${_id}/manage`}>
+							Manage
 						</Button>
 						<Button
 							color="grey"
@@ -34,9 +34,9 @@ const TournamentCard = ({ tournament, setCurrentTournament, openTournamentsModal
 								openTournamentsModal()
 							}}
 						>
-							{'Edit Details'}
+							Edit Details
 						</Button>
-					</div>
+					</Button.Group>
 				</Card.Content>
 			</Card>
 		</Grid.Column>
