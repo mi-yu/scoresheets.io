@@ -1,14 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Menu, Container, Item, Header } from 'semantic-ui-react'
+import { Menu, Container, Item } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 
 const TournamentNav = ({ tournament }) => (
 	<div id="tournament-nav">
-		{/* <Container style={{ paddingTop: '1em' }}>
-			<Item id="tournament-nav-name">{tournament.name}</Item>
-		</Container> */}
 		<Menu
 			borderless
 		>
@@ -20,16 +17,16 @@ const TournamentNav = ({ tournament }) => (
 				</Link>
 				<Link to="/">
 					<Item
-						name="Teams"
-					>
-						Teams
-					</Item>
-				</Link>
-				<Link to="/">
-					<Item
 						name="Events"
 					>
 						Events
+					</Item>
+				</Link>
+				<Link to={`/tournaments/${tournament._id}/teams`}>
+					<Item
+						name="Teams"
+					>
+						Teams
 					</Item>
 				</Link>
 				<Link to="/">

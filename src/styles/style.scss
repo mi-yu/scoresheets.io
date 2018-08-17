@@ -4,12 +4,12 @@
 @import 'components/nav';
 @import 'pages/home';
 
-.container {
-	padding-top: $navHeight * 1.5;
+body {
+	margin-top: $navHeightSmaller;
+}
 
-	&.padded-less {
-		padding-top: $navHeight * 0.75;
-	}
+.container {
+	padding-top: 2em;
 }
 
 /* temp modals fix */

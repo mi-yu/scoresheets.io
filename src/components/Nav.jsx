@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Menu, Item, Container } from 'semantic-ui-react'
-import { Link, Redirect } from 'react-router-dom'
+import { Link, Redirect, Route } from 'react-router-dom'
 import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
 import { setUser } from '../actions/userActions'
@@ -93,25 +93,25 @@ class Nav extends Component {
 							</Link>
 						</Menu.Menu>
 					) : (
-							<Menu.Menu borderless position="right">
-								<Link to="/users/login" onClick={this.handleClick}>
-									<Item
-										name="Login"
-										className={activeItem.includes('login') ? 'active' : ''}
-									>
+						<Menu.Menu borderless position="right">
+							<Link to="/users/login" onClick={this.handleClick}>
+								<Item
+									name="Login"
+									className={activeItem.includes('login') ? 'active' : ''}
+								>
 										Login
-         </Item>
-								</Link>
-								<Link to="/users/register" onClick={this.handleClick}>
-									<Item
-										name="Register"
-										className={activeItem.includes('register') ? 'active' : ''}
-									>
+								</Item>
+							</Link>
+							<Link to="/users/register" onClick={this.handleClick}>
+								<Item
+									name="Register"
+									className={activeItem.includes('register') ? 'active' : ''}
+								>
 										Register
-									</Item>
-								</Link>
-							</Menu.Menu>
-						)}
+								</Item>
+							</Link>
+						</Menu.Menu>
+					)}
 				</Container>
 			</Menu>
 		)

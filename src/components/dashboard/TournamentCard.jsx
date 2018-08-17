@@ -23,7 +23,7 @@ const TournamentCard = ({ tournament, setCurrentTournament, openTournamentsModal
 				</Card.Content>
 				<Card.Content extra textAlign="center">
 					<Button.Group basic fluid size="small">
-						<Button as={Link} to={`/tournaments/${_id}/manage`}>
+						<Button as={Link} to={`/tournaments/${_id}`}>
 							Manage
 						</Button>
 						<Button

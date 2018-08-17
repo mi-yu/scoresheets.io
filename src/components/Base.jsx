@@ -62,8 +62,10 @@ class Base extends React.Component {
 			<div>
 				<Router>
 					<div>
-						<Nav hidden={window.location.pathname.includes('slideshow')} />
-						<Route path="/tournaments" component={TournamentNav} />
+						<div id="nav-wrapper">
+							<Nav hidden={window.location.pathname.includes('slideshow')} />
+							<Route path="/tournaments" component={TournamentNav} />
+						</div>
 						<Route exact path="/" component={HomePage} />
 						<Container>
 							{routes.map(route => (

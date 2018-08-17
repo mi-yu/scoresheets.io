@@ -127,10 +127,11 @@ h1, p {
         left: -3em;
         top: -3em; }
 
+body {
+  margin-top: 3.375em; }
+
 .container {
-  padding-top: 6.75em; }
-  .container.padded-less {
-    padding-top: 3.375em; }
+  padding-top: 2em; }
 
 /* temp modals fix */
 .ui.page.modals.transition.visible {

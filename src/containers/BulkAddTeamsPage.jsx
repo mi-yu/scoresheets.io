@@ -148,13 +148,13 @@ class BulkAddTeamsPage extends React.Component {
 	render() {
 		const { tournament, formData, redirectToManagePage } = this.state
 		if (!tournament) return null
-		if (redirectToManagePage) return <Redirect to={`/tournaments/${tournament._id}/manage`} />
+		if (redirectToManagePage) return <Redirect to={`/tournaments/${tournament._id}`} />
 
 		return (
 			<div>
 				<Header as="h1">Bulk Add Teams</Header>
 				<Header color="blue">
-					<Link to={`/tournaments/${tournament._id}/manage`}>
+					<Link to={`/tournaments/${tournament._id}`}>
 						<Icon name="long arrow left" />
 						{tournament.name}
 					</Link>
