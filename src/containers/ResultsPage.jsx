@@ -24,8 +24,7 @@ class ResultsPage extends React.Component {
 			`${API_ROOT}/tournaments/${tournamentId}/teams?division=${division}`,
 			`${API_ROOT}/tournaments/${tournamentId}`,
 		]
-		const requests = urls.map(url =>
-			request(url, {
+		const requests = urls.map(url => request(url, {
 				method: 'GET',
 				headers: new Headers({
 					Authorization: `Bearer ${token}`,
@@ -65,8 +64,7 @@ class ResultsPage extends React.Component {
 		return t2Count - t1Count
 	}
 
-	countOccurrences = (scores, target) =>
-		scores.reduce((total, score) => total + Number(score === target), 0)
+	countOccurrences = (scores, target) => scores.reduce((total, score) => total + Number(score === target), 0)
 
 	populateScores = (entries, teams) => {
 		let totalScore = 0
@@ -109,7 +107,7 @@ class ResultsPage extends React.Component {
 			<div>
 				<Breadcrumb>
 					<Breadcrumb.Section>
-						<Link to={`/tournaments/${tournament._id}/manage`}>
+						<Link to={`/tournaments/${tournament._id}`}>
 							{tournament.name}
 						</Link>
 					</Breadcrumb.Section>

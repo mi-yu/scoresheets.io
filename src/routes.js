@@ -7,6 +7,7 @@ import ScoreEntryPage from './containers/ScoreEntryPage'
 import ResultsPage from './containers/ResultsPage'
 import Slideshow from './containers/Slideshow'
 import RegisterPage from './containers/RegisterPage'
+import TeamsPage from './containers/tournaments/TeamsPage'
 
 const routes = [
 	{
@@ -30,8 +31,13 @@ const routes = [
 	},
 
 	{
-		path: '/tournaments/:id/manage',
+		path: '/tournaments/:id',
 		component: TournamentManagementPage,
+	},
+
+	{
+		path: '/tournaments/:id/teams',
+		component: TeamsPage,
 	},
 
 	{

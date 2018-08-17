@@ -8,9 +8,8 @@ const TeamTable = ({ teams }) => (
 		<Table.Header>
 			<Table.Row>
 				<Table.HeaderCell width={2}>Team Number</Table.HeaderCell>
-				<Table.HeaderCell width={4}>School</Table.HeaderCell>
-				<Table.HeaderCell id="spacer" width={6} />
-				<Table.HeaderCell>Actions</Table.HeaderCell>
+				<Table.HeaderCell>School</Table.HeaderCell>
+				<Table.HeaderCell style={{ marginLeft: 'auto' }} width={3}>Actions</Table.HeaderCell>
 			</Table.Row>
 		</Table.Header>
 

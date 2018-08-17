@@ -84,12 +84,6 @@ class TournamentManagementPage extends React.Component {
 		})
 	}
 
-	handleTeamsViewToggle = (e, { name }) => {
-		this.setState({
-			teamDisplayFormat: name,
-		})
-	}
-
 	matchesTeamsFilter = team => {
 		const { teamsFilter } = this.state
 		return (
@@ -121,8 +115,6 @@ class TournamentManagementPage extends React.Component {
 		if (loading) return null
 
 		const { teams } = tournament
-		const divBTeams = teams.filter(team => (team.division === 'B' && this.matchesTeamsFilter(team)))
-		const divCTeams = teams.filter(team => (team.division === 'C' && this.matchesTeamsFilter(team)))
 
 		return (
 			<div>
@@ -177,70 +169,6 @@ class TournamentManagementPage extends React.Component {
 						<Icon name="right arrow" />
 					</Button>
 				</Button.Group>
-				<Divider />
-				<Grid>
-					<Grid.Column floated="left">
-						<Header as="h2" floated="left">Teams</Header>
-					</Grid.Column>
-					<Grid.Column width={12} textAlign="right">
-						<Button
-							basic
-							size="tiny"
-							color="green"
-							onClick={() => {
-								setEditingTeam(false)
-								showEditCreateModal()
-							}}
-							style={{ marginRight: '1em' }}
-						>
-							<Icon name="plus" />
-							New Team
-						</Button>
-						<Button
-							size="tiny"
-							basic
-							as={Link}
-							to={`/tournaments/${tournament._id}/teams/add`}
-							color="green"
-							style={{ marginRight: '1em' }}
-						>
-							<Icon name="plus" />
-							<Icon name="zip" />
-							Bulk Add Teams
-						</Button>
-						<Button.Group style={{ marginRight: '1rem' }} size="tiny">
-							<Button icon name="rows" active={teamDisplayFormat === 'rows'} onClick={this.handleTeamsViewToggle}>
-								<Icon name="align justify" />
-							</Button>
-							<Button icon name="grid" active={teamDisplayFormat === 'grid'} onClick={this.handleTeamsViewToggle}>
-								<Icon name="grid layout" />
-							</Button>
-						</Button.Group>
-						<Input
-							size="small"
-							name="teamsFilter"
-							placeholder="Filter teams..."
-							icon="search"
-							onChange={this.handleFilter}
-						/>
-					</Grid.Column>
-				</Grid>
-				{teams.length > 0 && (
-					<div style={{ marginTop: '2em' }}>
-						<Header as="h3">B Teams</Header>
-						{teamDisplayFormat === 'grid' ? (
-							<TeamGrid teams={divBTeams} />
-						) : (
-							<TeamTable teams={divBTeams} />
-						)}
-						<Header as="h3">C Teams</Header>
-						{teamDisplayFormat === 'grid' ? (
-							<TeamGrid teams={divCTeams} />
-						) : (
-							<TeamTable teams={divCTeams} />
-						)}
-					</div>
-				)}
 				<Divider />
 				<Grid>
 					<Grid.Column floated="left" width={4}>
