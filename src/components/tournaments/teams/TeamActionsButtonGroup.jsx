@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Button, Icon } from 'semantic-ui-react'
-import { showConfirmDeleteModal, setCurrentTeam, setEditingTeam, showEditCreateModal } from '../../actions/teamActions'
+import { showConfirmDeleteModal, setCurrentTeam, setEditingTeam, showEditCreateModal } from '../../../actions/teamActions'
 
 const buttonStyle = {
 	display: 'flex',

@@ -29,6 +29,12 @@ export const setCurrentTeam = (teamId) => dispatch => {
 	})
 }
 
+export const clearCurrentTeam = () => dispatch => {
+	dispatch({
+		type: 'CLEAR_CURRENT_TEAM',
+	})
+}
+
 export const setEditingTeam = (editing) => dispatch => {
 	dispatch({
 		type: 'SET_EDITING_TEAM',

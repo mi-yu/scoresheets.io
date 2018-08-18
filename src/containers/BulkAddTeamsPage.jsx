@@ -7,6 +7,7 @@ import Auth from '../modules/Auth'
 import { API_ROOT } from '../config'
 import request from '../modules/request'
 import { setMessage } from '../actions/messageActions'
+import { addTeam } from '../actions/tournamentActions'
 
 const divisionOptions = [
 	{
@@ -26,14 +27,14 @@ class BulkAddTeamsPage extends React.Component {
 		for (let i = 0; i < 10; i += 1) {
 			formData.push({
 				teamNumber: undefined,
-				tournament: props.match.params.id,
+				tournament: props.match.params.tournamentId,
 				school: '',
 				identifier: '',
 				division: '',
 			})
 		}
 		this.state = {
-			redirectToManagePage: false,
+			redirectToTeamsPage: false,
 			options: divisionOptions,
 			formData,
 		}
@@ -42,7 +43,7 @@ class BulkAddTeamsPage extends React.Component {
 	componentDidMount() {
 		const { setMessage } = this.props
 		const token = Auth.getToken()
-		const url = `${API_ROOT}/tournaments/${this.props.match.params.id}`
+		const url = `${API_ROOT}/tournaments/${this.props.match.params.tournamentId}`
 
 		request(url, {
 			headers: {
@@ -64,7 +65,7 @@ class BulkAddTeamsPage extends React.Component {
 		for (let i = 0; i < n; i += 1) {
 			newRows.push({
 				teamNumber: undefined,
-				tournament: this.props.match.params.id,
+				tournament: this.props.match.params.tournamentId,
 				school: '',
 				identifier: '',
 				division: '',
@@ -100,7 +101,7 @@ class BulkAddTeamsPage extends React.Component {
 	isEmpty = row => row.teamNumber !== 0 || row.school !== '' || row.division !== ''
 
 	handleSubmit = () => {
-		const { setMessage } = this.props
+		const { setMessage, addTeam } = this.props
 		const { tournament, formData } = this.state
 		const url = `${API_ROOT}/tournaments/${tournament._id}/teams`
 		const token = Auth.getToken()
@@ -125,10 +126,11 @@ class BulkAddTeamsPage extends React.Component {
 			}),
 			body: JSON.stringify(filteredRows),
 		})
-			.then(() => {
-				setMessage(`Successfully created ${filteredRows.length} teams`, 'success')
+			.then((addedTeams) => {
+				setMessage(`Successfully created ${addedTeams.length} teams`, 'success')
+				addedTeams.forEach(team => addTeam(team))
 				this.setState({
-					redirectToManagePage: true,
+					redirectToTeamsPage: true,
 				})
 			})
 			.catch(err => {
@@ -146,9 +148,9 @@ class BulkAddTeamsPage extends React.Component {
 
 
 	render() {
-		const { tournament, formData, redirectToManagePage } = this.state
+		const { tournament, formData, redirectToTeamsPage } = this.state
 		if (!tournament) return null
-		if (redirectToManagePage) return <Redirect to={`/tournaments/${tournament._id}`} />
+		if (redirectToTeamsPage) return <Redirect to={`/tournaments/${tournament._id}/teams`} />
 
 		return (
 			<div>
@@ -256,6 +258,7 @@ BulkAddTeamsPage.defaultProps = {
 
 const mapDispatchToProps = dispatch => ({
 	setMessage: (message, type, details) => dispatch(setMessage(message, type, details)),
+	addTeam: (team) => dispatch(addTeam(team)),
 })
 
 export default connect(

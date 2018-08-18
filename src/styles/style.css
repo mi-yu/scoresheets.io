@@ -128,7 +128,8 @@ h1, p {
         top: -3em; }
 
 body {
-  margin-top: 3.375em; }
+  margin-top: 3.375em;
+  min-height: 80vh; }
 
 .container {
   padding-top: 2em; }

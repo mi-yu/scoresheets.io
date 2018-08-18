@@ -3,14 +3,50 @@ import PropTypes from 'prop-types'
 import { Grid, Header, Button, Icon, Input } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import TeamTable from '../../components/teams/TeamTable'
-import TeamGrid from '../../components/teams/TeamGrid'
-import { setEditingTeam, showEditCreateModal } from '../../actions/teamActions'
+import TeamTable from '../../components/tournaments/teams/TeamTable'
+import TeamGrid from '../../components/tournaments/teams/TeamGrid'
+import { setEditingTeam, showEditCreateModal, setCurrentTeam, clearCurrentTeam } from '../../actions/teamActions'
+import ConfirmDeleteTeamModal from '../../components/tournaments/teams/ConfirmDeleteTeamModal'
+import EditCreateTeamModal from '../../components/tournaments/teams/EditCreateTeamModal'
+import { API_ROOT } from '../../config'
+import request from '../../modules/request'
+import Auth from '../../modules/Auth'
+import { setCurrentTournament } from '../../actions/tournamentActions'
+import { setMessage } from '../../actions/messageActions';
 
 class TeamsPage extends React.Component {
 	state = {
 		filter: '',
 		displayFormat: 'rows',
+	}
+
+	componentDidMount() {
+		const { tournament, match, setCurrentTournament, setMessage } = this.props
+		if (!Object.keys(tournament).length) {
+			const token = Auth.getToken()
+
+			const urls = [
+				`${API_ROOT}/tournaments/${match.params.tournamentId}`,
+				`${API_ROOT}/tournaments/${match.params.tournamentId}/teams`,
+			]
+
+			const requests = urls.map(url => request(url, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}))
+
+			Promise.all(requests)
+				.then(([tournamentResponse, teamsResponse]) => {
+					setCurrentTournament({
+						...tournamentResponse,
+						teams: teamsResponse,
+					})
+				})
+				.catch(() => {
+					setMessage('There was a problem on the server, try again later.', 'error')
+				})
+		}
 	}
 
 	handleFilter = (e, { name, value }) => {
@@ -35,14 +71,20 @@ class TeamsPage extends React.Component {
 	}
 
 	render() {
-		const { tournament, setEditingTeam, showEditCreateModal } = this.props
+		const { tournament, setEditingTeam, showEditCreateModal, clearCurrentTeam } = this.props
 		const { displayFormat } = this.state
+
+		if (!tournament || !tournament.teams) return null
+
 		const { teams } = tournament
+
 		const divBTeams = teams.filter(team => (team.division === 'B' && this.matchcesFilter(team)))
 		const divCTeams = teams.filter(team => (team.division === 'C' && this.matchcesFilter(team)))
 
 		return (
 			<div>
+				<ConfirmDeleteTeamModal />
+				<EditCreateTeamModal />
 				<Grid>
 					<Grid.Column floated="left">
 						<Header as="h2" floated="left">Teams</Header>
@@ -54,6 +96,7 @@ class TeamsPage extends React.Component {
 							color="green"
 							onClick={() => {
 								setEditingTeam(false)
+								clearCurrentTeam()
 								showEditCreateModal()
 							}}
 							style={{ marginRight: '1em' }}
@@ -98,14 +141,14 @@ class TeamsPage extends React.Component {
 								{displayFormat === 'grid' ? (
 									<TeamGrid teams={divBTeams} />
 								) : (
-									<TeamTable teams={divBTeams} />
-								)}
+										<TeamTable teams={divBTeams} />
+									)}
 								<Header as="h3">C Teams</Header>
 								{displayFormat === 'grid' ? (
 									<TeamGrid teams={divCTeams} />
 								) : (
-									<TeamTable teams={divCTeams} />
-								)}
+										<TeamTable teams={divCTeams} />
+									)}
 							</div>
 						)
 					}
@@ -117,11 +160,15 @@ class TeamsPage extends React.Component {
 
 const mapStateToProps = state => ({
 	tournament: state.tournaments.currentTournament,
+	currentTeamId: state.teams.currentTeamId,
 })
 
 const mapDispatchToProps = dispatch => ({
 	showEditCreateModal: () => dispatch(showEditCreateModal()),
 	setEditingTeam: (team) => dispatch(setEditingTeam(team)),
+	clearCurrentTeam: () => dispatch(clearCurrentTeam()),
+	setMessage: (message, type) => dispatch(setMessage(message, type)),
+	setCurrentTournament: (tournament) => dispatch(setCurrentTournament(tournament)),
 })
 
 TeamsPage.propTypes = {
@@ -131,6 +178,7 @@ TeamsPage.propTypes = {
 		_id: PropTypes.string.isRequired,
 		teams: PropTypes.array.isRequired,
 	}).isRequired,
+	clearCurrentTeam: PropTypes.func.isRequired,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(TeamsPage)

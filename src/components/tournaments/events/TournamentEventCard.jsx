@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Card, Label, Button, Grid } from 'semantic-ui-react'
-import { Link } from 'react-router-dom'
+import { Card, Label, Grid } from 'semantic-ui-react'
+import TournamentEventActions from './TournamentEventActions'
 
 const TournamentEventCard = ({
 	_id,
@@ -49,33 +49,7 @@ const TournamentEventCard = ({
 					</Card.Description>
 				</Card.Content>
 				<Card.Content>
-					{division !== 'BC' ? (
-						<Button
-							fluid
-							basic
-							as={Link}
-							to={`/tournaments/${tournamentId}/scores/${division}/${_id}`}
-						>
-							Manage Scores
-						</Button>
-					) : (
-						<Button.Group fluid basic>
-							<Button
-								color="blue"
-								as={Link}
-								to={`/tournaments/${tournamentId}/scores/B/${_id}`}
-							>
-									B Scores
-							</Button>
-							<Button
-								color="blue"
-								as={Link}
-								to={`/tournaments/${tournamentId}/scores/C/${_id}`}
-							>
-									C Scores
-							</Button>
-						</Button.Group>
-					)}
+					<TournamentEventActions eventId={_id} division={division} tournamentId={tournamentId} />
 				</Card.Content>
 			</Card>
 		</Grid.Column>

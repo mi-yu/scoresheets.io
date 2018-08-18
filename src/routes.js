@@ -8,6 +8,7 @@ import ResultsPage from './containers/ResultsPage'
 import Slideshow from './containers/Slideshow'
 import RegisterPage from './containers/RegisterPage'
 import TeamsPage from './containers/tournaments/TeamsPage'
+import EventsPage from './containers/tournaments/EventsPage'
 
 const routes = [
 	{
@@ -36,12 +37,17 @@ const routes = [
 	},
 
 	{
-		path: '/tournaments/:id/teams',
+		path: '/tournaments/:tournamentId/teams',
 		component: TeamsPage,
 	},
 
 	{
-		path: '/tournaments/:id/teams/add',
+		path: '/tournaments/:tournamentId/events',
+		component: EventsPage,
+	},
+
+	{
+		path: '/tournaments/:tournamentId/teams/add',
 		component: BulkAddTeamsPage,
 	},
 
@@ -56,7 +62,7 @@ const routes = [
 	},
 
 	{
-		path: '/tournaments/:tournamentId/scores/:division/:eventId',
+		path: '/tournaments/:tournamentId/events/:division/:eventId',
 		component: ScoreEntryPage,
 	},
 ]

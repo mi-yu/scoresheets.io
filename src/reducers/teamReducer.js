@@ -37,6 +37,11 @@ export default (state = defaultState, action) => {
 				...state,
 				currentTeamId: action.payload,
 			}
+		case 'CLEAR_CURRENT_TEAM':
+			return {
+				...state,
+				currentTeamId: '',
+			}
 		default:
 			return state
 	}

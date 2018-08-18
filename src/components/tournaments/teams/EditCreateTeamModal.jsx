@@ -2,20 +2,16 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Button, Modal, Form } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import Auth from '../../modules/Auth'
-import { API_ROOT } from '../../config'
-import request from '../../modules/request'
-import { setMessage } from '../../actions/messageActions'
-import { updateTeam, addTeam } from '../../actions/tournamentActions'
-import { hideEditCreateModal } from '../../actions/teamActions'
+import Auth from '../../../modules/Auth'
+import { API_ROOT } from '../../../config'
+import request from '../../../modules/request'
+import { setMessage } from '../../../actions/messageActions'
+import { updateTeam, addTeam } from '../../../actions/tournamentActions'
+import { hideEditCreateModal } from '../../../actions/teamActions'
 
 class EditCreateTeamModal extends React.Component {
-	constructor(props) {
-		super(props)
-		const currentTeam = props.currentTournament.teams.find(team => team._id === props.currentTeamId)
-		this.state = {
-			currentTeam,
-		}
+	state = {
+		currentTeam: {},
 	}
 
 	handleChange = (e, { name, value }) => {
@@ -57,7 +53,7 @@ class EditCreateTeamModal extends React.Component {
 				hideEditCreateModal()
 				setMessage(message, 'success')
 				if (editing) updateTeam(res)
-				else addTeam(res)
+				else addTeam(res[0])
 			})
 			.catch(err => {
 				hideEditCreateModal()
@@ -72,10 +68,8 @@ class EditCreateTeamModal extends React.Component {
 	translateBulkWriteError = (errs) => errs.map(err => `Team ${err.op.division}${err.op.teamNumber} already exists\n`)
 
 	render() {
-		const { open, editing, hideEditCreateModal } = this.props
-		const { currentTeam } = this.state
-
-		if (!currentTeam) return null
+		const { open, editing, hideEditCreateModal, currentTournament, currentTeamId } = this.props
+		const currentTeam = currentTournament.teams.find(team => team._id === currentTeamId) || {}
 
 		return (
 			<Modal

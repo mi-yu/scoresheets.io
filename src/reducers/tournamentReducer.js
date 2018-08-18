@@ -66,7 +66,7 @@ export default (state = defaultState, action) => {
 		case 'ADD_TEAM': {
 			const { currentTournament } = state
 			const sortByTeamNumber = (a, b) => a.teamNumber - b.teamNumber
-			const newTeams = [currentTournament.teams, action.payload].sort(sortByTeamNumber)
+			const newTeams = [...currentTournament.teams, action.payload].sort(sortByTeamNumber)
 
 			return {
 				...state,

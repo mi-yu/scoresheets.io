@@ -2,12 +2,12 @@ import React from 'react'
 import { Modal, Button } from 'semantic-ui-react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import Auth from '../../modules/Auth'
-import request from '../../modules/request'
-import { API_ROOT } from '../../config'
-import { setCurrentTournament, removeTeam } from '../../actions/tournamentActions'
-import { setMessage } from '../../actions/messageActions'
-import { hideConfirmDeleteModal } from '../../actions/teamActions'
+import Auth from '../../../modules/Auth'
+import request from '../../../modules/request'
+import { API_ROOT } from '../../../config'
+import { setCurrentTournament, removeTeam } from '../../../actions/tournamentActions'
+import { setMessage } from '../../../actions/messageActions'
+import { hideConfirmDeleteModal } from '../../../actions/teamActions'
 
 class ConfirmDeleteTeamModal extends React.Component {
 	handleDeleteTeam = () => {

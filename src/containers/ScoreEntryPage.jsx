@@ -87,7 +87,7 @@ class ScoreEntryPage extends React.Component {
 			<div>
 				<Breadcrumb>
 					<Breadcrumb.Section>
-						<Link to={`/tournaments/${scoresheetEntry.tournament._id}`}>
+						<Link to={`/tournaments/${scoresheetEntry.tournament._id}/events`}>
 							{scoresheetEntry.tournament.name}
 						</Link>
 					</Breadcrumb.Section>
@@ -113,8 +113,8 @@ class ScoreEntryPage extends React.Component {
 							There are no division {scoresheetEntry.division} teams in this tournament.
 						</Segment>
 					) : (
-							<ScoreEntryForm scoresheetEntry={scoresheetEntry} />
-						)
+						<ScoreEntryForm scoresheetEntry={scoresheetEntry} />
+					)
 				}
 			</div>
 		)
