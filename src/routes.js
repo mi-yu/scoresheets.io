@@ -27,7 +27,7 @@ const routes = [
 	},
 
 	{
-		path: '/admin/dashboard',
+		path: '/dashboard',
 		component: DashboardPage,
 	},
 

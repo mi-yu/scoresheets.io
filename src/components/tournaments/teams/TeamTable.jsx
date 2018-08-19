@@ -36,6 +36,11 @@ class TeamTable extends React.Component {
 
 	render() {
 		const { teams, sortBy, sortDir } = this.state
+		const { teams: incomingTeams } = this.props
+
+		// TODO: fix n^2 hack
+		const filteredTeams = teams.filter(team => incomingTeams.find(incomingTeam => incomingTeam._id === team._id))
+
 		return (
 			<Table sortable>
 				<Table.Header>
@@ -58,7 +63,7 @@ class TeamTable extends React.Component {
 				</Table.Header>
 
 				<Table.Body>
-					{teams.map(team => <TeamRow team={team} key={team._id} />)}
+					{filteredTeams.map(team => <TeamRow team={team} key={team._id} />)}
 				</Table.Body>
 			</Table>
 		)

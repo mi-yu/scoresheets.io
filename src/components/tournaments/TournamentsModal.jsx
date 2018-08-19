@@ -131,7 +131,7 @@ class TournamentsModal extends React.Component {
 		if (events) {
 			eventsOptions = Object.keys(events).map(id => ({ text: events[id].name, value: id }))
 		} else {
-			return <Redirect to="/admin/dashboard" />
+			return <Redirect to="/dashboard" />
 		}
 
 		return (

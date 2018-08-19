@@ -53,7 +53,7 @@ class LoginForm extends React.Component {
 
 		return (
 			<div>
-				{redirect && <Redirect to="/admin/dashboard" />}
+				{redirect && <Redirect to="/dashboard" />}
 				<Form onSubmit={this.handleSubmit}>
 					<Form.Field required>
 						<label htmlFor="email">Email</label>

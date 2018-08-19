@@ -69,6 +69,10 @@ class TournamentManagementPage extends React.Component {
 			})
 	}
 
+	handleChange = (e, { name, value }) => {
+		this.setState({ [name]: value })
+	}
+
 	render() {
 		const { tournament } = this.props
 		const {
@@ -112,7 +116,7 @@ class TournamentManagementPage extends React.Component {
 				<Button.Group size="tiny">
 					<Dropdown
 						button
-						text={numAwards || 'Choose number of awards'}
+						text={numAwards ? `${numAwards} awards` : 'Choose number of awards'}
 						name="numAwards"
 						options={awardsOptions}
 						onChange={this.handleChange}

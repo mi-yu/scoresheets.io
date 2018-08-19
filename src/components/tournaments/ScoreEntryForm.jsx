@@ -73,7 +73,12 @@ class ScoreEntryForm extends React.Component {
 			} else if (clickedCol === 'rawScore') {
 				sortedScores = scores.sort((a, b) => a.rawScore - b.rawScore)
 			} else if (clickedCol === 'rank') {
-				sortedScores = scores.sort((a, b) => a.rank - b.rank)
+				sortedScores = scores.sort((a, b) => {
+					// sort dropped scores to end
+					if (a.rank === 0) return 1
+					if (b.rank === 0) return -1
+					return a.rank - b.rank
+				})
 			}
 		} else {
 			sortedScores = scores.reverse()
@@ -226,7 +231,7 @@ class ScoreEntryForm extends React.Component {
 								<Table.Cell>
 									{`${score.team.division}${score.team.teamNumber} (${
 										score.team.displayName
-										})`}
+									})`}
 								</Table.Cell>
 								<Table.Cell>
 									<Form.Input

@@ -32,6 +32,10 @@ class TournamentEventTable extends React.Component {
 
 	render() {
 		const { sortDir, sortBy, events } = this.state
+		const { events: incomingEvents } = this.props
+
+		// TODO: fix this n^2 hack
+		const filteredEvents = events.filter(event => incomingEvents.includes(event._id))
 
 		return (
 			<Table sortable>
@@ -58,7 +62,7 @@ class TournamentEventTable extends React.Component {
 				</Table.Header>
 
 				<Table.Body>
-					{events.map(event => <TournamentEventRow event={event} key={event._id} />)}
+					{filteredEvents.map(event => <TournamentEventRow event={event} key={event._id} />)}
 				</Table.Body>
 			</Table>
 		)
