@@ -93,7 +93,7 @@ class ScoreEntryPage extends React.Component {
 					</Breadcrumb.Section>
 					<Breadcrumb.Divider />
 					<Breadcrumb.Section>
-						{scoresheetEntry.event.name}
+						{scoresheetEntry.event.name} {scoresheetEntry.division}
 					</Breadcrumb.Section>
 				</Breadcrumb>
 				<div

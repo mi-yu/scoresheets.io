@@ -19,6 +19,17 @@ class ScoreEntryForm extends React.Component {
 		}
 	}
 
+	componentDidMount() {
+		const { scoresheetEntry } = this.state
+		const { scores } = scoresheetEntry
+
+		if (scores[0].rank === undefined) {
+			this.handleSort('teamNumber')()
+		} else {
+			this.handleSort('rank')()
+		}
+	}
+
 	handleChange = (e, { scoreindex, name, value }) => {
 		const { scoresheetEntry } = this.state
 		const { scores } = scoresheetEntry
@@ -215,7 +226,7 @@ class ScoreEntryForm extends React.Component {
 								<Table.Cell>
 									{`${score.team.division}${score.team.teamNumber} (${
 										score.team.displayName
-									})`}
+										})`}
 								</Table.Cell>
 								<Table.Cell>
 									<Form.Input

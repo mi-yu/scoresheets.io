@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import TeamTable from '../../components/tournaments/teams/TeamTable'
 import TeamGrid from '../../components/tournaments/teams/TeamGrid'
-import { setEditingTeam, showEditCreateModal, setCurrentTeam, clearCurrentTeam } from '../../actions/teamActions'
+import { setEditingTeam, showEditCreateModal, clearCurrentTeam } from '../../actions/teamActions'
 import ConfirmDeleteTeamModal from '../../components/tournaments/teams/ConfirmDeleteTeamModal'
 import EditCreateTeamModal from '../../components/tournaments/teams/EditCreateTeamModal'
 import { API_ROOT } from '../../config'
@@ -141,14 +141,14 @@ class TeamsPage extends React.Component {
 								{displayFormat === 'grid' ? (
 									<TeamGrid teams={divBTeams} />
 								) : (
-										<TeamTable teams={divBTeams} />
-									)}
+									<TeamTable teams={divBTeams} />
+								)}
 								<Header as="h3">C Teams</Header>
 								{displayFormat === 'grid' ? (
 									<TeamGrid teams={divCTeams} />
 								) : (
-										<TeamTable teams={divCTeams} />
-									)}
+									<TeamTable teams={divCTeams} />
+								)}
 							</div>
 						)
 					}
@@ -179,6 +179,11 @@ TeamsPage.propTypes = {
 		teams: PropTypes.array.isRequired,
 	}).isRequired,
 	clearCurrentTeam: PropTypes.func.isRequired,
+	match: PropTypes.shape({
+		params: PropTypes.shape({
+			tournamentId: PropTypes.string.isRequired,
+		}).isRequired,
+	}).isRequired,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(TeamsPage)

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Menu, Item, Container } from 'semantic-ui-react'
-import { Link, Redirect, Route } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
 import { setUser } from '../actions/userActions'
@@ -100,7 +100,7 @@ class Nav extends Component {
 									className={activeItem.includes('login') ? 'active' : ''}
 								>
 										Login
-								</Item>
+         </Item>
 							</Link>
 							<Link to="/users/register" onClick={this.handleClick}>
 								<Item
@@ -108,7 +108,7 @@ class Nav extends Component {
 									className={activeItem.includes('register') ? 'active' : ''}
 								>
 										Register
-								</Item>
+									</Item>
 							</Link>
 						</Menu.Menu>
 					)}

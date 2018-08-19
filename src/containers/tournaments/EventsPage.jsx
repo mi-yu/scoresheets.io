@@ -9,8 +9,7 @@ import { setEvents } from '../../actions/eventActions'
 import { setCurrentTournament } from '../../actions/tournamentActions'
 import { setMessage } from '../../actions/messageActions'
 import arrayToObject from '../../modules/arrayToObject'
-import TournamentEventCard from '../../components/tournaments/events/TournamentEventCard'
-import TournamentEventGrid from '../../components/tournaments/events/TournamentEventGrid';
+import TournamentEventGrid from '../../components/tournaments/events/TournamentEventGrid'
 import TournamentEventTable from '../../components/tournaments/events/TournamentEventTable'
 
 class EventsPage extends React.Component {

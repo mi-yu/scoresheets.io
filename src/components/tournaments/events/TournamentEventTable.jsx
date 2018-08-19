@@ -4,23 +4,68 @@ import { Table } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import TournamentEventRow from './TournamentEventRow'
 
-const TeamTable = ({ events, eventList }) => (
-	<Table>
-		<Table.Header>
-			<Table.Row>
-				<Table.HeaderCell width={4}>Event Name</Table.HeaderCell>
-				<Table.HeaderCell>Meta</Table.HeaderCell>
-				<Table.HeaderCell style={{ marginLeft: 'auto' }} width={3}>Actions</Table.HeaderCell>
-			</Table.Row>
-		</Table.Header>
+class TournamentEventTable extends React.Component {
+	constructor(props) {
+		super(props)
+		this.state = {
+			sortDir: 'ascending',
+			sortBy: 'name',
+			events: props.events.map(eventId => props.eventList[eventId]),
+		}
+	}
 
-		<Table.Body>
-			{events.map(eventId => <TournamentEventRow event={eventList[eventId]} key={eventId} />)}
-		</Table.Body>
-	</Table>
-)
+	handleSort = (clickedCol) => () => {
+		const { events, sortBy, sortDir } = this.state
+		let sortedEvents
+		if (sortBy !== clickedCol) {
+			sortedEvents = events.sort((a, b) => a[clickedCol].localeCompare(b[clickedCol]))
+		} else {
+			sortedEvents = events.reverse()
+		}
 
-TeamTable.propTypes = {
+		this.setState({
+			events: sortedEvents,
+			sortBy: clickedCol,
+			sortDir: sortDir === 'ascending' ? 'descending' : 'ascending',
+		})
+	}
+
+	render() {
+		const { sortDir, sortBy, events } = this.state
+
+		return (
+			<Table sortable>
+				<Table.Header>
+					<Table.Row>
+						<Table.HeaderCell
+							width={4}
+							sorted={sortBy === 'name' ? sortDir : null}
+							onClick={this.handleSort('name')}
+						>
+							Event Name
+						</Table.HeaderCell>
+						<Table.HeaderCell
+							width={4}
+							sorted={sortBy === 'category' ? sortDir : null}
+							onClick={this.handleSort('category')}
+						>
+							Category
+						</Table.HeaderCell>
+						<Table.HeaderCell width={2}>Division(s)</Table.HeaderCell>
+						<Table.HeaderCell width={2}>Other</Table.HeaderCell>
+						<Table.HeaderCell width={3}>Actions</Table.HeaderCell>
+					</Table.Row>
+				</Table.Header>
+
+				<Table.Body>
+					{events.map(event => <TournamentEventRow event={event} key={event._id} />)}
+				</Table.Body>
+			</Table>
+		)
+	}
+}
+
+TournamentEventTable.propTypes = {
 	events: PropTypes.arrayOf(PropTypes.shape({
 		_id: PropTypes.string.isRequired,
 	})).isRequired,
@@ -31,4 +76,4 @@ const mapStateToProps = state => ({
 	eventList: state.events.eventList,
 })
 
-export default connect(mapStateToProps, null)(TeamTable)
+export default connect(mapStateToProps, null)(TournamentEventTable)
