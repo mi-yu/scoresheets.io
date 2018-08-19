@@ -88,7 +88,7 @@ class ScoreEntryPage extends React.Component {
 				<Breadcrumb>
 					<Breadcrumb.Section>
 						<Link to={`/tournaments/${scoresheetEntry.tournament._id}/events`}>
-							{scoresheetEntry.tournament.name}
+							{scoresheetEntry.tournament.name} Events
 						</Link>
 					</Breadcrumb.Section>
 					<Breadcrumb.Divider />

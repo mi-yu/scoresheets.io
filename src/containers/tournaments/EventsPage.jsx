@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Grid, Header, Input } from 'semantic-ui-react'
+import { Grid, Header, Input, Button, Icon } from 'semantic-ui-react'
 import Auth from '../../modules/Auth';
 import { API_ROOT } from '../../config';
 import request from '../../modules/request';
@@ -10,6 +10,8 @@ import { setCurrentTournament } from '../../actions/tournamentActions'
 import { setMessage } from '../../actions/messageActions'
 import arrayToObject from '../../modules/arrayToObject'
 import TournamentEventCard from '../../components/tournaments/events/TournamentEventCard'
+import TournamentEventGrid from '../../components/tournaments/events/TournamentEventGrid';
+import TournamentEventTable from '../../components/tournaments/events/TournamentEventTable'
 
 class EventsPage extends React.Component {
 	state = {
@@ -67,10 +69,13 @@ class EventsPage extends React.Component {
 	}
 
 	render() {
+		const { displayFormat } = this.state
 		const { tournament, eventList } = this.props
 		const { events } = tournament
 
 		if (!eventList || !events) return null
+
+		const filteredEvents = events.filter(eventId => this.matchesFilter(eventList[eventId]))
 
 		return (
 			<div>
@@ -78,7 +83,15 @@ class EventsPage extends React.Component {
 					<Grid.Column floated="left" width={4}>
 						<Header as="h2">Events</Header>
 					</Grid.Column>
-					<Grid.Column floated="right" width={4} textAlign="right">
+					<Grid.Column floated="right" width={6} textAlign="right">
+						<Button.Group style={{ marginRight: '1rem' }} size="tiny">
+							<Button icon name="rows" active={displayFormat === 'rows'} onClick={this.handleTeamsViewToggle}>
+								<Icon name="align justify" />
+							</Button>
+							<Button icon name="grid" active={displayFormat === 'grid'} onClick={this.handleTeamsViewToggle}>
+								<Icon name="grid layout" />
+							</Button>
+						</Button.Group>
 						<Input
 							size="small"
 							name="filter"
@@ -88,20 +101,11 @@ class EventsPage extends React.Component {
 						/>
 					</Grid.Column>
 				</Grid>
-				<Grid>
-					{events.map(eventId => {
-						if (this.matchesFilter(eventList[eventId])) {
-							return (
-								<TournamentEventCard
-									key={eventId}
-									{...eventList[eventId]}
-									tournamentId={tournament._id}
-								/>
-							)
-						}
-						return null
-					})}
-				</Grid>
+				{
+					displayFormat === 'grid'
+						? <TournamentEventGrid events={filteredEvents} />
+						: <TournamentEventTable events={filteredEvents} />
+				}
 			</div>
 		)
 	}

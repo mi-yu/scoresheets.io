@@ -15,7 +15,12 @@ const theme = createTheme(
 		quarternary: '#CECECE',
 	},
 	{
-		primary: 'Roboto',
+		primary: 'Lato',
+		secondary: {
+			name: 'Lato',
+			googleFont: true,
+			styles: ['400'],
+		},
 	},
 )
 
@@ -51,13 +56,12 @@ export default class Slideshow extends React.Component {
 			`${API_ROOT}/tournaments/${id}/scoresheets`,
 			`${API_ROOT}/tournaments/${id}/teams`,
 		]
-		const requests = urls.map(url =>
-			request(url, {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			}),
+		const requests = urls.map(url => request(url, {
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		}),
 		)
 
 		Promise.all(requests)
@@ -82,11 +86,11 @@ export default class Slideshow extends React.Component {
 		entries.forEach(entry => {
 			entry.scores.forEach(score => {
 				if (
-					!score.rank ||
-					score.dq ||
-					score.participationOnly ||
-					score.noShow ||
-					score.dropped
+					!score.rank
+					|| score.dq
+					|| score.participationOnly
+					|| score.noShow
+					|| score.dropped
 				) {
 					drops += 1
 				}
@@ -166,12 +170,12 @@ export default class Slideshow extends React.Component {
 				</Slide>
 				{topTeamsPerEvent.map(entry => (
 					<Slide transition={['fade']}>
-						<Heading size={3} padding="50px">
+						<Heading size={4} padding="50px">
 							{entry.event.name} {entry.division}
 						</Heading>
 						{entry.scores.map((score, n) => (
 							<Appear order={entry.scores.length - n - 1}>
-								<Text textAlign="center" textFont="Roboto">
+								<Text textAlign="center">
 									{n + 1}. {score.team.division}
 									{score.team.teamNumber} ({score.team.school}
 									{score.team.identifier ? ` ${score.team.identifier}` : ''})

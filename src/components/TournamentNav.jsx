@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 
 const TournamentNav = ({ tournament }) => {
-	if (!tournament) return null
+	if (!tournament || window.location.pathname.includes('slideshow')) return null
 
 	return (
 		<div id="tournament-nav">
