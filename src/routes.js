@@ -9,6 +9,7 @@ import Slideshow from './containers/Slideshow'
 import RegisterPage from './containers/RegisterPage'
 import TeamsPage from './containers/tournaments/TeamsPage'
 import EventsPage from './containers/tournaments/EventsPage'
+import SettingsPage from './containers/tournaments/SettingsPage'
 
 const routes = [
 	{
@@ -54,6 +55,11 @@ const routes = [
 	{
 		path: '/tournaments/:tournamentId/:division/results',
 		component: ResultsPage,
+	},
+
+	{
+		path: '/tournaments/:tournamentId/settings',
+		component: SettingsPage,
 	},
 
 	{

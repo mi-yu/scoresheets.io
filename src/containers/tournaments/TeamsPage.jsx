@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Grid, Header, Button, Icon, Input } from 'semantic-ui-react'
+import { Grid, Header, Button, Icon, Input, Segment } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import TeamTable from '../../components/tournaments/teams/TeamTable'
@@ -135,22 +135,27 @@ class TeamsPage extends React.Component {
 				</Grid>
 				<Grid>
 					{
-						teams.length > 0 && (
+						teams.length > 0 ? (
 							<div style={{ marginTop: '2em', width: '100%' }}>
 								<Header as="h3">B Teams</Header>
 								{displayFormat === 'grid' ? (
 									<TeamGrid teams={divBTeams} />
 								) : (
-									<TeamTable teams={divBTeams} />
-								)}
+										<TeamTable teams={divBTeams} />
+									)}
 								<Header as="h3">C Teams</Header>
 								{displayFormat === 'grid' ? (
 									<TeamGrid teams={divCTeams} />
 								) : (
-									<TeamTable teams={divCTeams} />
-								)}
+										<TeamTable teams={divCTeams} />
+									)}
 							</div>
-						)
+						) : (
+								<Segment style={{ width: '100%' }} textAlign="center" basic>
+									It looks like there are no teams here!
+									If you expect to see teams here, try refreshing.
+							</Segment>
+							)
 					}
 				</Grid>
 			</div>

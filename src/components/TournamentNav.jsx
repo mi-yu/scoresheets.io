@@ -3,9 +3,11 @@ import PropTypes from 'prop-types'
 import { Menu, Container, Item } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
+import Auth from '../modules/Auth'
 
 const TournamentNav = ({ tournament }) => {
 	if (!tournament || window.location.pathname.includes('slideshow')) return null
+	if (!Auth.isAuthenticated()) return null
 
 	return (
 		<div id="tournament-nav">
@@ -37,6 +39,13 @@ const TournamentNav = ({ tournament }) => {
 							name="Results"
 						>
 							Results
+						</Item>
+					</Link>
+					<Link to={`/tournaments/${tournament._id}/settings`}>
+						<Item
+							name="Settings"
+						>
+							Settings
 						</Item>
 					</Link>
 				</Container>

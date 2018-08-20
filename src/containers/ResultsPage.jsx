@@ -1,17 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Breadcrumb, Table } from 'semantic-ui-react'
+import { Breadcrumb, Table, Header } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
 import { API_ROOT } from '../config'
 import request from '../modules/request'
+import restricted from '../assets/imgs/restricted.svg'
 
 class ResultsPage extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
 			...props,
+			unauthorized: false,
 		}
 	}
 
@@ -19,17 +21,19 @@ class ResultsPage extends React.Component {
 		const { division, tournamentId } = this.props.match.params
 		const token = Auth.getToken()
 
+		if (!token) return this.setState({ unauthorized: true })
+
 		const urls = [
 			`${API_ROOT}/tournaments/${tournamentId}/scoresheets?division=${division}`,
 			`${API_ROOT}/tournaments/${tournamentId}/teams?division=${division}`,
 			`${API_ROOT}/tournaments/${tournamentId}`,
 		]
 		const requests = urls.map(url => request(url, {
-				method: 'GET',
-				headers: new Headers({
-					Authorization: `Bearer ${token}`,
-				}),
+			method: 'GET',
+			headers: new Headers({
+				Authorization: `Bearer ${token}`,
 			}),
+		}),
 		)
 
 		Promise.all(requests)
@@ -42,7 +46,11 @@ class ResultsPage extends React.Component {
 				})
 			})
 			.catch(err => {
-				console.log(err)
+				if (err.code === 401) {
+					this.setState({
+						unauthorized: true,
+					})
+				}
 			})
 	}
 
@@ -64,7 +72,9 @@ class ResultsPage extends React.Component {
 		return t2Count - t1Count
 	}
 
-	countOccurrences = (scores, target) => scores.reduce((total, score) => total + Number(score === target), 0)
+	countOccurrences = (scores, target) => (
+		scores.reduce((total, score) => total + Number(score === target), 0)
+	)
 
 	populateScores = (entries, teams) => {
 		let totalScore = 0
@@ -95,10 +105,35 @@ class ResultsPage extends React.Component {
 		return teams
 	}
 
+	renderUnauthorized = () => {
+		const wrapperStyle = {
+			textAlign: 'center',
+			display: 'flex',
+			height: '60vh',
+			flexDirection: 'column',
+			justifyContent: 'center',
+			alignItems: 'center',
+		}
+		const imgStyle = {
+			width: '15em',
+		}
+		return (
+			<div style={wrapperStyle}>
+				<Header as="h3">
+					{"Something's"} fishy...
+				</Header>
+				<p>The results you are trying to access either {"don't"} exist or are not public.</p>
+				<p>Contact the tournament director for more information.</p>
+				<img src={restricted} alt="results restricted" style={imgStyle} />
+			</div>
+		)
+	}
+
 	render() {
 		const { match } = this.props
 		const { division } = match.params
-		const { entries, teams, tournament } = this.state
+		const { entries, teams, tournament, unauthorized } = this.state
+		if (unauthorized) return this.renderUnauthorized()
 		if (!entries) return null
 
 		const populatedTeams = this.populateScores(entries, teams)
@@ -155,14 +190,10 @@ ResultsPage.propTypes = {
 	match: PropTypes.shape({
 		params: PropTypes.object.isRequired,
 	}),
-	location: PropTypes.shape({
-		state: PropTypes.object.isRequired,
-	}),
 }
 
 ResultsPage.defaultProps = {
 	match: undefined,
-	location: undefined,
 }
 
 const mapStateToProps = state => ({
