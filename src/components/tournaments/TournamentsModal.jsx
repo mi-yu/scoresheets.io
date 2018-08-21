@@ -76,7 +76,7 @@ class TournamentsModal extends React.Component {
 
 	handleQuickAddEvent = key => {
 		const { events, currentTournament, setCurrentTournament } = this.props
-		const eventKeys = Object.keys(events)
+		const eventKeys = Object.keys(events).filter(eventId => events[eventId].inRotation)
 		let newEvents = eventKeys
 		switch (key) {
 			case 0: // only B events
@@ -129,7 +129,9 @@ class TournamentsModal extends React.Component {
 		} = this.props
 
 		if (events) {
-			eventsOptions = Object.keys(events).map(id => ({ text: events[id].name, value: id }))
+			eventsOptions = Object.keys(events)
+				.filter(id => events[id].inRotation)
+				.map(id => ({ text: events[id].name, value: id }))
 		} else {
 			return <Redirect to="/dashboard" />
 		}

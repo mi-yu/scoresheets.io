@@ -1,12 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Breadcrumb, Table, Header } from 'semantic-ui-react'
+import { Breadcrumb, Table } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
 import { API_ROOT } from '../config'
 import request from '../modules/request'
-import restricted from '../assets/imgs/restricted.svg'
+import ResultsUnauthorized from './errors/ResultsUnauthorized'
+
 
 class ResultsPage extends React.Component {
 	constructor(props) {
@@ -105,35 +106,11 @@ class ResultsPage extends React.Component {
 		return teams
 	}
 
-	renderUnauthorized = () => {
-		const wrapperStyle = {
-			textAlign: 'center',
-			display: 'flex',
-			height: '60vh',
-			flexDirection: 'column',
-			justifyContent: 'center',
-			alignItems: 'center',
-		}
-		const imgStyle = {
-			width: '15em',
-		}
-		return (
-			<div style={wrapperStyle}>
-				<Header as="h3">
-					{"Something's"} fishy...
-				</Header>
-				<p>The results you are trying to access either {"don't"} exist or are not public.</p>
-				<p>Contact the tournament director for more information.</p>
-				<img src={restricted} alt="results restricted" style={imgStyle} />
-			</div>
-		)
-	}
-
 	render() {
 		const { match } = this.props
 		const { division } = match.params
 		const { entries, teams, tournament, unauthorized } = this.state
-		if (unauthorized) return this.renderUnauthorized()
+		if (unauthorized) return <ResultsUnauthorized />
 		if (!entries) return null
 
 		const populatedTeams = this.populateScores(entries, teams)
