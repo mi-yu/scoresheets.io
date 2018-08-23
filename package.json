@@ -23,7 +23,7 @@
 		"start-js": "react-scripts start",
 		"start": "node_modules/.bin/npm-run-all -p watch-css start-js",
 		"build-js": "react-scripts build",
-		"build": "export REACT_APP_API_ROOT=https://soscribe.herokuapp.com && node_modules/.bin/npm-run-all build-css build-js",
+		"build": "export REACT_APP_API_ROOT=https://soscribe.herokuapp.com && export REACT_APP_RESULTS_MANAGER_API_URL=https://scoresheets-results-manager.herokuapp.com && node_modules/.bin/npm-run-all build-css build-js",
 		"test": "react-scripts test --env=jsdom",
 		"eject": "react-scripts eject",
 		"build-css": "node-sass-chokidar src/styles/style.scss -o src/styles",
