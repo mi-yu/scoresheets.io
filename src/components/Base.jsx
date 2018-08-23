@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Route, BrowserRouter as Router } from 'react-router-dom'
+import { Route, BrowserRouter as Router, Switch } from 'react-router-dom'
 import { Container, Message } from 'semantic-ui-react'
 import { setMessage, hideMessage, showMessage } from '../actions/messageActions'
 import { setEvents } from '../actions/eventActions'
@@ -16,6 +16,8 @@ import HomePage from '../containers/HomePage'
 import Footer from '../containers/Footer'
 import routes from '../routes'
 import { setTournaments } from '../actions/tournamentActions'
+import ErrorBoundary from '../containers/errors/ErrorBoundary'
+import NotFound from '../containers/errors/NotFound'
 
 const translateMessageType = type => {
 	switch (type) {
@@ -68,37 +70,42 @@ class Base extends React.Component {
 							<Nav hidden={window.location.pathname.includes('slideshow')} />
 							<Route path="/tournaments" component={TournamentNav} />
 						</div>
-						<Route exact path="/" component={HomePage} />
-						<Container>
-							{routes.map(route => (
-								<Route
-									exact
-									path={route.path}
-									key={route.path}
-									render={props => (
-										<route.component {...props} setMessage={setMessage} />
-									)}
-								/>
-							))}
-						</Container>
-						{messageVisible && (
-							<Message
-								onDismiss={hideMessage}
-								color={messageColor}
-							>
-								{message}
-								{messageDetails.length ? (
-									<Message.List style={{
-										textAlign: 'center',
-									}}
-									>
-										{messageDetails.map(detail => <span>{detail}<br /></span>)}
-									</Message.List>
-								) : null
-								}
-							</Message>
-						)}
-						<Footer hidden={window.location.pathname.includes('slideshow')} />
+						<ErrorBoundary>
+							<Route exact path="/" component={HomePage} />
+							<Container>
+								<Switch>
+									{routes.map(route => (
+										<Route
+											exact
+											path={route.path}
+											key={route.path}
+											render={props => (
+												<route.component {...props} setMessage={setMessage} />
+											)}
+										/>
+									))}
+									<Route component={NotFound} />
+								</Switch>
+							</Container>
+							{messageVisible && (
+								<Message
+									onDismiss={hideMessage}
+									color={messageColor}
+								>
+									{message}
+									{messageDetails.length ? (
+										<Message.List style={{
+											textAlign: 'center',
+										}}
+										>
+											{messageDetails.map(detail => <span>{detail}<br /></span>)}
+										</Message.List>
+									) : null
+									}
+								</Message>
+							)}
+							<Footer hidden={window.location.pathname.includes('slideshow')} />
+						</ErrorBoundary>
 					</div>
 				</Router>
 			</div>
