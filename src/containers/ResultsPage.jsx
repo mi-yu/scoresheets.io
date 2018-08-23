@@ -15,6 +15,8 @@ class ResultsPage extends React.Component {
 		this.state = {
 			...props,
 			unauthorized: false,
+			resultsLoading: false,
+			resultsGenerated: false,
 		}
 	}
 
@@ -109,6 +111,8 @@ class ResultsPage extends React.Component {
 		const { setMessage, match } = this.props
 		const { division } = match.params
 
+		this.setState({ resultsLoading: true })
+
 		const eventNames = entries.map(entry => entry.event.name)
 		const csvHeader = ['Team Number', 'School', ...eventNames, 'Total Score', 'Rank']
 		const csvBody = populatedTeams.map(team => [
@@ -134,18 +138,19 @@ class ResultsPage extends React.Component {
 				division,
 			}),
 		})
-			.then(() => {
-				setMessage('Succesfully generated CSV at link: somelink.com', 'success')
+			.then((res) => {
+				this.setState({ resultsLoading: false, resultsGenerated: true, resultsLink: res.link })
 			})
 			.catch((err) => {
 				setMessage(JSON.stringify(err), 'error')
+				this.setState({ resultsLoading: false })
 			})
 	}
 
 	render() {
 		const { match } = this.props
 		const { division } = match.params
-		const { entries, teams, tournament, unauthorized } = this.state
+		const { entries, teams, tournament, unauthorized, resultsLoading, resultsGenerated, resultsLink } = this.state
 		if (unauthorized) return <ResultsUnauthorized />
 		if (!entries) return null
 
@@ -164,14 +169,28 @@ class ResultsPage extends React.Component {
 						Division {division} Results
 					</Breadcrumb.Section>
 				</Breadcrumb>
-				<Button
-					basic
-					style={{ display: 'block', marginTop: '1em' }}
-					onClick={this.postCSV(populatedTeams)}
-					data-html2canvas-ignore="true"
-				>
-					Download PDF
-				</Button>
+				<br />
+				{resultsGenerated ? (
+					<Button
+						style={{ marginTop: '1em' }}
+						color="green"
+						as="a"
+						href={resultsLink}
+						rel="noopener noreferrer"
+						target="_blank"
+					>
+						Click to download
+					</Button>
+				) : (
+					<Button
+						basic
+						loading={resultsLoading}
+						style={{ marginTop: '1em' }}
+						onClick={this.postCSV(populatedTeams)}
+					>
+							Generate CSV
+					</Button>
+				)}
 				<Table celled collapsing size="small" compact>
 					<Table.Header>
 						<Table.Row>
