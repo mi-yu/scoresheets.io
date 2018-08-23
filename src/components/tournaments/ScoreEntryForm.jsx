@@ -176,6 +176,7 @@ class ScoreEntryForm extends React.Component {
 	render() {
 		const { sortBy, sortDir, scoresheetEntry } = this.state
 		const { scores } = scoresheetEntry
+		const { locked } = this.props
 
 		return (
 			<Form style={{ margin: '2em 0' }}>
@@ -239,6 +240,7 @@ class ScoreEntryForm extends React.Component {
 										scoreindex={i}
 										fluid
 										type="number"
+										disabled={locked}
 										value={score.rawScore}
 										onChange={this.handleChange}
 									/>
@@ -249,6 +251,7 @@ class ScoreEntryForm extends React.Component {
 										scoreindex={i}
 										fluid
 										type="number"
+										disabled={locked}
 										value={score.tiebreaker}
 										onChange={this.handleChange}
 									/>
@@ -259,6 +262,7 @@ class ScoreEntryForm extends React.Component {
 										scoreindex={i}
 										fluid
 										selection
+										disabled={locked}
 										value={score.tier}
 										onChange={this.handleChange}
 										options={tierOptions}
@@ -271,6 +275,7 @@ class ScoreEntryForm extends React.Component {
 											label="Dropped"
 											width={8}
 											checked={score.dropped}
+											disabled={locked}
 											scoreindex={i}
 											onChange={this.handleCheck}
 										/>
@@ -279,6 +284,7 @@ class ScoreEntryForm extends React.Component {
 											label="PP"
 											width={8}
 											checked={score.participationOnly}
+											disabled={locked}
 											scoreindex={i}
 											onChange={this.handleCheck}
 										/>
@@ -289,6 +295,7 @@ class ScoreEntryForm extends React.Component {
 											name="noShow"
 											label="NS"
 											checked={score.noShow}
+											disabled={locked}
 											scoreindex={i}
 											onChange={this.handleCheck}
 										/>
@@ -297,6 +304,7 @@ class ScoreEntryForm extends React.Component {
 											name="dq"
 											label="DQ"
 											checked={score.dq}
+											disabled={locked}
 											scoreindex={i}
 											onChange={this.handleCheck}
 										/>
@@ -307,6 +315,7 @@ class ScoreEntryForm extends React.Component {
 										name="notes"
 										scoreindex={i}
 										fluid
+										disabled={locked}
 										value={score.notes}
 										onChange={this.handleChange}
 									/>
@@ -316,7 +325,7 @@ class ScoreEntryForm extends React.Component {
 						))}
 					</Table.Body>
 				</Table>
-				<Button type="submit" color="green" onClick={this.submitScores}>
+				<Button type="submit" color="green" disabled={locked} onClick={this.submitScores}>
 					Save Scores
 				</Button>
 			</Form>
@@ -331,6 +340,7 @@ ScoreEntryForm.propTypes = {
 		division: PropTypes.string.isRequired,
 	}).isRequired,
 	setMessage: PropTypes.func.isRequired,
+	locked: PropTypes.bool.isRequired,
 }
 
 const mapDispatchToProps = dispatch => ({

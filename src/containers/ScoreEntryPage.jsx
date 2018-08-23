@@ -80,7 +80,7 @@ class ScoreEntryPage extends React.Component {
 
 	render() {
 		const { scoresheetEntry, loading } = this.state
-		const { scores } = scoresheetEntry
+		const { scores, locked } = scoresheetEntry
 		if (loading || !scores.length) return null
 
 		return (
@@ -105,7 +105,7 @@ class ScoreEntryPage extends React.Component {
 					}}
 				>
 					<label style={{ fontSize: '1.2em', marginRight: '1em' }}>Lock Scores</label>
-					<Checkbox toggle name="locked" checked={scoresheetEntry.locked} onChange={this.toggleScoresheetLock} />
+					<Checkbox toggle name="locked" checked={locked} onChange={this.toggleScoresheetLock} />
 				</div>
 				{
 					scores.length === 0 ? (
@@ -113,7 +113,7 @@ class ScoreEntryPage extends React.Component {
 							There are no division {scoresheetEntry.division} teams in this tournament.
 						</Segment>
 					) : (
-						<ScoreEntryForm scoresheetEntry={scoresheetEntry} />
+						<ScoreEntryForm scoresheetEntry={scoresheetEntry} locked={locked} />
 					)
 				}
 			</div>

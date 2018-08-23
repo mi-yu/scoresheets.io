@@ -1,13 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Breadcrumb, Table } from 'semantic-ui-react'
+import { Breadcrumb, Button, Table } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
-import { API_ROOT } from '../config'
+import { API_ROOT, RESULTS_MANAGER_API_URL } from '../config'
 import request from '../modules/request'
 import ResultsUnauthorized from './errors/ResultsUnauthorized'
-
+import { setMessage } from '../actions/messageActions'
 
 class ResultsPage extends React.Component {
 	constructor(props) {
@@ -21,8 +21,6 @@ class ResultsPage extends React.Component {
 	componentDidMount() {
 		const { division, tournamentId } = this.props.match.params
 		const token = Auth.getToken()
-
-		if (!token) return this.setState({ unauthorized: true })
 
 		const urls = [
 			`${API_ROOT}/tournaments/${tournamentId}/scoresheets?division=${division}`,
@@ -106,6 +104,44 @@ class ResultsPage extends React.Component {
 		return teams
 	}
 
+	postCSV = (populatedTeams) => () => {
+		const { entries, tournament } = this.state
+		const { setMessage, match } = this.props
+		const { division } = match.params
+
+		const eventNames = entries.map(entry => entry.event.name)
+		const csvHeader = ['Team Number', 'School', ...eventNames, 'Total Score', 'Rank']
+		const csvBody = populatedTeams.map(team => [
+			`${team.division}${team.teamNumber}`,
+			team.displayName,
+			...team.scores,
+			team.totalScore,
+			team.rank,
+		])
+
+		const combinedCSV = [csvHeader, ...csvBody]
+
+		const token = Auth.getToken()
+		request(`${RESULTS_MANAGER_API_URL}/generate`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${token}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				scoreData: combinedCSV,
+				tournament,
+				division,
+			}),
+		})
+			.then(() => {
+				setMessage('Succesfully generated CSV at link: somelink.com', 'success')
+			})
+			.catch((err) => {
+				setMessage(JSON.stringify(err), 'error')
+			})
+	}
+
 	render() {
 		const { match } = this.props
 		const { division } = match.params
@@ -116,7 +152,7 @@ class ResultsPage extends React.Component {
 		const populatedTeams = this.populateScores(entries, teams)
 
 		return (
-			<div>
+			<div id="results-table">
 				<Breadcrumb>
 					<Breadcrumb.Section>
 						<Link to={`/tournaments/${tournament._id}`}>
@@ -128,6 +164,14 @@ class ResultsPage extends React.Component {
 						Division {division} Results
 					</Breadcrumb.Section>
 				</Breadcrumb>
+				<Button
+					basic
+					style={{ display: 'block', marginTop: '1em' }}
+					onClick={this.postCSV(populatedTeams)}
+					data-html2canvas-ignore="true"
+				>
+					Download PDF
+				</Button>
 				<Table celled collapsing size="small" compact>
 					<Table.Header>
 						<Table.Row>
@@ -177,7 +221,11 @@ const mapStateToProps = state => ({
 	tournament: state.tournaments.currentTournament,
 })
 
+const mapDispatchToProps = dispatch => ({
+	setMessage: (message, type) => dispatch(setMessage(message, type)),
+})
+
 export default connect(
 	mapStateToProps,
-	null,
+	mapDispatchToProps,
 )(ResultsPage)

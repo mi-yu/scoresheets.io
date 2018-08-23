@@ -15,6 +15,7 @@ import TournamentNav from './TournamentNav'
 import HomePage from '../containers/HomePage'
 import Footer from '../containers/Footer'
 import routes from '../routes'
+import { setTournaments } from '../actions/tournamentActions'
 
 const translateMessageType = type => {
 	switch (type) {
@@ -29,11 +30,11 @@ const translateMessageType = type => {
 
 class Base extends React.Component {
 	componentDidMount() {
-		const { setEvents, showMessage, setUser } = this.props
+		const { setEvents, showMessage, setUser, setTournaments } = this.props
 
 		if (Auth.isAuthenticated()) {
 			const token = Auth.getToken()
-			const urls = [`${API_ROOT}/events`, `${API_ROOT}/users/me`]
+			const urls = [`${API_ROOT}/events`, `${API_ROOT}/users/me`, `${API_ROOT}/tournaments`]
 			const requests = urls.map(url => request(
 				url, {
 					headers: {
@@ -43,9 +44,10 @@ class Base extends React.Component {
 			)
 
 			Promise.all(requests)
-				.then(([resEvents, resUser]) => {
+				.then(([resEvents, resUser, resTournaments]) => {
 					setEvents(arrayToObject(resEvents))
 					setUser(resUser)
+					setTournaments(arrayToObject(resTournaments))
 				})
 				.catch(err => {
 					setMessage(err.message, 'error')
@@ -129,6 +131,7 @@ const mapDispatchToProps = dispatch => ({
 	showMessage: () => dispatch(showMessage()),
 	setEvents: events => dispatch(setEvents(events)),
 	setUser: user => dispatch(setUser(user)),
+	setTournaments: tournaments => dispatch(setTournaments(tournaments)),
 })
 
 export default connect(
