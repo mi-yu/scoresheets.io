@@ -79,9 +79,18 @@ class ScoreEntryPage extends React.Component {
 	}
 
 	render() {
+		const { tournament } = this.props
 		const { scoresheetEntry, loading } = this.state
 		const { scores, locked } = scoresheetEntry
-		if (loading || !scores.length) return null
+		if (loading) return null
+		if (!scores.length) {
+			return (
+				<Segment>
+					It looks like there are no division {scoresheetEntry.division} teams in this tournament.
+					Create one <Link to={`/tournaments/${tournament._id}/teams`}>here</Link>.
+				</Segment>
+			)
+		}
 
 		return (
 			<div>
@@ -126,17 +135,24 @@ ScoreEntryPage.propTypes = {
 	match: PropTypes.shape({
 		params: PropTypes.object.isRequired,
 	}),
+	tournament: PropTypes.shape({
+		_id: PropTypes.string.isRequired,
+	}).isRequired,
 }
 
 ScoreEntryPage.defaultProps = {
 	match: undefined,
 }
 
+const mapStateToProps = state => ({
+	tournament: state.tournaments.currentTournament,
+})
+
 const mapDispatchToProps = dispatch => ({
 	setMessage: (message, type, details) => dispatch(setMessage(message, type, details)),
 })
 
 export default connect(
-	null,
+	mapStateToProps,
 	mapDispatchToProps,
 )(ScoreEntryPage)

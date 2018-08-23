@@ -62,13 +62,6 @@ class TournamentNav extends React.Component {
 								Teams
 							</Item>
 						</Link>
-						<Link to="/">
-							<Item
-								name="Results"
-							>
-								Results
-							</Item>
-						</Link>
 						{/* <Link to={`/tournaments/${tournament._id}/settings`}>
 							<Item
 								name="Settings"

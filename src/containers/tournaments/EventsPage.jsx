@@ -72,7 +72,7 @@ class EventsPage extends React.Component {
 		const { tournament, eventList } = this.props
 		const { events } = tournament
 
-		if (!eventList || !events) return null
+		if (!Object.keys(eventList).length || !events) return null
 
 		const filteredEvents = events.filter(eventId => this.matchesFilter(eventList[eventId]))
 

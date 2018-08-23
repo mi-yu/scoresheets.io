@@ -71,17 +71,14 @@ class RegisterForm extends React.Component {
 		return message
 	}
 
-	renderDirectorFields = () => {
-		return (
-			<div>
-				{/* <Form.Field>
-					<label htmlFor="director specific fields">
-						Tell us a little about your tournament (optional)
-					</label>
-				</Form.Field> */}
-			</div>
-		)
-	}
+	renderDirectorFields = () => (
+		<div>
+			<small>Disclaimer: Scoresheets is a side-project in alpha and under rapid development.
+				It is strongly recommended to have abackup score management system running alongside Scoresheets
+				such as Excel, Google Sheets, and so on.
+			</small>
+		</div>
+	)
 
 	renderSupervisorFields = () => {
 		const { tournamentCode } = this.state
@@ -102,7 +99,15 @@ class RegisterForm extends React.Component {
 	}
 
 	render() {
-		const { group, firstName, lastName, password, email, redirectToLogin, submitDisabled } = this.state
+		const {
+			group,
+			firstName,
+			lastName,
+			password,
+			email,
+			redirectToLogin,
+			submitDisabled,
+		} = this.state
 		if (redirectToLogin) return <Redirect to="/users/login" />
 
 		return (
@@ -155,7 +160,7 @@ class RegisterForm extends React.Component {
 				</Form.Field>
 				{group === 'director' && this.renderDirectorFields()}
 				{group === 'supervisor' && this.renderSupervisorFields()}
-				<Button color="green" onClick={this.handleSubmit} disabled={submitDisabled}>
+				<Button color="green" onClick={this.handleSubmit} disabled={submitDisabled} style={{ marginTop: '1em' }}>
 					Submit
 				</Button>
 			</Form>

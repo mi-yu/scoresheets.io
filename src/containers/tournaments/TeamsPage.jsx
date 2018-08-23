@@ -22,7 +22,7 @@ class TeamsPage extends React.Component {
 
 	componentDidMount() {
 		const { tournament, match, setCurrentTournament, setMessage } = this.props
-		if (!Object.keys(tournament).length) {
+		if (!Object.keys(tournament).length || !tournament.teams) {
 			const token = Auth.getToken()
 
 			const urls = [
@@ -141,21 +141,21 @@ class TeamsPage extends React.Component {
 								{displayFormat === 'grid' ? (
 									<TeamGrid teams={divBTeams} />
 								) : (
-										<TeamTable teams={divBTeams} />
-									)}
+									<TeamTable teams={divBTeams} />
+								)}
 								<Header as="h3">C Teams</Header>
 								{displayFormat === 'grid' ? (
 									<TeamGrid teams={divCTeams} />
 								) : (
-										<TeamTable teams={divCTeams} />
-									)}
+									<TeamTable teams={divCTeams} />
+								)}
 							</div>
 						) : (
-								<Segment style={{ width: '100%' }} textAlign="center" basic>
+							<Segment style={{ width: '100%' }} textAlign="center" basic>
 									It looks like there are no teams here!
 									If you expect to see teams here, try refreshing.
-							</Segment>
-							)
+								</Segment>
+						)
 					}
 				</Grid>
 			</div>

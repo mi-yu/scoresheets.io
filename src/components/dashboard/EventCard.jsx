@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { setCurrentEvent, openEventsModal, setEditing } from '../../actions/eventActions'
 
 const EventCard = ({ event, setCurrentEvent, openEventsModal, setEditing, user }) => {
-	const { name, category, stateEvent, impound, division } = event
+	const { name, category, stateEvent, impound, division, inRotation, highScoreWins } = event
 	let color = ''
 	switch (category) {
 		case 'bio':
@@ -45,6 +45,8 @@ const EventCard = ({ event, setCurrentEvent, openEventsModal, setEditing, user }
 							))}
 						{stateEvent && <Label size="tiny">trial</Label>}
 						{impound && <Label size="tiny">impound</Label>}
+						{!inRotation && <Label size="tiny" color="red">not in rotation</Label>}
+						{!highScoreWins && <Label size="tiny" color="red">low score wins</Label>}
 					</Card.Description>
 				</Card.Content>
 				{user.group === 'admin' && (
