@@ -79,14 +79,16 @@ class ScoreEntryPage extends React.Component {
 	}
 
 	render() {
-		const { tournament } = this.props
+		const { tournament, match } = this.props
 		const { scoresheetEntry, loading } = this.state
 		const { scores, locked } = scoresheetEntry
+		const { division } = match.params
+
 		if (loading) return null
 		if (!scores.length) {
 			return (
 				<Segment>
-					It looks like there are no division {scoresheetEntry.division} teams in this tournament.
+					It looks like there are no division {division} teams in this tournament.
 					Create one <Link to={`/tournaments/${tournament._id}/teams`}>here</Link>.
 				</Segment>
 			)

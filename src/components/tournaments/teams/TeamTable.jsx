@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Table } from 'semantic-ui-react'
+import { connect } from 'react-redux'
 import TeamRow from './TeamRow'
 
 class TeamTable extends React.Component {
@@ -9,7 +10,6 @@ class TeamTable extends React.Component {
 		this.state = {
 			sortBy: 'teamNumber',
 			sortDir: 'ascending',
-			teams: props.teams,
 		}
 	}
 
@@ -35,11 +35,12 @@ class TeamTable extends React.Component {
 	}
 
 	render() {
-		const { teams, sortBy, sortDir } = this.state
-		const { teams: incomingTeams } = this.props
+		const { sortBy, sortDir } = this.state
+		const { tournament, division } = this.props
+		const { teams } = tournament
+		if (!teams || !teams.length) return null
 
-		// TODO: fix n^2 hack
-		const filteredTeams = teams.filter(team => incomingTeams.find(incomingTeam => incomingTeam._id === team._id))
+		const filteredTeams = teams.filter(team => team.division === division)
 
 		return (
 			<Table sortable>
@@ -71,9 +72,16 @@ class TeamTable extends React.Component {
 }
 
 TeamTable.propTypes = {
-	teams: PropTypes.arrayOf(PropTypes.shape({
-		_id: PropTypes.string.isRequired,
-	})).isRequired,
+	tournament: PropTypes.shape({
+		teams: PropTypes.arrayOf(PropTypes.shape({
+			_id: PropTypes.string.isRequired,
+		})).isRequired,
+	}).isRequired,
+	division: PropTypes.string.isRequired,
 }
 
-export default TeamTable
+const mapStateToProps = state => ({
+	tournament: state.tournaments.currentTournament,
+})
+
+export default connect(mapStateToProps, null)(TeamTable)

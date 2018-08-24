@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Grid, Header, Divider, Card, Button } from 'semantic-ui-react'
+import { Grid, Header, Divider, Card, Button, Checkbox } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 import Auth from '../modules/Auth'
@@ -21,7 +21,6 @@ class DashboardPage extends React.Component {
 	}
 
 	componentDidMount() {
-		// eslint-disable-next-line
 		const {
 			setEvents,
 			setTournaments,
@@ -58,9 +57,13 @@ class DashboardPage extends React.Component {
 		}
 	}
 
+	handleCheck = (e, { name, checked }) => {
+		this.setState({ [name]: checked })
+	}
+
 	render() {
 		const { tournaments, events, user } = this.props
-		const { redirectToLogin } = this.state
+		const { redirectToLogin, showOnlyInRotation } = this.state
 		if (!tournaments || !events) return null
 		if (redirectToLogin || !Auth.isAuthenticated()) return <Redirect to="/users/login" />
 
@@ -88,9 +91,18 @@ class DashboardPage extends React.Component {
 						<Divider />
 						<Header as="h1">2017-18 Season Events</Header>
 						<EventsModal />
+						<div style={{ margin: '1em 0' }}>
+							<Checkbox
+								name="showOnlyInRotation"
+								checked={showOnlyInRotation}
+								onChange={this.handleCheck}
+								label="Show only events in rotation"
+							/>
+						</div>
 						<Grid>
 							{Object.keys(events)
 								.sort((a, b) => events[a].name.localeCompare(events[b].name))
+								.filter(eventId => (showOnlyInRotation ? events[eventId].inRotation : true))
 								.map(id => (
 									<EventCard key={id} event={{ ...events[id] }} />
 								))}
@@ -107,6 +119,9 @@ DashboardPage.propTypes = {
 	setMessage: PropTypes.func.isRequired,
 	tournaments: PropTypes.arrayOf(PropTypes.object).isRequired,
 	events: PropTypes.arrayOf(PropTypes.object).isRequired,
+	user: PropTypes.shape({
+		group: PropTypes.string.isRequired,
+	}).isRequired,
 }
 
 const mapStateToProps = state => ({

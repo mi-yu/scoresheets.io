@@ -71,9 +71,9 @@ class Base extends React.Component {
 							<Route path="/tournaments" component={TournamentNav} />
 						</div>
 						<ErrorBoundary>
-							<Route exact path="/" component={HomePage} />
 							<Container>
 								<Switch>
+									<Route exact path="/" component={HomePage} />
 									{routes.map(route => (
 										<Route
 											exact

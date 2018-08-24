@@ -139,22 +139,22 @@ class TeamsPage extends React.Component {
 							<div style={{ marginTop: '2em', width: '100%' }}>
 								<Header as="h3">B Teams</Header>
 								{displayFormat === 'grid' ? (
-									<TeamGrid teams={divBTeams} />
+									<TeamGrid division="B" />
 								) : (
-									<TeamTable teams={divBTeams} />
+									<TeamTable division="B" />
 								)}
 								<Header as="h3">C Teams</Header>
 								{displayFormat === 'grid' ? (
-									<TeamGrid teams={divCTeams} />
+									<TeamGrid division="C" />
 								) : (
-									<TeamTable teams={divCTeams} />
+									<TeamTable division="C" />
 								)}
 							</div>
 						) : (
 							<Segment style={{ width: '100%' }} textAlign="center" basic>
 									It looks like there are no teams here!
 									If you expect to see teams here, try refreshing.
-								</Segment>
+							</Segment>
 						)
 					}
 				</Grid>
