@@ -78,9 +78,6 @@ class TeamsPage extends React.Component {
 
 		const { teams } = tournament
 
-		const divBTeams = teams.filter(team => (team.division === 'B' && this.matchcesFilter(team)))
-		const divCTeams = teams.filter(team => (team.division === 'C' && this.matchcesFilter(team)))
-
 		return (
 			<div>
 				<ConfirmDeleteTeamModal />
@@ -141,21 +138,21 @@ class TeamsPage extends React.Component {
 								{displayFormat === 'grid' ? (
 									<TeamGrid division="B" />
 								) : (
-									<TeamTable division="B" />
-								)}
+										<TeamTable division="B" />
+									)}
 								<Header as="h3">C Teams</Header>
 								{displayFormat === 'grid' ? (
 									<TeamGrid division="C" />
 								) : (
-									<TeamTable division="C" />
-								)}
+										<TeamTable division="C" />
+									)}
 							</div>
 						) : (
-							<Segment style={{ width: '100%' }} textAlign="center" basic>
+								<Segment style={{ width: '100%' }} textAlign="center" basic>
 									It looks like there are no teams here!
 									If you expect to see teams here, try refreshing.
 							</Segment>
-						)
+							)
 					}
 				</Grid>
 			</div>

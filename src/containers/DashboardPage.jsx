@@ -64,7 +64,7 @@ class DashboardPage extends React.Component {
 	render() {
 		const { tournaments, events, user } = this.props
 		const { redirectToLogin, showOnlyInRotation } = this.state
-		if (!tournaments || !events) return null
+		if (!tournaments || !events || !user.group) return null
 		if (redirectToLogin || !Auth.isAuthenticated()) return <Redirect to="/users/login" />
 
 		return (
@@ -117,8 +117,8 @@ class DashboardPage extends React.Component {
 
 DashboardPage.propTypes = {
 	setMessage: PropTypes.func.isRequired,
-	tournaments: PropTypes.arrayOf(PropTypes.object).isRequired,
-	events: PropTypes.arrayOf(PropTypes.object).isRequired,
+	tournaments: PropTypes.objectOf(PropTypes.object).isRequired,
+	events: PropTypes.objectOf(PropTypes.object).isRequired,
 	user: PropTypes.shape({
 		group: PropTypes.string.isRequired,
 	}).isRequired,

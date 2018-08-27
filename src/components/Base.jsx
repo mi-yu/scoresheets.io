@@ -89,6 +89,7 @@ class Base extends React.Component {
 							</Container>
 							{messageVisible && (
 								<Message
+									id="app-message"
 									onDismiss={hideMessage}
 									color={messageColor}
 								>

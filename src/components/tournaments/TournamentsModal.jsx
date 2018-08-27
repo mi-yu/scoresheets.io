@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Button, Modal, Form, Dropdown, Icon } from 'semantic-ui-react'
+import { Button, Modal, Form, Dropdown, Icon, Message } from 'semantic-ui-react'
 import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import OpenModalButton from '../modals/OpenModalButton'
@@ -20,6 +20,11 @@ import { setMessage } from '../../actions/messageActions'
 import request from '../../modules/request'
 
 class TournamentsModal extends React.Component {
+	state = {
+		showModalMessage: false,
+		modalMessage: '',
+	}
+
 	handleChange = (e, { name, value }) => {
 		const { currentTournament, setCurrentTournament } = this.props
 		setCurrentTournament({
@@ -67,10 +72,13 @@ class TournamentsModal extends React.Component {
 				clearCurrentTournament()
 				setEditing(false)
 				closeTournamentsModal()
+				setMessage(`Successfully updated tournament ${res.name}`, 'success')
 			})
 			.catch(err => {
-				closeTournamentsModal()
-				setMessage(err.message, 'error')
+				this.setState({
+					showModalMessage: true,
+					modalMessage: err.message,
+				})
 			})
 	}
 
@@ -128,6 +136,8 @@ class TournamentsModal extends React.Component {
 			setEditing,
 		} = this.props
 
+		const { showModalMessage, modalMessage } = this.state
+
 		if (events) {
 			eventsOptions = Object.keys(events)
 				.filter(id => events[id].inRotation)
@@ -151,7 +161,13 @@ class TournamentsModal extends React.Component {
 				)}
 				closeIcon
 				open={modalOpen}
-				onClose={closeTournamentsModal}
+				onClose={() => {
+					closeTournamentsModal()
+					this.setState({
+						showModalMessage: false,
+						modalMessage: '',
+					})
+				}}
 			>
 				<Modal.Header>
 					{currentTournament.name
@@ -264,6 +280,12 @@ class TournamentsModal extends React.Component {
 							</Button>
 						</Form.Field>
 					</Form>
+					{showModalMessage && (
+						<Message negative>
+							<Message.Header>There was a problem with the tournament you submitted:</Message.Header>
+							<p>{modalMessage}</p>
+						</Message>
+					)}
 				</Modal.Content>
 				<Modal.Actions>
 					<Button onClick={closeTournamentsModal}>Cancel</Button>
@@ -294,7 +316,7 @@ TournamentsModal.propTypes = {
 	setEditing: PropTypes.func.isRequired,
 	clearCurrentTournament: PropTypes.func.isRequired,
 	setMessage: PropTypes.func.isRequired,
-	events: PropTypes.arrayOf(PropTypes.object).isRequired,
+	events: PropTypes.objectOf(PropTypes.object).isRequired,
 	editing: PropTypes.bool.isRequired,
 }
 

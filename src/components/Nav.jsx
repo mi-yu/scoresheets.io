@@ -67,7 +67,7 @@ class Nav extends Component {
 					</Link>
 
 					{loggedIn ? (
-						<Menu.Menu borderless position="right">
+						<Menu.Menu position="right">
 							<Link to="/dashboard" onClick={this.handleClick}>
 								<Item
 									name="Dashboard"
@@ -100,7 +100,7 @@ class Nav extends Component {
 									className={activeItem.includes('login') ? 'active' : ''}
 								>
 										Login
-								</Item>
+         </Item>
 							</Link>
 							<Link to="/users/register" onClick={this.handleClick}>
 								<Item
@@ -108,7 +108,7 @@ class Nav extends Component {
 									className={activeItem.includes('register') ? 'active' : ''}
 								>
 										Register
-								</Item>
+									</Item>
 							</Link>
 						</Menu.Menu>
 					)}

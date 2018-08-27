@@ -141,7 +141,7 @@ body {
   margin-top: 1.5em !important;
   margin-bottom: 1.5em !important; }
 
-.message {
+#app-message {
   position: fixed !important;
   margin: 2em !important;
   top: 4.5em !important;

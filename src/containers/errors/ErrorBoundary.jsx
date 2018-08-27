@@ -25,7 +25,7 @@ class ErrorBoundary extends React.Component {
 }
 
 ErrorBoundary.propTypes = {
-	children: PropTypes.element.isRequired,
+	children: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.element, PropTypes.bool])).isRequired,
 }
 
 export default ErrorBoundary
