@@ -202,9 +202,6 @@ export default class Slideshow extends React.Component {
 					<Heading size={3} padding="50px">
 						Thanks for coming!
 					</Heading>
-					<Text textAlign="center">
-						Visit scoresheets.io/tournamentName/results for full results.
-					</Text>
 				</Slide>
 			</Deck>
 		)
