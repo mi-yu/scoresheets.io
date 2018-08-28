@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Form, Button, Icon, Table, Header, Popup } from 'semantic-ui-react'
+import { Form, Button, Icon, Table, Header, Popup, Breadcrumb } from 'semantic-ui-react'
 import { Redirect, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
@@ -155,13 +155,14 @@ class BulkAddTeamsPage extends React.Component {
 		return (
 			<div>
 				<Header as="h1">Bulk Add Teams</Header>
-				<Header color="blue">
-					<Link to={`/tournaments/${tournament._id}`}>
-						<Icon name="long arrow left" />
-						{tournament.name}
-					</Link>
-				</Header>
-				<Form>
+				<Breadcrumb>
+					<Breadcrumb.Section>
+						<Link to={`/tournaments/${tournament._id}/teams`}>{tournament.name} Teams</Link>
+					</Breadcrumb.Section>
+					<Breadcrumb.Divider />
+					<Breadcrumb.Section>Bulk Add Teams</Breadcrumb.Section>
+				</Breadcrumb>
+				<Form style={{ marginTop: '3em' }}>
 					<Table celled>
 						<Table.Header>
 							<Table.Row>

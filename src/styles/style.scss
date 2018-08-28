@@ -2,9 +2,10 @@
 @import 'shared/variables';
 @import 'shared/typography';
 @import 'components/nav';
+@import 'components/footer';
 @import 'pages/home';
 
-body {
+#root {
 	margin-top: $navHeightSmaller;
 	min-height: 80vh;
 }

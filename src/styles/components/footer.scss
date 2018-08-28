@@ -1,0 +1,13 @@
+footer {
+    height: 8em;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+
+    span {
+        opacity: 0.7;
+        padding: 1.5em;
+        font-size: 75%;
+    }
+}

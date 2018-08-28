@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Grid, Header, Input, Button, Icon } from 'semantic-ui-react'
+import { Grid, Header, Input, Button, Icon, Checkbox } from 'semantic-ui-react'
 import Auth from '../../modules/Auth';
 import { API_ROOT } from '../../config';
 import request from '../../modules/request';
@@ -16,6 +16,8 @@ class EventsPage extends React.Component {
 	state = {
 		filter: '',
 		displayFormat: 'rows',
+		showBEvents: true,
+		showCEvents: true,
 	}
 
 	componentDidMount() {
@@ -52,15 +54,24 @@ class EventsPage extends React.Component {
 		})
 	}
 
-	handleTeamsViewToggle = (e, { name }) => {
+	handleEventsViewToggle = (e, { name }) => {
 		this.setState({
 			displayFormat: name,
 		})
 	}
 
+	handleCheck = (e, { name, checked }) => {
+		this.setState({
+			[name]: checked,
+		})
+	}
+
 	matchesFilter = event => {
-		const { filter } = this.state
+		const { filter, showBEvents, showCEvents } = this.state
 		if (!event) return false
+		if (!showBEvents && !showCEvents) return false
+		if (!showBEvents && event.division === 'B') return false
+		if (!showCEvents && event.division === 'C') return false
 		return (
 			event.name.toLowerCase().includes(filter)
 			|| event.category.toLowerCase().includes(filter)
@@ -68,7 +79,7 @@ class EventsPage extends React.Component {
 	}
 
 	render() {
-		const { displayFormat } = this.state
+		const { displayFormat, showBEvents, showCEvents } = this.state
 		const { tournament, eventList } = this.props
 		const { events } = tournament
 
@@ -82,12 +93,25 @@ class EventsPage extends React.Component {
 					<Grid.Column floated="left" width={4}>
 						<Header as="h2">Events</Header>
 					</Grid.Column>
-					<Grid.Column floated="right" width={6} textAlign="right">
-						<Button.Group style={{ marginRight: '1rem' }} size="tiny">
-							<Button icon name="rows" active={displayFormat === 'rows'} onClick={this.handleTeamsViewToggle}>
+					<Grid.Column floated="right" width={8} textAlign="right">
+						<Checkbox
+							name="showBEvents"
+							checked={showBEvents}
+							label="Show B Events"
+							onChange={this.handleCheck}
+						/>
+						<Checkbox
+							name="showCEvents"
+							checked={showCEvents}
+							label="Show C Events"
+							onChange={this.handleCheck}
+							style={{ marginLeft: '1rem' }}
+						/>
+						<Button.Group style={{ margin: '0 1rem' }} size="tiny">
+							<Button icon name="rows" active={displayFormat === 'rows'} onClick={this.handleEventsViewToggle}>
 								<Icon name="align justify" />
 							</Button>
-							<Button icon name="grid" active={displayFormat === 'grid'} onClick={this.handleTeamsViewToggle}>
+							<Button icon name="grid" active={displayFormat === 'grid'} onClick={this.handleEventsViewToggle}>
 								<Icon name="grid layout" />
 							</Button>
 						</Button.Group>

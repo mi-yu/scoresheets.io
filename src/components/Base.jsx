@@ -7,14 +7,13 @@ import { setMessage, hideMessage, showMessage } from '../actions/messageActions'
 import { setEvents } from '../actions/eventActions'
 import { setUser } from '../actions/userActions'
 import { API_ROOT } from '../config'
+import routes from '../routes'
 import request from '../modules/request'
 import arrayToObject from '../modules/arrayToObject'
 import Auth from '../modules/Auth'
 import Nav from './Nav'
 import TournamentNav from './TournamentNav'
 import HomePage from '../containers/HomePage'
-import Footer from '../containers/Footer'
-import routes from '../routes'
 import { setTournaments } from '../actions/tournamentActions'
 import ErrorBoundary from '../containers/errors/ErrorBoundary'
 import NotFound from '../containers/errors/NotFound'
@@ -105,7 +104,6 @@ class Base extends React.Component {
 									}
 								</Message>
 							)}
-							<Footer hidden={window.location.pathname.includes('slideshow')} />
 						</ErrorBoundary>
 					</div>
 				</Router>
