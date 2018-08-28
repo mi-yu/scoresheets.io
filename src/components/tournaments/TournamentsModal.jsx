@@ -141,6 +141,7 @@ class TournamentsModal extends React.Component {
 		if (events) {
 			eventsOptions = Object.keys(events)
 				.filter(id => events[id].inRotation)
+				.sort((a, b) => events[a].name.localeCompare(events[b].name))
 				.map(id => ({ text: events[id].name, value: id }))
 		} else {
 			return <Redirect to="/dashboard" />

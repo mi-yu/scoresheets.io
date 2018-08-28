@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Form, Button, Icon, Table, Header } from 'semantic-ui-react'
+import { Form, Button, Icon, Table, Header, Popup } from 'semantic-ui-react'
 import { Redirect, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
@@ -96,9 +96,9 @@ class BulkAddTeamsPage extends React.Component {
 		})
 	}
 
-	validateRow = row => row.teamNumber !== 0 && row.school !== '' && row.division !== ''
+	rowIsValid = row => row.teamNumber && row.school !== '' && row.division !== ''
 
-	isEmpty = row => row.teamNumber !== 0 || row.school !== '' || row.division !== ''
+	rowIsEmpty = row => !row.teamNumber && row.school === '' && row.division === ''
 
 	handleSubmit = () => {
 		const { setMessage, addTeam } = this.props
@@ -108,7 +108,7 @@ class BulkAddTeamsPage extends React.Component {
 
 		try {
 			formData.forEach(row => {
-				if (!this.validateRow(row) && !this.isEmpty(row)) throw new Error()
+				if (!this.rowIsValid(row) && !this.rowIsEmpty(row)) throw new Error(row)
 			})
 		} catch (e) {
 			return setMessage(
@@ -116,7 +116,7 @@ class BulkAddTeamsPage extends React.Component {
 			)
 		}
 
-		const filteredRows = formData.filter(row => this.validateRow(row))
+		const filteredRows = formData.filter(row => this.rowIsValid(row))
 
 		request(url, {
 			method: 'POST',
@@ -165,10 +165,16 @@ class BulkAddTeamsPage extends React.Component {
 					<Table celled>
 						<Table.Header>
 							<Table.Row>
-								<Table.HeaderCell width={3}>Division</Table.HeaderCell>
-								<Table.HeaderCell width={2}>Team Number</Table.HeaderCell>
-								<Table.HeaderCell width={8}>School</Table.HeaderCell>
-								<Table.HeaderCell width={3}>Identifier</Table.HeaderCell>
+								<Table.HeaderCell width={3}>Division *</Table.HeaderCell>
+								<Table.HeaderCell width={2}>Team Number *</Table.HeaderCell>
+								<Table.HeaderCell width={8}>School *</Table.HeaderCell>
+								<Table.HeaderCell width={3}>
+									Identifier
+									<Popup
+										trigger={<Button size="mini" icon="question" floated="right" />}
+										content="Use this to distinguish between two teams from the same school (team A/B/C, team Red/Green, etc)"
+									/>
+								</Table.HeaderCell>
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
@@ -247,13 +253,6 @@ class BulkAddTeamsPage extends React.Component {
 
 BulkAddTeamsPage.propTypes = {
 	setMessage: PropTypes.func.isRequired,
-	location: PropTypes.shape({
-		state: PropTypes.object.isRequired,
-	}),
-}
-
-BulkAddTeamsPage.defaultProps = {
-	location: undefined,
 }
 
 const mapDispatchToProps = dispatch => ({

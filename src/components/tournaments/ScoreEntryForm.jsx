@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Button, Form, Table } from 'semantic-ui-react'
+import { Button, Form, Table, Popup } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import Auth from '../../modules/Auth'
 import request from '../../modules/request'
@@ -173,6 +173,20 @@ class ScoreEntryForm extends React.Component {
 		})
 	}
 
+	penaltiesPopupContent = () => {
+		const { scoresheetEntry } = this.state
+		const { scores } = scoresheetEntry
+		return (
+			<div>
+				<p>Please ensure all drops/penalties applied are accurate.</p>
+				<p>Dropped: rank 0</p>
+				<p>NS (no show): rank {scores.length + 1}</p>
+				<p>PP (participation points): rank {scores.length}</p>
+				<p>DQ (disqualification): rank {scores.length + 2}</p>
+			</div>
+		)
+	}
+
 	render() {
 		const { sortBy, sortDir, scoresheetEntry } = this.state
 		const { scores } = scoresheetEntry
@@ -212,6 +226,10 @@ class ScoreEntryForm extends React.Component {
 								width={3}
 							>
 								Drops/Penalties
+								<Popup
+									trigger={<Button icon="question" size="mini" floated="right" />}
+									content={this.penaltiesPopupContent()}
+								/>
 							</Table.HeaderCell>
 							<Table.HeaderCell
 								width={3}

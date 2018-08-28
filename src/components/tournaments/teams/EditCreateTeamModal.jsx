@@ -1,17 +1,28 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Button, Modal, Form } from 'semantic-ui-react'
+import { Button, Modal, Form, Message } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import Auth from '../../../modules/Auth'
 import { API_ROOT } from '../../../config'
 import request from '../../../modules/request'
 import { setMessage } from '../../../actions/messageActions'
 import { updateTeam, addTeam } from '../../../actions/tournamentActions'
-import { hideEditCreateModal } from '../../../actions/teamActions'
+import { hideEditCreateModal, clearCurrentTeam } from '../../../actions/teamActions'
 
 class EditCreateTeamModal extends React.Component {
 	state = {
 		currentTeam: {},
+		showModalMessage: false,
+		modalMessage: '',
+	}
+
+	componentDidMount() {
+		const { currentTeamId, currentTournament } = this.props
+		if (currentTeamId) {
+			this.setState({
+				currentTeam: currentTournament.teams.find(team => team._id === currentTeamId) || {},
+			})
+		}
 	}
 
 	handleChange = (e, { name, value }) => {
@@ -48,34 +59,51 @@ class EditCreateTeamModal extends React.Component {
 			}),
 		})
 			.then(res => {
+				this.setState({
+					showModalMessage: false,
+				})
 				const { division, teamNumber } = currentTeam
 				const message = editing ? `Successfully updated team ${division}${teamNumber}.` : `Succesfully created team ${division}${teamNumber}`
-				hideEditCreateModal()
 				setMessage(message, 'success')
+
 				if (editing) updateTeam(res)
 				else addTeam(res[0])
+
+				hideEditCreateModal()
+				clearCurrentTeam()
 			})
 			.catch(err => {
-				hideEditCreateModal()
+				let message = ''
 				if (err.name === 'BulkWriteError') {
-					setMessage('There was a problem with team creation:', 'error', this.translateBulkWriteError(err.errors))
+					message = this.translateBulkWriteError(err.errors)
 				} else {
-					setMessage(err.message, 'error')
+					message = err.message
 				}
+
+				this.setState({
+					modalMessage: message,
+					showModalMessage: true,
+				})
 			})
 	}
 
 	translateBulkWriteError = (errs) => errs.map(err => `Team ${err.op.division}${err.op.teamNumber} already exists\n`)
 
 	render() {
-		const { open, editing, hideEditCreateModal, currentTournament, currentTeamId } = this.props
-		const currentTeam = currentTournament.teams.find(team => team._id === currentTeamId) || {}
+		const { open, editing, hideEditCreateModal, clearCurrentTeam } = this.props
+		const { currentTeam, showModalMessage, modalMessage } = this.state
 
 		return (
 			<Modal
 				closeIcon
 				open={open}
-				onClose={hideEditCreateModal}
+				onClose={() => {
+					this.setState({
+						showModalMessage: false,
+					})
+					hideEditCreateModal()
+					clearCurrentTeam()
+				}}
 			>
 				<Modal.Header>
 					{editing ? `Edit Team: ${currentTeam.school}` : 'New Team'}
@@ -123,6 +151,12 @@ class EditCreateTeamModal extends React.Component {
 							/>
 						</Form.Field>
 					</Form>
+					{showModalMessage && (
+						<Message negative>
+							<Message.Header>There were problems with the team you submitted:</Message.Header>
+							<p>{modalMessage}</p>
+						</Message>
+					)}
 				</Modal.Content>
 				<Modal.Actions>
 					<Button onClick={hideEditCreateModal}>Cancel</Button>
@@ -147,6 +181,7 @@ const mapDispatchToProps = dispatch => ({
 	updateTeam: (updatedTeam) => dispatch(updateTeam(updatedTeam)),
 	addTeam: (addedTeam) => dispatch(addTeam(addedTeam)),
 	hideEditCreateModal: () => dispatch(hideEditCreateModal()),
+	clearCurrentTeam: () => dispatch(clearCurrentTeam()),
 })
 
 EditCreateTeamModal.propTypes = {

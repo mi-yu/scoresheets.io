@@ -22,10 +22,10 @@ const TeamActionsButtonGroup = ({
 	showEditCreateModal,
 }) => (
 	<Button.Group basic size={size}>
-		<Button icon style={buttonStyle}>
+		{/* <Button icon style={buttonStyle}>
 			<Icon name="trophy" size="small" />
 			<div style={buttonTextStyle}>Scores</div>
-		</Button>
+		</Button> */}
 		<Button
 			icon
 			onClick={() => {

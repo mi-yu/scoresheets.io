@@ -12,7 +12,7 @@ import { API_ROOT } from '../../config'
 import request from '../../modules/request'
 import Auth from '../../modules/Auth'
 import { setCurrentTournament } from '../../actions/tournamentActions'
-import { setMessage } from '../../actions/messageActions';
+import { setMessage } from '../../actions/messageActions'
 
 class TeamsPage extends React.Component {
 	state = {
@@ -71,7 +71,7 @@ class TeamsPage extends React.Component {
 	}
 
 	render() {
-		const { tournament, setEditingTeam, showEditCreateModal, clearCurrentTeam } = this.props
+		const { tournament, setEditingTeam, showEditCreateModal, clearCurrentTeam, currentTeamId } = this.props
 		const { displayFormat } = this.state
 
 		if (!tournament || !tournament.teams) return null
@@ -81,7 +81,7 @@ class TeamsPage extends React.Component {
 		return (
 			<div>
 				<ConfirmDeleteTeamModal />
-				<EditCreateTeamModal />
+				<EditCreateTeamModal key={currentTeamId} />
 				<Grid>
 					<Grid.Column floated="left">
 						<Header as="h2" floated="left">Teams</Header>
@@ -138,21 +138,21 @@ class TeamsPage extends React.Component {
 								{displayFormat === 'grid' ? (
 									<TeamGrid division="B" />
 								) : (
-										<TeamTable division="B" />
-									)}
+									<TeamTable division="B" />
+								)}
 								<Header as="h3">C Teams</Header>
 								{displayFormat === 'grid' ? (
 									<TeamGrid division="C" />
 								) : (
-										<TeamTable division="C" />
-									)}
+									<TeamTable division="C" />
+								)}
 							</div>
 						) : (
-								<Segment style={{ width: '100%' }} textAlign="center" basic>
+							<Segment style={{ width: '100%' }} textAlign="center" basic>
 									It looks like there are no teams here!
 									If you expect to see teams here, try refreshing.
-							</Segment>
-							)
+								</Segment>
+						)
 					}
 				</Grid>
 			</div>

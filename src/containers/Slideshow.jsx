@@ -144,19 +144,11 @@ export default class Slideshow extends React.Component {
 
 	getSweepstakesTeams = teams => {
 		const { numAwards } = this.state
-		const sorted = teams.sort((t1, t2) => t1.rank - t2.rank)
 
-		const usedSchools = new Set()
-		const finalTeams = []
-
-		sorted.forEach(team => {
-			if (!usedSchools.has(team.school)) {
-				finalTeams.push(team)
-				usedSchools.add(team.school)
-			}
-		})
-
-		return finalTeams.splice(0, Math.min(finalTeams.length, numAwards))
+		return teams
+			.sort((t1, t2) => t1.rank - t2.rank)
+			.splice(0, Math.min(teams.length, numAwards * 2))
+			.reverse()
 	}
 
 	render() {
