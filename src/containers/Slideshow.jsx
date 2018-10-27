@@ -43,6 +43,7 @@ export default class Slideshow extends React.Component {
 		this.state = {
 			...props,
 			numAwards: qs.parse(props.location.search).numAwards || 4,
+			sweepstakesBySchool: qs.parse(props.location.search).sweepstakesBySchool === 'true',
 		}
 	}
 
@@ -143,12 +144,65 @@ export default class Slideshow extends React.Component {
 	}
 
 	getSweepstakesTeams = teams => {
-		const { numAwards } = this.state
+		const { numAwards, sweepstakesBySchool } = this.state
+
+		const sortByRank = (t1, t2) => t1.rank - t2.rank
+
+		if (sweepstakesBySchool) {
+			const cTeams = teams.filter(team => team.division === 'C').sort(sortByRank)
+			const bTeams = teams.filter(team => team.division === 'B').sort(sortByRank)
+			const reassignRanks = (team, i) => {
+				team.rank = i + 1
+			}
+
+			const seenC = {}
+			let filteredCTeams = cTeams.filter(team => {
+				const seen = seenC[team.school.substring(0, team.school.length - 2)]
+				seenC[team.school.substring(0, team.school.length - 2)] = true
+				return !seen
+			})
+
+			filteredCTeams.forEach(reassignRanks)
+
+			const seenB = {}
+			let filteredBTeams = bTeams.filter(team => {
+				const seen = seenB[team.school.substring(0, team.school.length - 2)]
+				seenB[team.school.substring(0, team.school.length - 2)] = true
+				return !seen
+			})
+
+			filteredBTeams.forEach(reassignRanks)
+
+			filteredBTeams = filteredBTeams.splice(0, Math.min(filteredBTeams.length, numAwards)).reverse()
+			filteredCTeams = filteredCTeams.splice(0, Math.min(filteredCTeams.length, numAwards)).reverse()
+
+			return filteredBTeams.concat(filteredCTeams)
+		}
 
 		return teams
-			.sort((t1, t2) => t1.rank - t2.rank)
+			.sort(sortByRank)
 			.splice(0, Math.min(teams.length, numAwards * 2))
 			.reverse()
+			.sort((t1, t2) => t1.division.localeCompare(t2.division))
+	}
+
+	renderSweepstakesTeam = team => {
+		const { sweepstakesBySchool } = this.state
+
+		if (sweepstakesBySchool) {
+			return (
+				<Text textAlign="center" textSize="64px">
+					{team.school}
+				</Text>
+			)
+		}
+
+		return (
+			<Text textAlign="center" textSize="64px">
+				{team.division}
+				{team.teamNumber} ({team.displayName})
+			</Text>
+		)
 	}
 
 	render() {
@@ -182,11 +236,7 @@ export default class Slideshow extends React.Component {
 							Sweepstakes {team.division} - {getRankSuffix(team.rank)} Place
 						</Heading>
 						<Appear>
-							<Text textAlign="center" textSize="64px">
-								{team.division}
-								{team.teamNumber} ({team.school}
-								{team.identifier ? ` ${team.identifier}` : ''})
-							</Text>
+							{this.renderSweepstakesTeam(team)}
 						</Appear>
 					</Slide>
 				))}
@@ -202,7 +252,7 @@ export default class Slideshow extends React.Component {
 
 Slideshow.propTypes = {
 	location: PropTypes.shape({
-		state: PropTypes.object.isRequired,
+		search: PropTypes.string,
 	}),
 	match: PropTypes.shape({
 		params: PropTypes.object.isRequired,

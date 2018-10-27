@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Redirect, Link } from 'react-router-dom'
-import { Header, Button, Icon, Dropdown } from 'semantic-ui-react'
+import { Header, Button, Icon, Dropdown, Checkbox } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import Auth from '../modules/Auth'
 import request from '../modules/request'
@@ -33,6 +33,7 @@ class TournamentManagementPage extends React.Component {
 		super(props)
 		this.state = {
 			loading: true,
+			sweepstakesBySchool: false,
 		}
 	}
 
@@ -73,12 +74,18 @@ class TournamentManagementPage extends React.Component {
 		this.setState({ [name]: value })
 	}
 
+	handleCheck = (e, { name, checked }) => {
+		console.log(name, checked)
+		this.setState({ [name]: checked })
+	}
+
 	render() {
 		const { tournament } = this.props
 		const {
 			redirectToLogin,
 			numAwards,
 			loading,
+			sweepstakesBySchool,
 		} = this.state
 
 		if (redirectToLogin) return <Redirect to="/users/login" />
@@ -113,28 +120,38 @@ class TournamentManagementPage extends React.Component {
 					<Icon name="trophy" />
 					C Results
 				</Button>
-				<Button.Group size="tiny">
-					<Dropdown
-						button
-						text={numAwards ? `${numAwards} awards` : 'Choose number of awards'}
-						name="numAwards"
-						options={awardsOptions}
-						onChange={this.handleChange}
-						value={numAwards}
+				<div>
+					<Checkbox
+						name="sweepstakesBySchool"
+						checked={sweepstakesBySchool}
+						onChange={this.handleCheck}
+						label="Award sweepstakes by school"
+						style={{ display: 'block', margin: '1em 0' }}
 					/>
-					<Button
-						icon
-						primary
-						labelPosition="right"
-						as={Link}
-						to={`/tournaments/${tournament._id}/slideshow?numAwards=${numAwards || 4}`}
-						rel="noopener noreferrer"
-						target="_blank"
-					>
-						{'Start Awards Presentation'}
-						<Icon name="right arrow" />
-					</Button>
-				</Button.Group>
+					<Button.Group size="tiny">
+						<Dropdown
+							button
+							text={numAwards ? `${numAwards} awards` : 'Choose number of awards'}
+							name="numAwards"
+							options={awardsOptions}
+							onChange={this.handleChange}
+							value={numAwards}
+						/>
+						<Button
+							icon
+							primary
+							labelPosition="right"
+							as={Link}
+							to={`/tournaments/${tournament._id}/slideshow?numAwards=${numAwards || 4}&sweepstakesBySchool=${sweepstakesBySchool}`}
+							rel="noopener noreferrer"
+							target="_blank"
+						>
+							{'Start Awards Presentation'}
+							<Icon name="right arrow" />
+						</Button>
+					</Button.Group>
+
+				</div>
 			</div>
 		)
 	}
