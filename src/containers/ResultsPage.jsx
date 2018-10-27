@@ -189,7 +189,7 @@ class ResultsPage extends React.Component {
 						onClick={this.postCSV(populatedTeams)}
 					>
 							Generate CSV
-					</Button>
+						</Button>
 				)}
 				<Table celled collapsing size="small" compact>
 					<Table.Header>
