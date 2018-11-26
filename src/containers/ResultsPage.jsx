@@ -31,11 +31,11 @@ class ResultsPage extends React.Component {
 			`${API_ROOT}/tournaments/${tournamentId}`,
 		]
 		const requests = urls.map(url => request(url, {
-				method: 'GET',
-				headers: new Headers({
-					Authorization: `Bearer ${token}`,
-				}),
+			method: 'GET',
+			headers: new Headers({
+				Authorization: `Bearer ${token}`,
 			}),
+		}),
 		)
 
 		Promise.all(requests)
@@ -147,7 +147,7 @@ class ResultsPage extends React.Component {
 						style={{ marginTop: '1em' }}
 						onClick={this.postCSV(populatedTeams)}
 					>
-						Generate CSV
+							Generate CSV
 					</Button>
 				)}
 				<Table celled collapsing size="small" compact>
