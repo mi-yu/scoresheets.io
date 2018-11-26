@@ -6,6 +6,7 @@ import qs from 'qs'
 import Auth from '../modules/Auth'
 import request from '../modules/request'
 import { API_ROOT } from '../config'
+import populateScores from '../lib/scores/populateScores';
 
 const theme = createTheme(
 	{
@@ -70,7 +71,7 @@ export default class Slideshow extends React.Component {
 				this.setState({
 					topTeamsPerEvent: this.getTopTeamsPerEvent(scoresheets),
 					tournament,
-					sweepstakes: this.getSweepstakesTeams(teams),
+					sweepstakes: this.getSweepstakesTeams(scoresheets, teams),
 				})
 			})
 			.catch(err => {
@@ -107,7 +108,7 @@ export default class Slideshow extends React.Component {
 			})
 
 			// Take at most the top n scores, throwing out drops.
-			entry.scores = entry.scores.slice(
+			entry.topScores = entry.scores.slice(
 				0,
 				Math.min(numAwards, entry.scores.length - drops, entry.scores.length),
 			)
@@ -143,18 +144,18 @@ export default class Slideshow extends React.Component {
 		return filteredEntries
 	}
 
-	getSweepstakesTeams = teams => {
+	getSweepstakesTeams = (scoresheets, teams) => {
 		const { numAwards, sweepstakesBySchool } = this.state
 
-		const sortByRank = (t1, t2) => t1.rank - t2.rank
+		const bScores = scoresheets.filter(entry => entry.division === 'B')
+		const cScores = scoresheets.filter(entry => entry.division === 'C')
+		const bTeams = populateScores(bScores, teams.filter(team => team.division === 'B'))
+		const cTeams = populateScores(cScores, teams.filter(team => team.division === 'C'))
 
 		if (sweepstakesBySchool) {
-			const cTeams = teams.filter(team => team.division === 'C').sort(sortByRank)
-			const bTeams = teams.filter(team => team.division === 'B').sort(sortByRank)
-			const reassignRanks = (team, i) => {
-				team.rank = i + 1
+			const reassignRank = (team, i) => {
+				team.rank = i + 1;
 			}
-
 			const seenC = {}
 			let filteredCTeams = cTeams.filter(team => {
 				const seen = seenC[team.school.substring(0, team.school.length - 2)]
@@ -162,7 +163,7 @@ export default class Slideshow extends React.Component {
 				return !seen
 			})
 
-			filteredCTeams.forEach(reassignRanks)
+			filteredCTeams.forEach(reassignRank)
 
 			const seenB = {}
 			let filteredBTeams = bTeams.filter(team => {
@@ -171,16 +172,20 @@ export default class Slideshow extends React.Component {
 				return !seen
 			})
 
-			filteredBTeams.forEach(reassignRanks)
+			filteredBTeams.forEach(reassignRank)
 
-			filteredBTeams = filteredBTeams.splice(0, Math.min(filteredBTeams.length, numAwards)).reverse()
-			filteredCTeams = filteredCTeams.splice(0, Math.min(filteredCTeams.length, numAwards)).reverse()
+			filteredBTeams = filteredBTeams
+				.splice(0, Math.min(filteredBTeams.length, numAwards))
+				.reverse()
+			filteredCTeams = filteredCTeams
+				.splice(0, Math.min(filteredCTeams.length, numAwards))
+				.reverse()
 
 			return filteredBTeams.concat(filteredCTeams)
 		}
 
-		return teams
-			.sort(sortByRank)
+		return [...bTeams, ...cTeams]
+			.sort((t1, t2) => t1.rank - t2.rank)
 			.splice(0, Math.min(teams.length, numAwards * 2))
 			.reverse()
 			.sort((t1, t2) => t1.division.localeCompare(t2.division))
@@ -219,8 +224,8 @@ export default class Slideshow extends React.Component {
 						<Heading size={4} padding="50px">
 							{entry.event.name} {entry.division}
 						</Heading>
-						{entry.scores.map((score, n) => (
-							<Appear order={entry.scores.length - n - 1}>
+						{entry.topScores.map((score, n) => (
+							<Appear order={entry.topScores.length - n - 1}>
 								<Text textAlign="center">
 									{n + 1}. {score.team.division}
 									{score.team.teamNumber} ({score.team.school}
@@ -235,9 +240,7 @@ export default class Slideshow extends React.Component {
 						<Heading size={4} padding="50px">
 							Sweepstakes {team.division} - {getRankSuffix(team.rank)} Place
 						</Heading>
-						<Appear>
-							{this.renderSweepstakesTeam(team)}
-						</Appear>
+						<Appear>{this.renderSweepstakesTeam(team)}</Appear>
 					</Slide>
 				))}
 				<Slide>
