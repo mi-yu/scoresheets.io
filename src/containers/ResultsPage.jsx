@@ -8,6 +8,7 @@ import { API_ROOT, RESULTS_MANAGER_API_URL } from '../config'
 import request from '../modules/request'
 import ResultsUnauthorized from './errors/ResultsUnauthorized'
 import { setMessage } from '../actions/messageActions'
+import populateScores from '../lib/scores/populateScores'
 
 class ResultsPage extends React.Component {
 	constructor(props) {
@@ -39,7 +40,8 @@ class ResultsPage extends React.Component {
 
 		Promise.all(requests)
 			.then(([entries, teams, tournament]) => {
-				const sortedEntries = entries.sort((a, b) => a.event.name.localeCompare(b.event.name))
+				const sortedEntries = entries.sort((a, b) => a.event.name.localeCompare(b.event.name),
+				)
 				this.setState({
 					entries: sortedEntries,
 					teams,
@@ -55,58 +57,7 @@ class ResultsPage extends React.Component {
 			})
 	}
 
-	breakTie = (t1, t2) => {
-		const MAX_PLACES = 10
-		let currentPlace = 1
-		let tieBroken = false
-
-		let t1Count = 0
-		let t2Count = 0
-
-		while (!tieBroken && currentPlace <= MAX_PLACES) {
-			t1Count = this.countOccurrences(t1.scores, currentPlace)
-			t2Count = this.countOccurrences(t2.scores, currentPlace)
-			if (t1Count - t2Count !== 0) tieBroken = true
-			else currentPlace += 1
-		}
-
-		return t2Count - t1Count
-	}
-
-	countOccurrences = (scores, target) => (
-		scores.reduce((total, score) => total + Number(score === target), 0)
-	)
-
-	populateScores = (entries, teams) => {
-		let totalScore = 0
-		teams.forEach(team => {
-			team.scores = []
-			entries.forEach(entry => {
-				entry.scores.forEach(score => {
-					if (score.team._id === team._id) {
-						team.scores.push(score.rank || 0)
-						totalScore += score.rank || 0
-					}
-				})
-			})
-			team.totalScore = totalScore
-			totalScore = 0
-		})
-
-		teams.sort((t1, t2) => {
-			const scoreDiff = t1.totalScore - t2.totalScore
-			if (scoreDiff === 0) return this.breakTie(t1, t2)
-			return scoreDiff
-		})
-
-		teams.forEach((team, index) => {
-			team.rank = index + 1
-		})
-
-		return teams
-	}
-
-	postCSV = (populatedTeams) => () => {
+	postCSV = populatedTeams => () => {
 		const { entries, tournament } = this.state
 		const { setMessage, match } = this.props
 		const { division } = match.params
@@ -138,10 +89,14 @@ class ResultsPage extends React.Component {
 				division,
 			}),
 		})
-			.then((res) => {
-				this.setState({ resultsLoading: false, resultsGenerated: true, resultsLink: res.link })
+			.then(res => {
+				this.setState({
+					resultsLoading: false,
+					resultsGenerated: true,
+					resultsLink: res.link,
+				})
 			})
-			.catch((err) => {
+			.catch(err => {
 				setMessage(JSON.stringify(err), 'error')
 				this.setState({ resultsLoading: false })
 			})
@@ -150,24 +105,28 @@ class ResultsPage extends React.Component {
 	render() {
 		const { match } = this.props
 		const { division } = match.params
-		const { entries, teams, tournament, unauthorized, resultsLoading, resultsGenerated, resultsLink } = this.state
+		const {
+			entries,
+			teams,
+			tournament,
+			unauthorized,
+			resultsLoading,
+			resultsGenerated,
+			resultsLink,
+		} = this.state
 		if (unauthorized) return <ResultsUnauthorized />
 		if (!entries) return null
 
-		const populatedTeams = this.populateScores(entries, teams)
+		const populatedTeams = populateScores(entries, teams)
 
 		return (
 			<div id="results-table">
 				<Breadcrumb>
 					<Breadcrumb.Section>
-						<Link to={`/tournaments/${tournament._id}`}>
-							{tournament.name}
-						</Link>
+						<Link to={`/tournaments/${tournament._id}`}>{tournament.name}</Link>
 					</Breadcrumb.Section>
 					<Breadcrumb.Divider />
-					<Breadcrumb.Section>
-						Division {division} Results
-					</Breadcrumb.Section>
+					<Breadcrumb.Section>Division {division} Results</Breadcrumb.Section>
 				</Breadcrumb>
 				<br />
 				{resultsGenerated ? (
@@ -189,7 +148,7 @@ class ResultsPage extends React.Component {
 						onClick={this.postCSV(populatedTeams)}
 					>
 							Generate CSV
-						</Button>
+					</Button>
 				)}
 				<Table celled collapsing size="small" compact>
 					<Table.Header>
@@ -211,10 +170,11 @@ class ResultsPage extends React.Component {
 							<Table.Row key={team._id}>
 								<Table.Cell>
 									{team.division}
-									{team.teamNumber}{' '}
-									{`(${team.displayName})`}
+									{team.teamNumber} {`(${team.displayName})`}
 								</Table.Cell>
-								{team.scores.map(score => <Table.Cell>{score}</Table.Cell>)}
+								{team.scores.map(score => (
+									<Table.Cell>{score}</Table.Cell>
+								))}
 								<Table.Cell>{team.totalScore}</Table.Cell>
 								<Table.Cell>{team.rank}</Table.Cell>
 							</Table.Row>
