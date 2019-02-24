@@ -3,6 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"dependencies": {
+		"csv-parse": "^4.3.0",
 		"node-sass-chokidar": "^1.3.3",
 		"prop-types": "^15.6.0",
 		"qs": "^6.5.2",

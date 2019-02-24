@@ -1,8 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Breadcrumb, Checkbox, Segment } from 'semantic-ui-react'
+import { Breadcrumb, Checkbox, Segment, Button } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
+import csvParse from 'csv-parse/lib/es5/sync'
 import Auth from '../modules/Auth'
 import request from '../modules/request'
 import { setMessage } from '../actions/messageActions'
@@ -10,10 +11,14 @@ import { API_ROOT } from '../config'
 import ScoreEntryForm from '../components/tournaments/ScoreEntryForm'
 
 class ScoreEntryPage extends React.Component {
-	state = {
-		scoresheetEntry: {
-			scores: [],
-		},
+	constructor(props) {
+		super(props)
+		this.fileReader = new FileReader()
+		this.state = {
+			scoresheetEntry: {
+				scores: [],
+			},
+		}
 	}
 
 	componentDidMount() {
@@ -40,6 +45,34 @@ class ScoreEntryPage extends React.Component {
 			.catch(err => {
 				setMessage(err.message, 'error')
 			})
+	}
+
+	handleReadFile = () => {
+		// TODO: finish this
+		const { scoresheetEntry } = this.state
+		const scores = scoresheetEntry.scores.slice()
+
+		const parsed = csvParse(this.fileReader.result)
+
+		parsed.forEach(pair => {
+			const teamNumber = Number(pair[0])
+			const rawScore = Number(pair[1])
+			const idx = scores.map(score => score.team.teamNumber).indexOf(teamNumber)
+			scores[idx].rawScore = rawScore
+		})
+
+		this.setState({
+			scoresheetEntry: {
+				...scoresheetEntry,
+				scores,
+			},
+		})
+	}
+
+	handleCSVUpload = e => {
+		this.fileReader = new FileReader()
+		this.fileReader.onloadend = this.handleReadFile
+		this.fileReader.readAsText(e.target.files[0])
 	}
 
 	toggleScoresheetLock = () => {
@@ -115,7 +148,25 @@ class ScoreEntryPage extends React.Component {
 						alignItems: 'flex-start',
 					}}
 				>
-					<label style={{ fontSize: '1.2em', marginRight: '1em' }}>Lock Scores</label>
+					<label
+						htmlFor="upload"
+					>
+						<Button
+							icon="upload"
+							label={{
+								basic: true,
+								content: 'Import CSV',
+							}}
+							labelPosition="right"
+						/>
+						<input
+							hidden
+							id="upload"
+							type="file"
+							onChange={this.handleCSVUpload}
+						/>
+					</label>
+					<label style={{ fontSize: '1.2em', marginRight: '1em' }} htmlFor="lock scores">Lock Scores</label>
 					<Checkbox toggle name="locked" checked={locked} onChange={this.toggleScoresheetLock} />
 				</div>
 				{
